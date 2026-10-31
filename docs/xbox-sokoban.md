@@ -1,9 +1,9 @@
 # Sokoban puzzle repairs
 
-Latest status (October 29): the normal texture-retirement build passes the full
-prepared set from level one through thirteen and natural wrap, with 2,728 moves
-and 628 pushes checked. Older corruption observations below concern pre-fix
-binaries. The installed Xbox archive remains the level-ten-only repair; full-set
+Latest status (October 31): the full prepared set now passes both the earlier
+SDL run and a [current native-graphics controller run](#native-full-set-controller-run-october-31-2026)
+from level one through thirteen and natural wrap, with 2,728 moves and 628 pushes
+checked. The installed Xbox archive remains the level-ten-only repair; full-set
 physical/controller and audio qualification are still open.
 
 Gammastr20's [Sokoban](https://scratch.mit.edu/projects/24490009/) has passed
@@ -319,3 +319,37 @@ See the [rendering-fix validation](xbox-texture-retirement.md).
 The physical Xbox still has the earlier `efdbc005...` level-ten-only repair.
 This emulator result neither changes that installation nor proves controller
 transport, audio, FPS, all-thirteen full-image pixel equality, or 64MB support.
+
+## Native full-set controller run (October 31, 2026)
+
+Normal runtime `c7c0a9d9…` completes the same `8253ed9a…` prepared archive in
+one fresh xemu process, using native NV2A graphics/windowing and **SDL3 audio**.
+The guest is configured for 128MB. Inputs use the emulated USB controller;
+no game state or input vector is written.
+
+- All thirteen puzzles complete naturally, including the repaired goal scans,
+  and wrap to level one at **2,728 moves / 628 pushes**. Every player/map state
+  matches the independent route.
+- All 2,715 nonfinal moves pass settled tile-center checks. Thirteen initial /
+  Black-restart pairs are identical across the complete image. Another 2,717
+  comparisons find no unexpected RGB changes outside changed/player cells
+  (with a four-pixel margin) and the monitor sidebar; this does not establish
+  complete expected-frame equality.
+- The wrapped playfield matches the first board across 755,136 pixels,
+  excluding the updated move counter. Green Flag restores the exact initial
+  screen; another Up push and Black restart work. A fresh browser relaunch
+  repeats the initial image and push, followed by a second clean, stable return
+  to the exact 21-game browser.
+
+A 10.037-second APU music excerpt matches the unchanged authored song at
+correlation 0.99487, without pitch/time fitting, clipping or zero 256-frame
+blocks. This checks the SDL3 audio path, not native XboxAudio, HDMI/TV listening
+or long-run continuity. Paused emulator observations are not FPS measurements.
+
+Early scanout, a short counter-observation deadline and an unavailable debugger
+field produced retained observer failures; later read-only observations verified
+progress and correct images without changing runtime code. Private evidence is
+under ignored `build-xbox/sokoban-native-fullset-20261031/`, summarized in
+`final-review.json`. The owned guest is closed and its private base disk is
+unchanged. The physical full-set installation/playthrough remains open; this
+run adds no physical, expanded-graphics or retail-64MB acceptance.
