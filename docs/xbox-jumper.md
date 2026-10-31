@@ -98,14 +98,36 @@ diagnostic transitions do not substitute for playing the regenerated game to vic
 
 The regenerated full game also passes A-to-play, movement/jumping, Black and
 Y+Black restart before victory, held-A Green Flag replay, and two fresh launch/exit
-cycles on the private disk. A complete win on this regenerated archive and physical
-installation remain open. Private evidence is in
+cycles on the private disk. Private evidence is in
 `build-xbox/jumper-victory-timer-20261031/`, especially `clock-comparison-review.json`,
 `fixed-jumper-smoke-review.json` and `archive-delta-audit.json`.
 
+#### Full timer-fixed playthrough
+
+A subsequent fresh native run of archive `cb9ff899…` clears all twenty courses
+through ordinary controller play and reaches the visible win. The timer remains
+stopped across a separate neutral observation. **Y+Black directly after this win
+returns to course 1 with a running timer**, advancing from 1.2 to 3.0 in the next
+observation. This verifies the repair in the full game as well as the clock fixture.
+
+The run includes an authored Black restart on course 13 to take the lower route;
+the unsuccessful upper-ledge attempt is retained. No game-state writes or saved
+gameplay state are used. Read-only Player-loop inspection derives the current
+bytecode boundary instead of assuming indices from an earlier load.
+
+Held-A Green Flag replay then restores Play, A starts a new round, movement and
+jumping resume, Black restarts the level, and held-A Exit leaves zero project
+sprites and a stable browser. This private disk has the usual 21 games plus two
+unselected clock diagnostics. No console archive, executable or settings were changed.
+
+Evidence: `build-xbox/jumper-fixed-fullrun-20261031/`, including `receipt.json`,
+`victory-and-restart-review.json`, `replay-and-close-review.json`, the original
+screenshots and failed-route reviews. These emulator checks close the regenerated
+archive's full-win/restart/replay gate; they add no hardware, frame-rate or audio acceptance.
+
 ## Still needed
 
-- Complete a full win/replay cycle on the regenerated timer-fix archive.
+- Install the regenerated archive and repeat victory/Y+Black/Green Flag on the Xbox.
 - Repeat later-course gameplay on the physical Xbox. Emulator frame budgets are
   not Xbox FPS, smoothness, audio or retail 64 MB qualification.
 - Repeat the historical second-Exit handoff on current native hardware; prior
