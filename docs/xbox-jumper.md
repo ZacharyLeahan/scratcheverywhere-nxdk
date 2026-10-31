@@ -46,30 +46,66 @@ Private evidence: ignored `build-xbox/jumper-native-fullrun-20261031/`, especial
 `fixture-install-receipt.json`, `review-progress.json`, controller/QMP histories,
 original screenshots and failed-route reviews.
 
-### Current-build repeat
+### Current-build full run
 
 The normal current-main build, XBE `c7c0a9d9…` from the code merged through
 [PR 55](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/55), also
-clears **courses 1–19** with native graphics/windowing. This fresh run starts
+clears **all twenty courses** with native graphics/windowing. This fresh run starts
 from the browser with the same prepared archive and controller profile above;
 it includes the [color-boundary correction](xbox-color-self-alpha.md).
-The final stage's two opening ledges and lower underpass pass again, but
-victory and post-victory replay remain unverified.
+The final route uses wall jumps to reach the left column's black cap, jumps over
+the upper lava, lands in a safe gap and walks under the last obstacle. The visible
+**“You Win!!!”** scene settles at level 21. Its authored timer stays at 90.8 during
+a separate 240-frame neutral observation; this is not a performance measurement.
 
-Short automated jump holds needed longer presses, and routes needed adjusting
-for different entry heights. Natural deaths and wall-jump recovery are retained
-in the evidence. These adjustments change only the test controls; no game or
-engine repair, gameplay-state writes or saved-state loading were used. Read-only
-collision-image inspection supports route planning, not a gameplay pass.
+Natural deaths, wall-jump recovery and failed routes are retained. Read-only
+thread inspection identifies completed movement loops for controller feedback;
+an input change arriving one loop late stops the planned sequence. Neither host
+route predictions nor intermediate collision probes count as gameplay passes.
+No game-state writes, saved-state loading or engine repair were used to win.
+
+After the restart issue below, the pause menu's held-A Green Flag confirmation
+returns to Play. A starts a new game, its timer advances, jumping works and Black
+restarts the level. Held-A Exit returns to exactly 21 browser entries / 42 buttons
+with zero project sprites, and another neutral interval leaves that browser stable.
 
 Private evidence: `build-xbox/jumper-c7-fullrun-20261031/`, including
 `receipt.json`, `checkpoint.json`, per-course reviews and `end-state-audit.json`.
-Both preserved test guests end paused with controls released. This repeat adds
-no physical-console, audio, smoothness or frame-rate qualification.
+The completed current-build guest closes with controls released; the earlier
+baseline run remains paused. This adds no physical-console, audio, smoothness or
+frame-rate qualification.
+
+### Post-victory restart timer
+
+On the installed prepared copy, Y+Black after winning returns to course 1 but
+leaves Timer at zero. The original `Text1` victory branch permanently stops its
+clock; the authored Restart handler only resets its value. This is project logic,
+not an Xbox runtime or input defect. Green Flag replay restores the clock.
+
+`scripts/prepare-jumper.py` now replaces that one victory stop with a wait until
+the level leaves 21. It keeps the existing single clock alive without starting a
+second timer on ordinary restarts. Movement, assets, credits and the controller
+profile are unchanged. The generated archive is SHA-256
+`cb9ff89903dffd3899e07b483ce24b29fc498ebdee0f4adeb7bedcea01e76a3f`;
+the profile retains `454f1e88…` above. Existing installations need the regenerated
+archive copied over; updating the executable alone does not apply this repair.
+
+Four archive-integrity/revision-guard tests pass. Separate old/fixed clock fixtures
+run under the unchanged normal native executable: the old script reproduces the
+failure; the fixed script passes victory freeze, post-win restart, three ordinary
+restart cycles at a single-clock rate, and a second win/restart. These authored
+diagnostic transitions do not substitute for playing the regenerated game to victory.
+
+The regenerated full game also passes A-to-play, movement/jumping, Black and
+Y+Black restart before victory, held-A Green Flag replay, and two fresh launch/exit
+cycles on the private disk. A complete win on this regenerated archive and physical
+installation remain open. Private evidence is in
+`build-xbox/jumper-victory-timer-20261031/`, especially `clock-comparison-review.json`,
+`fixed-jumper-smoke-review.json` and `archive-delta-audit.json`.
 
 ## Still needed
 
-- Complete the final stage and verify the visible win, timer stop and replay.
+- Complete a full win/replay cycle on the regenerated timer-fix archive.
 - Repeat later-course gameplay on the physical Xbox. Emulator frame budgets are
   not Xbox FPS, smoothness, audio or retail 64 MB qualification.
 - Repeat the historical second-Exit handoff on current native hardware; prior
