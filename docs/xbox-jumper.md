@@ -46,6 +46,27 @@ Private evidence: ignored `build-xbox/jumper-native-fullrun-20261031/`, especial
 `fixture-install-receipt.json`, `review-progress.json`, controller/QMP histories,
 original screenshots and failed-route reviews.
 
+### Current-build repeat
+
+The normal current-main build, XBE `c7c0a9d9…` from the code merged through
+[PR 55](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/55), also
+clears **courses 1–19** with native graphics/windowing. This fresh run starts
+from the browser with the same prepared archive and controller profile above;
+it includes the [color-boundary correction](xbox-color-self-alpha.md).
+The final stage's two opening ledges and lower underpass pass again, but
+victory and post-victory replay remain unverified.
+
+Short automated jump holds needed longer presses, and routes needed adjusting
+for different entry heights. Natural deaths and wall-jump recovery are retained
+in the evidence. These adjustments change only the test controls; no game or
+engine repair, gameplay-state writes or saved-state loading were used. Read-only
+collision-image inspection supports route planning, not a gameplay pass.
+
+Private evidence: `build-xbox/jumper-c7-fullrun-20261031/`, including
+`receipt.json`, `checkpoint.json`, per-course reviews and `end-state-audit.json`.
+Both preserved test guests end paused with controls released. This repeat adds
+no physical-console, audio, smoothness or frame-rate qualification.
+
 ## Still needed
 
 - Complete the final stage and verify the visible win, timer stop and replay.
