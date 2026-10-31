@@ -58,7 +58,7 @@ this common cycle does not repeat every full-game objective.
 | [Hill Climb Racing](xbox-hill-climb.md) | Jeep 1,000; motorcycle 420; fuel pickup, airtime/crash, vehicle swap/replay | Launch cycle | Extended terrain; precise brake/air control; audio |
 | [Mario](xbox-mario.md) | Four opening pipes; Goomba/pit death and automatic recovery; replay/relaunch | Current native full level without deaths; flagpole/fireworks/fade, natural replay, Green Flag and two clean returns; short intro Back taps | Hardware full level/native Back behavior; subjective audio and performance |
 | Doodle Jump ([checklist](xbox-game-qualification.md)) | At least 1,044 m; both edge wraps; fall/replay/relaunch | Launch cycle | Monsters, longer play and audio |
-| [Jumper](xbox-jumper.md) | Levels 1–4; lava death, restart/replay; readiness-guard exits | Native baseline `eb3492c2…` and current `c7c0a9d9…` each clear courses 1–19 and final-stage ledges/underpass; natural deaths/respawns | Final-stage win/replay; later hardware levels; historical second-Exit handoff needs repeat; audio |
+| [Jumper](xbox-jumper.md) | Levels 1–4; lava death, restart/replay; readiness-guard exits | Current native `c7c0a9d9…` clears all 20 courses; visible win/stopped timer, Green Flag replay, renewed jumping/Black restart and clean browser return | Full win on regenerated timer-fix archive; later hardware levels; post-win Y+Black timer repair needs installation; historical second-Exit handoff; audio |
 | Connect Four ([checklist](xbox-game-qualification.md)) | Both players; horizontal/vertical/diagonal wins; full-column rejection/replay | Launch cycle | One unexplained initial mouse-mode launch; no authored playback |
 
 ## Performance and audio
