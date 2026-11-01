@@ -94,10 +94,12 @@ def prepare(source, output):
         raise ValueError("Unexpected project revision: expected the authored guarded level click.")
     choice = "xbox_level_choice"
     results_active = "xbox_results_menu_active"
-    if any(key in stage["variables"] for key in [choice, results_active]) or any(t["name"] == "Xbox level menu" for t in project["targets"]):
+    results_ready = "xbox_results_menu_ready"
+    if any(key in stage["variables"] for key in [choice, results_active, results_ready]) or any(t["name"] == "Xbox level menu" for t in project["targets"]):
         raise ValueError("This project already has the Xbox level menu.")
     stage["variables"][choice] = ["Xbox level choice", 1]
     stage["variables"][results_active] = ["Xbox results menu active", 0]
+    stage["variables"][results_ready] = ["Xbox results menu ready", 0]
 
     # Copy the original guarded click chain, preserving its lock checks and
     # identify call. Only the selected menu clone receives the new key shortcut.
@@ -136,8 +138,10 @@ def prepare(source, output):
     costume_name = extra.add("looks_costumenumbername", fields={"NUMBER_NAME": ["name", None]})
     menu_button = extra.add("operator_equals", {"OPERAND1": [2, costume_name], "OPERAND2": literal("button")})
     active = extra.add("operator_equals", {"OPERAND1": variable("Xbox results menu active", results_active), "OPERAND2": literal(1)})
+    ready = extra.add("operator_equals", {"OPERAND1": variable("Xbox results menu ready", results_ready), "OPERAND2": literal(1)})
+    enabled = extra.add("operator_and", {"OPERAND1": [2, active], "OPERAND2": [2, ready]})
     in_game = extra.add("operator_equals", {"OPERAND1": variable("page", page), "OPERAND2": literal("game")})
-    ending = extra.add("operator_and", {"OPERAND1": [2, active], "OPERAND2": [2, in_game]})
+    ending = extra.add("operator_and", {"OPERAND1": [2, enabled], "OPERAND2": [2, in_game]})
     condition = extra.add("operator_and", {"OPERAND1": [2, ending], "OPERAND2": [2, menu_button]})
     guard = extra.add("control_if", {"CONDITION": [2, condition], "SUBSTACK": [2, body]})
     extra.hat("event_whenkeypressed", {"KEY_OPTION": ["a", None]}, guard)
@@ -148,12 +152,25 @@ def prepare(source, output):
     helper = Blocks("xbox_level_menu_")
     reset = helper.add("data_setvariableto", {"VALUE": literal(1)}, {"VARIABLE": ["Xbox level choice", choice]})
     reset_results = helper.add("data_setvariableto", {"VALUE": literal(0)}, {"VARIABLE": ["Xbox results menu active", results_active]})
-    helper.hat("event_whenflagclicked", {}, helper.chain(reset, reset_results))
+    reset_ready = helper.add("data_setvariableto", {"VALUE": literal(0)}, {"VARIABLE": ["Xbox results menu ready", results_ready]})
+    helper.hat("event_whenflagclicked", {}, helper.chain(reset, reset_ready, reset_results))
     broadcasts = stage["broadcasts"]
     for message, state in [("ready", 0), ("hide signs", 0), ("game won", 1), ("game lost", 1)]:
         broadcast = next(key for key, name in broadcasts.items() if name == message)
+        disarm = helper.add("data_setvariableto", {"VALUE": literal(0)}, {"VARIABLE": ["Xbox results menu ready", results_ready]})
         set_active = helper.add("data_setvariableto", {"VALUE": literal(state)}, {"VARIABLE": ["Xbox results menu active", results_active]})
-        helper.hat("event_whenbroadcastreceived", {"BROADCAST_OPTION": [message, broadcast]}, set_active)
+        steps = [disarm, set_active]
+        if state:
+            # A Watergirl steering hold must not skip the ending screen. Arm
+            # Menu only after release; its next key edge is a deliberate press.
+            key = helper.add("sensing_keyoptions", fields={"KEY_OPTION": ["a", None]})
+            helper.blocks[key]["shadow"] = True
+            pressed = helper.add("sensing_keypressed", {"KEY_OPTION": [1, key]})
+            released = helper.add("operator_not", {"OPERAND": [2, pressed]})
+            wait = helper.add("control_wait_until", {"CONDITION": [2, released]})
+            arm = helper.add("data_setvariableto", {"VALUE": literal(1)}, {"VARIABLE": ["Xbox results menu ready", results_ready]})
+            steps.extend([wait, arm])
+        helper.hat("event_whenbroadcastreceived", {"BROADCAST_OPTION": [message, broadcast]}, helper.chain(*steps))
     for key, delta, limit, wrap in [("right arrow", 1, 8, 1), ("left arrow", -1, 1, 8)]:
         change = helper.add("data_changevariableby", {"VALUE": literal(delta)}, {"VARIABLE": ["Xbox level choice", choice]})
         outside = helper.add("operator_gt" if delta > 0 else "operator_lt",
