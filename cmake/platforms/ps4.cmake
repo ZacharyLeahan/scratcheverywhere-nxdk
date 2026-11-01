@@ -90,7 +90,7 @@ macro(package_platform)
 		COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/romfs/"
 			"${CMAKE_CURRENT_BINARY_DIR}"
 		# Convert ELF to SELF
-		COMMAND ${ELF2SELF} $<TARGET_FILE:scratch-everyhere>
+		COMMAND ${ELF2SELF} $<TARGET_FILE:scratch-everywhere>
 			"${CMAKE_CURRENT_BINARY_DIR}/eboot.bin"
 		# Generate param.sfo
 		COMMAND ${MKSFO} "${CMAKE_CURRENT_BINARY_DIR}/sce_sys/param.sfo" -i APP_TYPE=1
