@@ -62,19 +62,22 @@ macro(package_platform)
 
 	# Format version in a way it is acceptable by the PS4
 	string(REPLACE "." ";" VERSION_LIST "${SE_APP_VERSION}")
+	list(LENGTH VERSION_LIST VERSION_LENGTH) 
 	list(GET VERSION_LIST 0 VERSION_MAJOR)
 	list(GET VERSION_LIST 1	VERSION_MINOR)
-	list(GET VERSION_LIST 2	VERSION_PATCH)
 	string(LENGTH ${VERSION_MAJOR} MAJOR_LENGTH)
 	string(LENGTH ${VERSION_MINOR} MINOR_LENGTH)
 	if(MAJOR_LENGTH EQUAL 1)
 		set(VERSION_MAJOR "0${VERSION_MAJOR}")
 	endif()
-	if(MINOR_LENGTH EQUAL 1 AND VERSION_PATCH STREQUAL "")
+	if(MINOR_LENGTH EQUAL 1 AND VERSION_LENGTH LESS 3)
 		set(VERSION_MINOR "${VERSION_MINOR}0")
 	endif()
-	if(NOT VERSION_PATCH STREQUAL "")
-		set(VERSION_MINOR "${VERSION_MINOR}${VERSION_PATCH}")
+	if(VERSION_LENGTH GREATER 2)
+	    list(GET VERSION_LIST 2	VERSION_PATCH)
+	    if(NOT VERSION_PATCH STREQUAL "")
+		    set(VERSION_MINOR "${VERSION_MINOR}${VERSION_PATCH}")
+		endif()
 	endif()
 
 	# More info about param.sfo at https://github.com/red-prig/fpPS4/wiki/PARAM.SFO
@@ -87,7 +90,7 @@ macro(package_platform)
 		COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/romfs/"
 			"${CMAKE_CURRENT_BINARY_DIR}"
 		# Convert ELF to SELF
-		COMMAND ${ELF2SELF} $<TARGET_FILE:scratch-everywhere>
+		COMMAND ${ELF2SELF} $<TARGET_FILE:scratch-everyhere>
 			"${CMAKE_CURRENT_BINARY_DIR}/eboot.bin"
 		# Generate param.sfo
 		COMMAND ${MKSFO} "${CMAKE_CURRENT_BINARY_DIR}/sce_sys/param.sfo" -i APP_TYPE=1
