@@ -119,3 +119,26 @@ backend is selected before loading the project. This verifies the emulator
 path, not the physical console's missing replay or the cause of HDMI loss.
 Ignored evidence: `build-xbox/maze-native-20261031/review.json`, source-matched
 symbols, GDB snapshots, QMP input journal and `review-contact-sheet.jpg`.
+
+
+## Native hardware replay and Exit (November 1, 2026)
+
+Normal build `c7c0a9d9…` completes the full maze on the physical 128 MB Xbox.
+After **You win!**, a short Back tap opens pause; Green Flag restores the
+starting ball and removes the old win bubble. Down then moves the ball again.
+Return to game list, a fresh browser launch, renewed Right movement and a
+second return all pass. The three-second homebrew reset chord restores XBMC.
+The retrieved log confirms NV2A graphics/windowing and Xbox audio.
+
+The archive and controller profile match the previous physical backups. The
+regular dashboard launcher is preserved, and the exact original settings were
+restored after this batch. Input uses the small adapter's documented HTTP path
+at `.243`, with no KVM firmware change; physical controller-port numbering is
+not established. One Wi-Fi request timed out, stopped and released input; fresh
+video and neutral status allowed a separately recorded continuation.
+
+Private evidence is shared observations
+`scratch-sokoban-availability-20261101T134004Z/maze-physical-review.json`, with
+282 original JPEG hashes verified. This closes this build's missing physical
+Maze replay/Exit checks. It does not establish repeated-start reliability,
+other games' handoffs or FPS. The project has no authored sound playback.
