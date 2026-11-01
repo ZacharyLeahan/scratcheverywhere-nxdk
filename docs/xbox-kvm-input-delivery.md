@@ -247,3 +247,25 @@ routes, direct reachability results and the rejected collision route are under
 ignored `build-xbox/hardware/snake-followup-20261028/` and
 `snake-self-collision-v6-20261028-*`. Hardware pickup/self-collision and shared
 input-delivery gates remain open.
+
+
+## Still-image capture is not a game stall (November 1, 2026)
+
+The current KVM's adaptive MJPEG path suppresses byte-identical images and
+publishes a still-screen keepalive every five seconds. `/stream` sends the
+last published image once on connection, then waits for new publications.
+The shared source documents this in `capture_mjpeg.c` and `stream_worker_task`.
+A five-second socket deadline can therefore expire on a healthy static board.
+
+The native Sokoban test hit that observer deadline in puzzle eight. A short
+Back press opened pause; B resumed the same board, with every tile/player
+position unchanged. The tester now uses a twelve-second read deadline and
+seven-second map-observation windows. Completed puzzles are retained across
+observer continuations; no game state is written. These are test-tool changes,
+not a runtime or firmware fix.
+
+A JPEG receipt, HDMI lock or USB completion still does not prove game liveness.
+Check a real controller response and distinguish an unchanged board from a
+missing observation. Keep excluded attempts and verify neutral input before
+retrying. Private evidence is shared observations
+`scratch-sokoban-availability-20261101T134004Z/sokoban-capture-keepalive-followup.json`.

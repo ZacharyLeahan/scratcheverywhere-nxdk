@@ -1,4 +1,4 @@
-# Xbox game status — October 31, 2026
+# Xbox game status — November 1, 2026
 
 [Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) is the
 place to find current code. This page summarizes what we have actually tested;
@@ -8,8 +8,11 @@ the detailed evidence. **The 21-game hardware qualification is incomplete.**
 The physical console has **128 MB RAM**. A separate normal build of main now
 passes native NV2A browser selection and gameplay checks for Catch Apples,
 Appel and PacMan, with three clean returns to the game list. Catch also passes
-ending/replay/steering. Native startup reliability and remaining gameplay, audio
-and handoff checks stay open; see the
+ending/replay/steering. Current build `c7c0a9d9…` also passes a native Maze win,
+post-win replay, fresh launch and two clean returns on hardware. The installed
+full-set Sokoban copy also passes native puzzles 1–8 with every board checked.
+Native startup reliability and remaining gameplay, audio and handoff checks
+stay open; see the
 [physical backend follow-up](xbox-native-hardware-followup.md). The installed
 primary dashboard launcher still uses the older SDL Xbox renderer. Merging code
 does not replace it, game archives or saved renderer preferences. Retail 64 MB
@@ -43,7 +46,7 @@ this common cycle does not repeat every full-game objective.
 | [Hopper Heros](xbox-hopper.md) | Movement/jump; Score 8; loss/replay and relaunch | Launch cycle | Sustained progression; early short Start sometimes missed; audio |
 | [Ultra Bird](xbox-ultra-bird.md) | Six pipes / Score 6; loss/replay; repeated launch/exit | Launch cycle | Controller delivery; no authored sound |
 | [Catch Apples](xbox-catch-apples.md) | Score 22 / timer expiry; replay; special-apple scores repaired; current main native Score 14 ending, replay, both D-pad directions and clean Exit | Native timer ending, replay, steering and return | Further repeated native handoff checks; historical Exit → 2048; audio |
-| [Maze Starter](xbox-maze-replay.md) | Complete maze, wall blocking, repeated clean replay; current requested-native full win/wall check, then HDMI/controller loss | Current native full win, two-minute winning scene, exact-image replay, movement and clean return | Current native replay/Exit after HDMI loss; retrieved log has no explicit crash; shared browser/controller handoff; no authored sound |
+| [Maze Starter](xbox-maze-replay.md) | Complete maze and wall blocking; current native `c7c0a9d9…` full win, post-win Green Flag, renewed movement, fresh browser launch, two clean returns and dashboard reset | Current native full win, two-minute winning scene, exact-image replay, movement and clean return | Repeated-start reliability and shared controller/browser handoffs; no authored sound |
 | [Snake](xbox-snake.md) | Score 225 tail-collision ending; blade shrink, clock slowdown/restoration; replay | Launch cycle | Latest second Exit interrupted by adapter disconnects; active audio |
 | [Appel](xbox-appel.md) | Normal play to 21/35 apples, checkpoints/death; earlier diagnostic Level 1 win; TV music reported clean; current native menu/terrain/walk/jump to two apples and clean Exit | Normal v4 Level 1 win: 17 apples / 1:07.8; complete authored replay; Try Again | Movement smoothness; normal-v4 physical win/replay; later levels; audio continuity |
 | [Tetris](xbox-tetris.md) | Ten-line/level-up runs; later four-line objective at 1,200; top-out/replay | Independent ordinary four-line run; cap ending checked with seeded diagnostic | Subjective audio; initial capture anomaly; cap is not a natural full playthrough |
@@ -52,7 +55,7 @@ this common cycle does not repeat every full-game objective.
 | [PacMan](xbox-pacman.md) | Turns/walls/scoring; power pellet +100 and blue ghosts; loss/replay; current native turn/Score 40 and clean Exit | All 92 collectibles plus one ghost: 1,380; visible Win; Win/loss replay | Hardware full board/ghost; original final High Score gap; optional prepared repair passes ending probes and natural loss/replay, not installed |
 | [Space Invaders](xbox-space-invaders.md) | Score 1,230; shield/life loss, replay/relaunch | Native full wave: 55 → 0 → fresh 55, Score 990 / three lives; wave-two recovery | Hardware full wave; complete audio/listening |
 | Asteroids ([checklist](xbox-game-qualification.md)) | Thrust/turn/fire; Score 9,200; Game Over/replay/relaunch | Launch cycle | Further level progression; audio |
-| [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch | SDL and current native graphics: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; native Green Flag/Black restart, fresh launch and two clean returns; source-matched 10s SDL3 APU music | Full-set copy not installed on hardware; physical full set, native hardware, audio/listening and FPS |
+| [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch; full-set archive now installed and current native build passes puzzles 1–8 with Black restarts/every board checked | SDL and current native graphics: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; native Green Flag/Black restart, fresh launch and two clean returns; source-matched 10s SDL3 APU music | Physical full-set puzzles 9–13, wrap/replay/Exit, audio/listening and FPS |
 | [2048](xbox-2048.md) | Natural 2048 win / Score 20,264; continue, loss/replay and repeated exits | Launch cycle | KVM missed/duplicate input and held-confirmation handoff; no authored playback |
 | [Retro Racing](xbox-retro-racing.md) | 108 MPH, braking/steering/off-road slowdown; pause/replay | Current native full lap 02:02.00, Y pause, deliberate drift/smoke, off-road slowdown, replay and two clean returns | Hardware full lap/drift/traffic visuals; audio. Traffic collision is not authored |
 | [Hill Climb Racing](xbox-hill-climb.md) | Jeep 1,000; motorcycle 420; fuel pickup, airtime/crash, vehicle swap/replay | Launch cycle | Extended terrain; precise brake/air control; audio |

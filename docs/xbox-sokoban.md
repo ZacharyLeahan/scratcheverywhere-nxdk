@@ -1,10 +1,11 @@
 # Sokoban puzzle repairs
 
-Latest status (October 31): the full prepared set now passes both the earlier
+Latest status (November 1): the full prepared set passes both the earlier
 SDL run and a [current native-graphics controller run](#native-full-set-controller-run-october-31-2026)
 from level one through thirteen and natural wrap, with 2,728 moves and 628 pushes
-checked. The installed Xbox archive remains the level-ten-only repair; full-set
-physical/controller and audio qualification are still open.
+checked. The full-set archive is now installed on the Xbox, where native build
+`c7c0a9d9…` completes puzzles 1–8 and Black restarts with every board/player
+state checked. Puzzles 9–13, wrap/replay and audio qualification remain open.
 
 Gammastr20's [Sokoban](https://scratch.mit.edu/projects/24490009/) has passed
 puzzles one through three on the Xbox. The downloaded tenth puzzle contains
@@ -353,3 +354,34 @@ under ignored `build-xbox/sokoban-native-fullset-20261031/`, summarized in
 `final-review.json`. The owned guest is closed and its private base disk is
 unchanged. The physical full-set installation/playthrough remains open; this
 run adds no physical, expanded-graphics or retail-64MB acceptance.
+
+
+## Full-set installation and native hardware (November 1, 2026)
+
+Prepared archive `8253ed9a…` is installed as the ordinary
+`E:/ScratchEverywhere/Sokoban-Gammastr20.sb2`. The previous `efdbc005…` copy
+is preserved as `soko-efdbc005-20261101.fixture`. Temporary upload, final file,
+backup and unchanged `7bf8c7b1…` controller profile pass full FTP readback.
+The regular dashboard executable remains unchanged.
+
+Separate native build `c7c0a9d9…` completes puzzles 1–8 through ordinary D-pad
+input: **283 route moves**, with every tile/player state checked against the
+independent solution. Black restores each puzzle after a first-move prefix.
+An offline check repeats all 299 accepted state comparisons. This is a bounded
+first-eight-puzzle result, not a full-set hardware pass.
+
+The current KVM suppresses identical MJPEG images and sends a five-second
+keepalive. An observer using the same five-second socket deadline stopped at
+puzzle 8; Back still opened pause, and B resumed the exact preserved board.
+The reader now allows the keepalive, and continuation does not replay completed
+puzzles or write game state. Short test pulses sometimes leave the board
+unchanged; their failed attempts are retained separately, with fresh video and
+neutral input required before a retry. A longer neutral interval is now used.
+The authored project gates movement on a script-tick cooldown; these tests do
+not establish why every individual pulse was missed.
+
+Private evidence is shared observations
+`scratch-sokoban-availability-20261101T134004Z`, especially
+`sokoban-full-install/receipt.json`, `sokoban-through-eight-review.json` and the
+linked `sokoban-native-full13*` continuation records. Puzzles 9–13, natural wrap,
+post-wrap replay/Exit and listening quality remain open.
