@@ -50,5 +50,6 @@ both profile-selected engines using SDL3 window/audio and the Xbox renderer.
 Both pause/return paths pass. Native NV2A startup still blanks intermittently,
 as seen before this repair; no native physical acceptance is claimed. Actual
 Xbox Ninja course completion, other platforms, audio, measured pacing and long
-sessions remain open. This remains a candidate off main until its review is
-merged.
+sessions remain open. The
+[code-only repair is merged](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/66);
+this evidence note stays on the feature branch.
