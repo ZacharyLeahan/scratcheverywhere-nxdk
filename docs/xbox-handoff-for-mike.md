@@ -40,7 +40,8 @@ Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban puzzles.
 On the physical **128 MB Xbox**, native Maze passes win/replay/two clean returns;
 Sokoban completes puzzles 1–11 and is paused in twelve. These use the earlier
 tested executable; the new 1.3 binary is not yet hardware-tested. The primary
-launcher remains the older SDL build. **Full 21-game and 64 MB qualification are open.**
+launcher remains the older SDL build. **Full qualification of the existing 21 games and 64 MB support are open.**
+Nine more games are approved for testing below: **30 is the target, not a pass count.**
 
 Open: native startup/handoffs, later levels/replay, audio and Appel smoothness.
 A short Appel sample near 29 FPS does not establish a speed improvement; the
@@ -281,7 +282,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <p><strong>Left:</strong> Xbox all-ten-level victory/post-win replay, audio/feel. Full victory is xemu-only.</p>
 <p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md">Evidence / fix details</a></p>
 </td>
-<td width="50%" valign="top"><p><strong>21 games; one final unpaired clip.</strong></p><p>Grades reflect the linked Xbox evidence. Emulator-only wins do not raise the hardware grade.</p></td>
+<td width="50%" valign="top"><p><strong>21 recorded games; nine new candidates below.</strong></p><p>Grades reflect the linked Xbox evidence. Emulator-only wins do not raise the hardware grade.</p></td>
 </tr>
 </tbody>
 </table>
@@ -290,6 +291,29 @@ Hopper links to the original game; we tested its Everywhere variant. Ultra Bird'
 link is the example Discord channel because its standalone project URL was not
 recorded. Full Appel Level 1 completion is currently emulator evidence; the
 normal physical run has not yet repeated that win.
+
+## Next nine: target pack of 30
+
+Approved candidates; **playability U = untested on Xbox**. No new game earns a
+grade or gameplay GIF until real hardware evidence exists. Emulator results will
+be labeled separately. These additions focus on controller-friendly Scratch games.
+
+| Game / creator | Planned controller actions | Xbox result / GIF |
+| --- | --- | --- |
+| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) — Will_Wam | P1/P2 move + jump; CPU or local versus | **U — not tested.** GIF pending. |
+| [GlowBall](https://scratch.mit.edu/projects/112176502/) — Will_Wam | P1/P2 directions; CPU or local versus | **U — not tested.** GIF pending. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) — griffpatch | Move/jump; reset | **U — not tested.** GIF pending. |
+| [Fireboy and Watergirl – Forest Temple](https://scratch.mit.edu/projects/571560558/) — vatsalnewar | Separate move/jump controls for both characters | **U — not tested.** GIF pending. |
+| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) — colinmacc | Directions; reset/menu | **U — not tested.** GIF pending. |
+| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) — theChAOTiC | Move; attack/select; interact | **U — not tested.** GIF pending. |
+| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) — theChAOTiC | Move; slam; dash | **U — not tested.** GIF pending. |
+| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) — pandakun | Move; jump; dash | **U — not tested.** GIF pending. |
+| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) — pandakun | Hold/release jump | **U — not tested.** GIF pending. |
+
+For each: verify menus, a meaningful objective, loss/win and replay, return to
+launcher/relaunch, audio and smoothness. Record each fix as **core**, **Xbox**,
+**controller profile** or **prepared project**. The two-player games also need
+independent and simultaneous controller checks.
 
 ## Why adding games is cumbersome
 
