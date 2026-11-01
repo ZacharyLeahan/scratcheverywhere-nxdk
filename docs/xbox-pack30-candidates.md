@@ -170,6 +170,29 @@ passes an independent Scratch VM reference comparison, both actual execution
 modes in xemu, and ordinary controller traversal from course one to two plus
 clean browser return. It changes neither Ninja’s archive nor Xbox input
 mappings. The focused fixture also passes both profile-selected engines on the
-physical Xbox using SDL, including pause/browser returns. Actual Xbox Ninja
-course completion, native NV2A startup, wider platforms and long sessions remain
-open.
+physical Xbox using SDL, including pause/browser returns. Ninja now clears course one twice on the physical Xbox with the merged build
+and SDL window/audio, including a Green Flag replay between clears. Natural
+spike death/respawn, movement in course two and clean 30-game browser return
+also pass. Native NV2A startup, later courses, quality and long sessions remain open.
+
+## November 1 follow-up limits
+
+**Candy attribution is under investigation.** The original and prepared archives
+both reach `map_loaded=1` with three active threads in a pinned official Scratch
+VM 5.0.300 headless run using ordinary keyboard input and wall-clock steps.
+That does not qualify rendering or gameplay, but it prevents attributing the
+original loading failure solely to an author defect. On the merged runtime,
+the original archive remains at Loading with 297 sprites and 680 bytecode
+threads, including many map generators. Eight additional input-neutral
+300-vblank chunks leave that state unchanged. The paused guest is in kernel
+code; a script wait graph alone does not establish the root cause. The prepared
+copy remains the working Xbox compatibility workaround; no engine fix is
+claimed for this difference.
+
+**Fireboy startup is still unreliable in the new build.** After Ninja returned
+to the browser, opening the installed V5 Fireboy copy under merged31f with SDL
+reached texture precache, then displayed an invalid GPU DMA command error. One
+controller reset did not restore XBMC. Earlier ordinary-build controls/retry
+results stand; no first-level clear is claimed. The primary dashboard executable
+and original settings were not overwritten. Retrieve the startup log after
+manual recovery and reproduce the game-to-game transition before promoting a build.
