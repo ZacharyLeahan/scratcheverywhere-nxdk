@@ -9,10 +9,13 @@ GIFs are silent and repeat from the beginning.
 
 The [manifest](manifest.json) records each clip's capture time, duration,
 source-image hashes and output hash. Original JPEGs, detailed timestamps and
-controller traces remain local in ignored `build-xbox/hardware/` and
-`build-xbox/game21/`. The Spider Adventure clip uses the saved October 27
+controller traces remain local in ignored `build-xbox/hardware/`,
+`build-xbox/game21/`, and the ESP-KVM checkout’s `observations/`. The Spider Adventure clip uses the saved October 27
 physical recording, seconds 7–19; its original relative timestamps preserve
 capture gaps. An exact absolute start time was not recorded. Short clips
 illustrate gameplay; the accompanying milestones may come from longer tests.
+The Beach Volleyball clip uses a continuous November 1 hardware interval;
+two stream warm-up/cache frames are excluded before sampling. It demonstrates
+CPU gameplay, not independent two-player support or a measured frame rate.
 See the [recap](../xbox-handoff-for-mike.md) for game credits/source links and
 the [qualification matrix](../xbox-game-qualification.md) for limits.

@@ -38,8 +38,10 @@ and launches/exits all **21 games** in native xemu. Separate emulator runs compl
 Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban puzzles.
 
 On the physical **128 MB Xbox**, native Maze passes win/replay/two clean returns;
-Sokoban completes puzzles 1–11 and is paused in twelve. These use the earlier
-tested executable; the new 1.3 binary is not yet hardware-tested. The primary
+Sokoban completes puzzles 1–11; its saved test ends six moves into twelve.
+Those results use the earlier identified executable. The separate 1.3 build now
+boots on hardware and plays Beach Volleyball’s CPU mode. Level EATEN! needs a
+Green Flag retry before its scene appears; the primary dashboard
 launcher remains the older SDL build. **Full qualification of the existing 21 games and 64 MB support are open.**
 Nine more games are approved for testing below: **30 is the target, not a pass count.**
 
@@ -52,7 +54,8 @@ from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scr
 
 **Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
 They are conservative, provisional assessments of the tested game/build; they
-are not benchmark scores or a promise about the new, untested-on-hardware 1.3 binary.
+are not benchmark scores. Earlier clips use earlier builds; Beach and Level EATEN!
+use the separate 1.3 build.
 
 - **A:** smooth, responsive and stable through the main gameplay/ending/replay checks.
 - **B+:** tested objective or game loop plus replay works; quality/reliability checks remain.
@@ -199,7 +202,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <p><strong>Playability: B — Eleven puzzles complete</strong></p>
 <p><strong>Playable:</strong> Push crates onto goals; puzzles 1–11 complete; twelve Black restarts checked.</p>
 <p><strong>Got working:</strong> Project: repaired trapped crates, missing row, start position and goal scan.</p>
-<p><strong>Left:</strong> Finish 12–13, wrap/replay/Exit, listening and feel. Round paused in twelve.</p>
+<p><strong>Left:</strong> Finish 12–13, wrap/replay/Exit, listening and feel. Saved run ends in twelve.</p>
 <p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-sokoban.md">Evidence / fix details</a></p>
 </td>
 <td width="50%" valign="top">
@@ -282,7 +285,15 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <p><strong>Left:</strong> Xbox all-ten-level victory/post-win replay, audio/feel. Full victory is xemu-only.</p>
 <p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md">Evidence / fix details</a></p>
 </td>
-<td width="50%" valign="top"><p><strong>21 recorded games; nine new candidates below.</strong></p><p>Grades reflect the linked Xbox evidence. Emulator-only wins do not raise the hardware grade.</p></td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/333452181/">Beach Volleyball</a></h3>
+<img src="mike-gameplay/beach-volleyball.gif" alt="Beach Volleyball gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — CPU match playable; 2P pending</strong></p>
+<p><strong>Playable:</strong> X starts Easy CPU; D-pad moves, A jumps; scored twice, natural 2–5 loss; Green Flag/X replay and browser return.</p>
+<p><strong>Got working:</strong> Prepared project/profile: X-to-CPU shortcut and on-screen controls; original gameplay/assets preserved.</p>
+<p><strong>Left:</strong> Independent two-player controls; direct ending-screen replay; audio, measured smoothness and longer testing. Short Start does not replay this ending; use Back → Green Flag.</p>
+<p><a href="#next-nine-target-pack-of-30">New-game progress and limits</a></p>
+</td>
 </tr>
 </tbody>
 </table>
@@ -294,21 +305,35 @@ normal physical run has not yet repeated that win.
 
 ## Next nine: target pack of 30
 
-Approved candidates; **playability U = untested on Xbox**. No new game earns a
-grade or gameplay GIF until real hardware evidence exists. Emulator results will
-be labeled separately. These additions focus on controller-friendly Scratch games.
+**All nine are installed; 30 is the target, not a qualified-game count.**
+**U = no Xbox gameplay qualification yet.** Beach’s first physical result/GIF is
+above; the other recordings are placeholders. These additions focus on
+controller-friendly Scratch games.
+
+All nine original projects pass the limited **native xemu load → pause → Exit**
+check, restoring the exact 30-game list each time. This does not prove gameplay,
+endings, audio or smoothness. Level EATEN also passes emulator movement/jump,
+collection/growth from 100 to 200, Y reset and Green Flag replay/browser return.
+
+Beach and GlowBall have prepared **CPU-menu shortcuts**: X starts a CPU game.
+Each adds one helper sprite, a controls hint and a controller profile; original
+gameplay scripts/assets are unchanged. Both pass emulator CPU start, movement,
+jump, scoring, replay and Exit. Beach’s CPU shortcut also passes on hardware;
+GlowBall’s prepared copy is not yet installed on the console.
+Independent simultaneous two-player input needs backend/per-port binding work;
+the current backend exposes one active pad. CPU play is the initial target.
 
 | Game / creator | Planned controller actions | Xbox result / GIF |
 | --- | --- | --- |
-| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) — Will_Wam | P1/P2 move + jump; CPU or local versus | **U — not tested.** GIF pending. |
-| [GlowBall](https://scratch.mit.edu/projects/112176502/) — Will_Wam | P1/P2 directions; CPU or local versus | **U — not tested.** GIF pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) — griffpatch | Move/jump; reset | **U — not tested.** GIF pending. |
-| [Fireboy and Watergirl – Forest Temple](https://scratch.mit.edu/projects/571560558/) — vatsalnewar | Separate move/jump controls for both characters | **U — not tested.** GIF pending. |
-| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) — colinmacc | Directions; reset/menu | **U — not tested.** GIF pending. |
-| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) — theChAOTiC | Move; attack/select; interact | **U — not tested.** GIF pending. |
-| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) — theChAOTiC | Move; slam; dash | **U — not tested.** GIF pending. |
-| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) — pandakun | Move; jump; dash | **U — not tested.** GIF pending. |
-| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) — pandakun | Hold/release jump | **U — not tested.** GIF pending. |
+| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) — Will_Wam | X: Easy CPU; D-pad: move; A: jump | **B — CPU match/replay/return.** Real Xbox GIF above; 2P pending. |
+| [GlowBall](https://scratch.mit.edu/projects/112176502/) — Will_Wam | Prepared copy: X CPU, D-pad move, A jump; independent 2P pending | **U — hardware gameplay pending.** GIF pending. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) — griffpatch | Move/jump; Y reset | **C — startup workaround required.** After Green Flag: walk/jump, eat two blocks, fall/recover, Y reset. Initial launch showed only blue; level completion, audio/smoothness and GIF pending. |
+| [Fireboy and Watergirl – Forest Temple](https://scratch.mit.edu/projects/571560558/) — vatsalnewar | Separate move/jump controls for both characters | **U — hardware gameplay pending.** GIF pending. |
+| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) — colinmacc | Directions; reset/menu | **U — hardware gameplay pending.** GIF pending. |
+| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) — theChAOTiC | Move; attack/select; interact | **U — hardware gameplay pending.** GIF pending. |
+| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) — theChAOTiC | Move; slam; dash | **U — hardware gameplay pending.** GIF pending. |
+| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) — pandakun | Move; jump; dash | **U — hardware gameplay pending.** GIF pending. |
+| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) — pandakun | Hold/release jump | **U — hardware gameplay pending.** GIF pending. |
 
 For each: verify menus, a meaningful objective, loss/win and replay, return to
 launcher/relaunch, audio and smoothness. Record each fix as **core**, **Xbox**,
