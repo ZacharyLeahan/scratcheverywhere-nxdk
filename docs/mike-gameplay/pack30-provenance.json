@@ -109,6 +109,42 @@
       "sha256": "f7c517f9ec2c5f1f22d89317401a849e2749e9b6787e29fed464f9d914aad83d",
       "bytes": 2638113,
       "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    },
+    {
+      "gif": "candy-caves.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 4.7865062499999995,
+      "encoded_seconds": 4.7,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "84d60d948f23d265ad636ecc824e967dafb78a464723833ac137bd1a54c4af07",
+      "sha256": "55438ecafb16ae2a96c9a9bfb6c08e70a6b33419d5ef8e2b4052bb6db818029d",
+      "bytes": 2465140,
+      "scope": "ActualXbox renewedmining afterexplicitreplay; source-time sampling, no speedup; not a gameFPS measurement"
+    },
+    {
+      "gif": "paint-the-maze.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 7.309148334,
+      "encoded_seconds": 7.300000000000001,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "84d60d948f23d265ad636ecc824e967dafb78a464723833ac137bd1a54c4af07",
+      "sha256": "e174c651c9987934c53232b3e1c962abdbeec271baee844633e257a4efdda60d",
+      "bytes": 863870,
+      "scope": "Real Xbox video only; one continuous source-time interval, not a game FPS measurement"
     }
   ]
 }
