@@ -54,8 +54,9 @@ from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scr
 
 **Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
 They are conservative, provisional assessments of the tested game/build; they
-are not benchmark scores. Earlier clips use earlier builds. Beach/GlowBall use the separate ordinary 1.3
-build; the other new clips use its diagnostic variant with read-only logging.
+are not benchmark scores. Earlier clips use earlier builds. Beach, GlowBall and Ninja Climb use the
+separate ordinary 1.3 build; Level EATEN, Fireboy, Mushroom Valley and Bouncy
+Heroes use its diagnostic variant with read-only logging.
 Repeat those loops with the ordinary build before final acceptance. GIF sampling
 does not measure game frame rate.
 
@@ -372,8 +373,8 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
 | [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. No first-level clear or independent 2P yet. |
-| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **U:** Gameplay/menu qualification pending; GIF placeholder. |
-| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **D:** Menus work; level loading stops responding. xemu reproduces it; clone-initialization prepared repair under test. GIF placeholder. |
+| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **U:** Xbox test/GIF pending. Prepared A Play/B Home/Y Reset passes opening menu checks in xemu; opening puzzles under test. |
+| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **D:** Menus work; level loading stops responding. xemu reproduces it; a prepared clone-initialization repair passes mining, natural Game Over, replay and browser return there. Xbox retest pending. GIF placeholder. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
 | [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **C:** Move/jump/dash, death/recovery/replay/return. Opening section uncleared. |
 | [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) | **B:** Score 2/loss, prepared A retry, renewed jump/return. |
@@ -382,7 +383,8 @@ New helpers are on the development branch, **not main yet**:
 [Beach/GlowBall CPU menus](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/fa9a6b5b)
 and [Mushroom Valley retry](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/6c69b63c).
 These are **prepared-project/profile changes**, separate from core/Xbox code.
-Fireboy’s compact menu hint and Candy’s repair are still candidates. Original
+Fireboy’s compact menu hint, Candy’s clone-initialization repair and Paint’s
+controller menu are still candidates awaiting physical tests. Original
 archives/assets/credits are preserved. All nine also passed limited native xemu
 load → pause → Exit checks; that alone does not qualify gameplay.
 
