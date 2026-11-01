@@ -10,10 +10,12 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <cstdio>
 #include <cstring>
 #include <filesystem.hpp>
 #include <limits>
+#include <memory>
 #include <image.hpp>
 #ifdef SE_NV2A_PROFILE
 #include <log.hpp>
@@ -54,8 +56,8 @@ static void logHeapStatus(const std::string &label) {
     if (NT_SUCCESS(MmQueryStatistics(&stats))) {
         size_t freePages = stats.AvailablePages;
         size_t totalPages = stats.TotalPhysicalPages;
-        NV2A_LOG("Physical Memory Stats [" + label + "]: FreePages=" + std::to_string(freePages) + 
-                 " TotalPages=" + std::to_string(totalPages) + 
+        NV2A_LOG("Physical Memory Stats [" + label + "]: FreePages=" + std::to_string(freePages) +
+                 " TotalPages=" + std::to_string(totalPages) +
                  " FreeBytes=" + std::to_string(freePages * 4096));
     }
 #else
@@ -291,12 +293,10 @@ static NV2ATexture *createDXTTexture(Renderer_NV2A *r, int w, int h, uint32_t co
     }
     if (!t) return nullptr;
 
-    const size_t rowBytes = static_cast<size_t>(dxtPitch(w, codec));
-    const size_t blockRows = (static_cast<size_t>(toPowerOfTwo(h)) + 3) / 4;
-    for (size_t row = 0; row < blockRows; ++row) {
-        memcpy(t->data + row * static_cast<size_t>(t->pitch), data + row * rowBytes, rowBytes);
+    if (!r->updateTexture(t, data, dxtPitch(w, codec))) {
+        r->destroyTexture(t);
+        return nullptr;
     }
-    __asm__ __volatile__("sfence" ::: "memory");
     return t;
 }
 
@@ -464,7 +464,10 @@ nonstd::expected<void, std::string> Image_NV2A::buildTiles() {
     return {};
 }
 
-void Image_NV2A::renderTiled(ImageRenderParams &params) {
+void Image_NV2A::renderTiled(ImageRenderParams &params, bool gpuHue) {
+#ifndef SE_XBOX_NV2A_HYBRID_HUE
+    (void)gpuHue;
+#endif
     if (tiles.empty() || !nv2aRenderer) return;
 
     const float x = params.x;
@@ -578,6 +581,12 @@ void Image_NV2A::renderTiled(ImageRenderParams &params) {
                 {{p_bl.first, p_bl.second}, {cr, cg, cb, ca}, {u0, v1}}
             };
 
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+            if (gpuHue) {
+                nv2aRenderer->drawHueQuad(tile.texture, tile.texture->scaleMode, quad, params.colorEffect);
+                continue;
+            }
+#endif
             nv2aRenderer->bindTexture(tile.texture, tile.texture->scaleMode);
             nv2aRenderer->drawTriangles(quad, 6);
         }
@@ -984,6 +993,87 @@ struct EffectEntry {
     uint32_t lastUsed;
 };
 
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+struct HuePersistence {
+    uint32_t lastFrame;
+    uint32_t consecutiveFrames;
+    float hue;
+};
+static constexpr uint32_t HUE_STABLE_FRAMES = 12;
+// Bounded shared tracking: clones sharing an image/effect key contribute at
+// most one observation per frame. No source-specific class-layout changes.
+static std::unordered_map<EffectKey, HuePersistence, EffectKeyHash> s_huePersistence;
+static bool observeHueKey(const EffectKey &key, uint32_t frame, float effect) {
+    float hue = std::fmod(effect, 200.0f);
+    if (hue < 0) hue += 200.0f;
+    auto it = s_huePersistence.find(key);
+    if (it == s_huePersistence.end()) {
+        if (s_huePersistence.size() >= 256) {
+            auto oldest = s_huePersistence.begin();
+            for (auto entry = s_huePersistence.begin(); entry != s_huePersistence.end(); ++entry)
+                if (frame - entry->second.lastFrame > frame - oldest->second.lastFrame) oldest = entry;
+            s_huePersistence.erase(oldest);
+        }
+        it = s_huePersistence.emplace(key, HuePersistence{frame, 1, hue}).first;
+    } else if (it->second.hue != hue) {
+        // Adjacent animated values can share a quantized CPU cache key.
+        // They must not count as an unchanged hue, even within one frame.
+        it->second = HuePersistence{frame, 1, hue};
+    } else if (it->second.lastFrame != frame) {
+        it->second.consecutiveFrames = frame - it->second.lastFrame == 1
+            ? std::min(HUE_STABLE_FRAMES, it->second.consecutiveFrames + 1) : 1;
+        it->second.lastFrame = frame;
+    }
+    return it->second.consecutiveFrames >= HUE_STABLE_FRAMES;
+}
+// One shared budget for all images/clones, using the existing Xbox TSC rate.
+// Unknown costs stay GPU. Learn warm bake guards from successful production
+// fallback bakes of the same owner/size, rather than importing probe timings.
+static constexpr uint64_t HUE_BUDGET_TICKS = 4ull * 733333;
+struct HueFrameBudget {
+    uint32_t frame = 0;
+    bool initialized = false;
+    uint64_t spent = 0;
+    uint32_t bakes = 0;
+    void begin(uint32_t now) {
+        if (!initialized || now != frame) {
+            frame = now; initialized = true; spent = 0; bakes = 0;
+        }
+    }
+    bool allows(uint64_t estimate) const {
+        return estimate && bakes == 0 && spent <= HUE_BUDGET_TICKS &&
+            estimate <= HUE_BUDGET_TICKS - spent;
+    }
+};
+static HueFrameBudget s_hueBudget;
+static std::unordered_map<EffectKey, uint64_t, EffectKeyHash> s_hueWarmGuards;
+static uint32_t s_hueAdmitted = 0, s_hueUnknown = 0, s_hueBudgetDenied = 0;
+static uint32_t s_hueOverruns = 0;
+static uint64_t s_hueWorstBake = 0;
+struct HueBakeMeasurement {
+    EffectKey key;
+    uint64_t start = __builtin_ia32_rdtsc();
+    bool learnWarm, admitted, success = false;
+    HueBakeMeasurement(EffectKey k, bool learn, bool admission)
+        : key(k), learnWarm(learn), admitted(admission) {}
+    ~HueBakeMeasurement() {
+        const uint64_t elapsed = __builtin_ia32_rdtsc() - start;
+        s_hueBudget.spent += elapsed;
+        ++s_hueBudget.bakes;
+        s_hueWorstBake = std::max(s_hueWorstBake, elapsed);
+        if (admitted && s_hueBudget.spent > HUE_BUDGET_TICKS) ++s_hueOverruns;
+        if (success && learnWarm) {
+            key.step = 0; // Cost belongs to the owner/size, not one hue.
+            if (s_hueWarmGuards.find(key) == s_hueWarmGuards.end() && s_hueWarmGuards.size() >= 256)
+                s_hueWarmGuards.erase(s_hueWarmGuards.begin());
+            auto &guard = s_hueWarmGuards[key];
+            guard = std::max(guard, elapsed + elapsed / 4);
+        }
+    }
+};
+
+#endif
+
 static std::unordered_map<EffectKey, EffectEntry, EffectKeyHash> s_effectCache;
 static size_t s_effectCacheBytes = 0;
 static size_t s_effectPeakBytes = 0;
@@ -994,6 +1084,7 @@ static size_t s_effectBudgetOverride = 0;
 Image_NV2A::EffectCacheStats Image_NV2A::getEffectCacheStats() {
     return {s_effectCacheBytes, s_effectPeakBytes, s_effectCache.size(), s_effectCreated, s_effectEvicted};
 }
+
 
 static size_t effectCacheBudget() {
     if (s_effectBudgetOverride) return s_effectBudgetOverride;
@@ -1011,6 +1102,7 @@ enum class EffectEvictionReason {
 static uint32_t s_effectEvictions[
     static_cast<size_t>(EffectEvictionReason::Count)
 ] = {};
+
 
 static std::unordered_map<EffectKey, EffectEntry, EffectKeyHash>::iterator
 evictEffectEntry(Renderer_NV2A *r, std::unordered_map<EffectKey, EffectEntry, EffectKeyHash>::iterator it, EffectEvictionReason reason) {
@@ -1085,6 +1177,16 @@ static void trimEffectCache(Renderer_NV2A *r, uint32_t now, const EffectKey *kee
 }
 
 static void purgeEffectOwner(Renderer_NV2A *r, const void *owner) {
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    for (auto it = s_hueWarmGuards.begin(); it != s_hueWarmGuards.end();) {
+        if (it->first.owner == owner) it = s_hueWarmGuards.erase(it);
+        else ++it;
+    }
+    for (auto it = s_huePersistence.begin(); it != s_huePersistence.end();) {
+        if (it->first.owner == owner) it = s_huePersistence.erase(it);
+        else ++it;
+    }
+#endif
     for (auto it = s_effectCache.begin(); it != s_effectCache.end();) {
         if (it->first.owner == owner) it = evictEffectEntry(r, it, EffectEvictionReason::OwnerReleased);
         else ++it;
@@ -1147,7 +1249,7 @@ struct EffectBakeProfile {
 #endif
 
 const uint8_t *Image_NV2A::getEffectSource(int &outPitch) {
-    NV2A_LOG("FX_DEBUG: [A] getEffectSource start - width=" + std::to_string(imgData.width) + 
+    NV2A_LOG("FX_DEBUG: [A] getEffectSource start - width=" + std::to_string(imgData.width) +
              " height=" + std::to_string(imgData.height) + " hasPixels=" + (imgData.pixels ? "yes" : "no"));
     logHeapStatus("getEffectSource_Start");
 
@@ -1191,12 +1293,12 @@ const uint8_t *Image_NV2A::getEffectSource(int &outPitch) {
             if (rgbaBytes > freeBytes ||
                 scratchBytes > freeBytes - rgbaBytes ||
                 reserveBytes > freeBytes - rgbaBytes - scratchBytes) {
-                NV2A_LOG("FX_DEBUG: Skipping texture reconstruction: insufficient memory required=" + 
+                NV2A_LOG("FX_DEBUG: Skipping texture reconstruction: insufficient memory required=" +
                          std::to_string(rgbaBytes + scratchBytes) + " free=" + std::to_string(freeBytes));
                 return nullptr;
             }
 
-            NV2A_LOG("FX_DEBUG: [C] Reconstructing from non-tiled texture - isDXT=" + std::string(texture->isDXT ? "yes" : "no") + 
+            NV2A_LOG("FX_DEBUG: [C] Reconstructing from non-tiled texture - isDXT=" + std::string(texture->isDXT ? "yes" : "no") +
                      " allocSize=" + std::to_string(texture->allocationSize));
             logHeapStatus("getEffectSource_ReconstructTexture");
 
@@ -1266,7 +1368,7 @@ const uint8_t *Image_NV2A::getEffectSource(int &outPitch) {
         if (rgbaBytes > freeBytes ||
             maxTileScratch > freeBytes - rgbaBytes ||
             reserveBytes > freeBytes - rgbaBytes - maxTileScratch) {
-            NV2A_LOG("FX_DEBUG: Skipping tiled reconstruction: insufficient memory required=" + 
+            NV2A_LOG("FX_DEBUG: Skipping tiled reconstruction: insufficient memory required=" +
                      std::to_string(rgbaBytes + maxTileScratch) + " free=" + std::to_string(freeBytes));
             return nullptr;
         }
@@ -1346,8 +1448,8 @@ const uint8_t *Image_NV2A::getEffectSource(int &outPitch) {
             if (!pix || rawW <= 0 || rawH <= 0) {
                 logHeapStatus("Image_Decode_OOM_Failure");
                 const char *failReason = stbi_failure_reason();
-                NV2A_LOG("Physical Memory Stats - Image decode failed: asset=" + cachedAssetPath + 
-                         " fileSize=" + std::to_string(fileSize) + 
+                NV2A_LOG("Physical Memory Stats - Image decode failed: asset=" + cachedAssetPath +
+                         " fileSize=" + std::to_string(fileSize) +
                          " stbi_reason=" + (failReason ? failReason : "unknown"));
             }
             if (pix && rawW > 0 && rawH > 0) {
@@ -1411,7 +1513,7 @@ static uint16_t getColorEffectStep(float colorEffect) {
     return step == 0 ? EFFECT_NO_HUE : static_cast<uint16_t>(step);
 }
 
-NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
+NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params, bool residentOnly) {
     if (imgData.width <= 0 || imgData.height <= 0) return nullptr;
     if (!nv2aRenderer && Render::getGlobalRenderer()) {
         nv2aRenderer = static_cast<Renderer_NV2A *>(Render::getGlobalRenderer());
@@ -1450,6 +1552,30 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
         }
     }
 
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    // Positive brightness still uses CPU hue. Preserve source resolution for
+    // bounded ordinary costumes without increasing the global effect budget.
+    // Fresh linear allocations are filled directly, without a scratch image.
+    bool sourceQuality = false;
+    const bool qualityCandidate = !residentOnly && hasColor && params.brightness > 0 &&
+        !hasPixelGrid && std::abs(params.whirlEffect) <= 0.001f &&
+        std::abs(params.fisheyeEffect) <= 0.001f && std::abs(params.mosaicEffect) <= 0.001f &&
+        params.subrect == nullptr && srcW <= 512 && srcH <= 512;
+    if (qualityCandidate) {
+        const int qualityW = (srcW + 15) & ~15, qualityH = srcH;
+        const size_t count = static_cast<size_t>(qualityW) * qualityH;
+        const size_t textureBytes = count * 4u;
+        const EffectKey fullKey{this, step, static_cast<uint16_t>(srcW), static_cast<uint16_t>(srcH)};
+        const bool cached = s_effectCache.find(fullKey) != s_effectCache.end();
+        if (textureBytes <= effectCacheBudget() / 4 &&
+            (cached || getAvailablePhysicalMemory() >= 12u * 1024u * 1024u)) {
+            effW = srcW;
+            effH = srcH;
+            sourceQuality = true;
+        }
+    }
+#endif
+
     const uint32_t currentFrame = Renderer_NV2A::getFrameCounter();
 #ifdef SE_NV2A_PROFILE
     {
@@ -1472,6 +1598,40 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
     effectSlots[0].lastUsedFrame = currentFrame;
 
     const EffectKey key{this, step, static_cast<uint16_t>(effW), static_cast<uint16_t>(effH)};
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    s_hueBudget.begin(currentFrame);
+    const bool fullResolution = effW >= srcW && effH >= srcH;
+    bool persistent = false;
+    if (residentOnly) {
+        persistent = observeHueKey(key, currentFrame, params.colorEffect);
+#if defined(SE_XBOX_TRACE_RENDERER) && defined(SE_NV2A_PROFILE)
+        static uint32_t resident = 0, suppressed = 0, misses = 0, persistentDraws = 0, qualityGpu = 0, lastReport = 0;
+        if (s_effectCache.find(key) != s_effectCache.end()) {
+            if (persistent && fullResolution) ++resident;
+            else ++suppressed;
+        }
+        else ++misses;
+        if (persistent) ++persistentDraws;
+        if (!fullResolution) ++qualityGpu;
+        if (resident + suppressed + misses == 1 || currentFrame - lastReport >= 120) {
+            NV2A_LOG("NV2A_HYBRID_POLICY: resident=" + std::to_string(resident) +
+                " misses=" + std::to_string(misses) + " persistentDraws=" + std::to_string(persistentDraws) +
+                " residentSuppressed=" + std::to_string(suppressed) +
+                " qualityGpu=" + std::to_string(qualityGpu) +
+                " stableFrames=" + std::to_string(HUE_STABLE_FRAMES) +
+                " tracked=" + std::to_string(s_huePersistence.size()) + " coldAdmission=budgeted" +
+                " admitted=" + std::to_string(s_hueAdmitted) + " unknown=" + std::to_string(s_hueUnknown) +
+                " budgetDenied=" + std::to_string(s_hueBudgetDenied) + " overruns=" + std::to_string(s_hueOverruns) +
+                " worstBakeUs=" + std::to_string(s_hueWorstBake * 1000 / 733333));
+            lastReport = currentFrame;
+        }
+#endif
+    }
+    // Gate resident hits and new admissions alike. Even a stable hue must stay
+    // GPU if CPU routing would reduce the logical source resolution. Texture
+    // allocation padding is deliberately excluded from this comparison.
+    if (residentOnly && (!persistent || !fullResolution)) return nullptr;
+#endif
     auto found = s_effectCache.find(key);
     if (found != s_effectCache.end()) {
         found->second.lastUsed = currentFrame;
@@ -1480,6 +1640,34 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
 #endif
         return found->second.tex;
     }
+
+
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    const bool warmSource = hasColor && !hasPixelGrid && hsvW == effW && hsvH == effH &&
+        hsvCache.size() == static_cast<size_t>(effW) * effH;
+    bool hybridAdmission = false;
+    if (residentOnly) {
+        if (!persistent) return nullptr;
+        EffectKey costKey = key;
+        costKey.step = 0;
+        const auto cost = s_hueWarmGuards.find(costKey);
+        if (!warmSource || cost == s_hueWarmGuards.end()) {
+            ++s_hueUnknown;
+            return nullptr;
+        }
+        if (!s_hueBudget.allows(cost->second)) {
+            ++s_hueBudgetDenied;
+            return nullptr;
+        }
+        hybridAdmission = true;
+        ++s_hueAdmitted;
+    }
+    // Existing unsupported-effect fallback remains mandatory, but its work
+    // consumes the same budget and prevents further admission this frame.
+    HueBakeMeasurement hueBake(key, warmSource, hybridAdmission);
+#else
+    if (residentOnly) return nullptr;
+#endif
 
     // Low-memory guard with cache reclamation and rate-limited summary logging
     constexpr size_t kFxMinFreeBytes = 2 * 1024 * 1024;
@@ -1493,12 +1681,16 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
         ++s_skipCount;
 
         if (currentFrame - s_lastSkipLogFrame >= 120) {
-            NV2A_LOG("FX_DEBUG: Low-memory effect skips=" + std::to_string(s_skipCount) + 
+            NV2A_LOG("FX_DEBUG: Low-memory effect skips=" + std::to_string(s_skipCount) +
                      " FreeBytes=" + std::to_string(getAvailablePhysicalMemory()));
             s_skipCount = 0;
             s_lastSkipLogFrame = currentFrame;
         }
-        return texture;
+        return
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+            hybridAdmission ? nullptr :
+#endif
+            texture;
     }
 
 #ifdef SE_NV2A_PROFILE
@@ -1516,18 +1708,30 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
 
     if (needSource) {
         src = getEffectSource(srcPitch);
-        if (!src) return texture;
+        if (!src) return
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+            hybridAdmission ? nullptr :
+#endif
+            texture;
     }
 
     const bool ownsReconstructedSource = !effectSource.empty() && src == effectSource.data();
 
-    const int capW = toPowerOfTwo(effW);
-    const int capH = toPowerOfTwo(effH);
-    const bool compactColor = hasColor && !OS::isEnhancedPlatform();
-    const uint32_t effectFormat = compactColor ? XGU_TEXTURE_FORMAT_A4R4G4B4_SWIZZLED
-                                               : XGU_TEXTURE_FORMAT_A8B8G8R8_SWIZZLED;
+    bool linearQuality = false;
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    linearQuality = sourceQuality;
+#endif
+    const int capW = linearQuality ? ((effW + 15) & ~15) : toPowerOfTwo(effW);
+    const int capH = linearQuality ? effH : toPowerOfTwo(effH);
+    const bool compactColor = hasColor && !OS::isEnhancedPlatform()
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+        && !sourceQuality
+#endif
+        ;
+    const uint32_t effectFormat = linearQuality ? XGU_TEXTURE_FORMAT_A8R8G8B8 :
+        compactColor ? XGU_TEXTURE_FORMAT_A4R4G4B4_SWIZZLED : XGU_TEXTURE_FORMAT_A8B8G8R8_SWIZZLED;
 
-    NV2ATexture *tex = nv2aRenderer->createTexture(capW, capH, effectFormat, true);
+    NV2ATexture *tex = nv2aRenderer->createTexture(linearQuality ? effW : capW, linearQuality ? effH : capH, effectFormat, !linearQuality, !linearQuality);
 
     while (!tex && !s_effectCache.empty()) {
         auto oldest = s_effectCache.end();
@@ -1541,23 +1745,36 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
         }
         if (oldest == s_effectCache.end()) break;
         evictEffectEntry(nv2aRenderer, oldest, EffectEvictionReason::AllocationRetry);
-        tex = nv2aRenderer->createTexture(capW, capH, effectFormat, true);
+        tex = nv2aRenderer->createTexture(linearQuality ? effW : capW, linearQuality ? effH : capH, effectFormat, !linearQuality, !linearQuality);
     }
-    
+
     if (!tex) {
         NV2A_LOG("FX_DEBUG: createTexture ultimately failed; falling back to original texture.");
         if (ownsReconstructedSource) {
             std::vector<uint8_t>().swap(effectSource);
         }
-        return texture;
+        return
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+            hybridAdmission ? nullptr :
+#endif
+            texture;
     }
 
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    int sxArr[512];
+#else
     int sxArr[COLOR_EFFECT_MAX_DIM];
+#endif
     for (int x = 0; x < effW; ++x) {
         sxArr[x] = std::clamp((x * srcW + (srcW / 2)) / effW, 0, srcW - 1);
     }
 
     uint32_t *lin = s_effectLinear;
+    uint16_t *packed16 = s_effectPacked16;
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    // tex was allocated on this cache miss and has not been submitted to GPU.
+    if (linearQuality) lin = reinterpret_cast<uint32_t *>(tex->data);
+#endif
 
     if (hasColor) {
         if (hsvW != effW || hsvH != effH || hsvCache.size() != static_cast<size_t>(effW) * effH) {
@@ -1593,7 +1810,10 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
                 } else {
                     uint32_t h2 = e.h + shift;
                     if (h2 >= 1536) h2 -= 1536;
-                    row[x] = hsv2rgbEffect(h2, e.s, e.v) | (static_cast<uint32_t>(e.a) << 24);
+                    uint32_t rgb = hsv2rgbEffect(h2, e.s, e.v);
+                    if (linearQuality)
+                        rgb = (rgb & 0x0000ff00u) | ((rgb & 0xffu) << 16) | ((rgb >> 16) & 0xffu);
+                    row[x] = rgb | (static_cast<uint32_t>(e.a) << 24);
                 }
             }
         }
@@ -1612,23 +1832,36 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
         std::vector<uint8_t>().swap(effectSource);
     }
 
-    for (int y = 0; y < effH; ++y) {
-        uint32_t *row = lin + static_cast<size_t>(y) * capW;
-        for (int x = effW; x < capW; ++x) row[x] = row[effW - 1];
+    if (!linearQuality) {
+        for (int y = 0; y < effH; ++y) {
+            uint32_t *row = lin + static_cast<size_t>(y) * capW;
+            for (int x = effW; x < capW; ++x) row[x] = row[effW - 1];
+        }
+        for (int y = effH; y < capH; ++y) {
+            memcpy(lin + static_cast<size_t>(y) * capW, lin + static_cast<size_t>(effH - 1) * capW, static_cast<size_t>(capW) * 4);
+        }
     }
-    for (int y = effH; y < capH; ++y) {
-        memcpy(lin + static_cast<size_t>(y) * capW, lin + static_cast<size_t>(effH - 1) * capW, static_cast<size_t>(capW) * 4);
+    if (linearQuality) {
+        // Visible pixels were all written above. Initialize every physical
+        // padding byte too, without clearing the visible region a second time.
+        const size_t rowBytes = static_cast<size_t>(effW) * sizeof(uint32_t);
+        for (int y = 0; y < effH; ++y)
+            std::memset(tex->data + static_cast<size_t>(y) * tex->pitch + rowBytes,
+                        0, static_cast<size_t>(tex->pitch) - rowBytes);
     }
 
     bool uploadSucceeded = false;
 
-    if (compactColor) {
+    if (linearQuality) {
+        nv2aRenderer->commitTextureUpload(tex);
+        uploadSucceeded = true;
+    } else if (compactColor) {
         for (int y = 0; y < capH; ++y) {
             const uint8_t *srcRow =
                 reinterpret_cast<const uint8_t *>(lin) +
                 static_cast<size_t>(y) * capW * 4;
 
-            uint16_t *dstRow = s_effectPacked16 +
+            uint16_t *dstRow = packed16 +
                 static_cast<size_t>(y) * capW;
 
             for (int x = 0; x < capW; ++x) {
@@ -1643,7 +1876,7 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
         }
 
         uploadSucceeded =
-            nv2aRenderer->updateTexture(tex, s_effectPacked16, capW * 2);
+            nv2aRenderer->updateTexture(tex, packed16, capW * 2);
     } else {
         uploadSucceeded =
             nv2aRenderer->updateTexture(tex, lin, capW * 4);
@@ -1652,11 +1885,16 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
     if (!uploadSucceeded) {
         nv2aRenderer->destroyTexture(tex);
         NV2A_LOG("FX_DEBUG: updateTexture failed; skipping effect bake.");
-        return texture;
+        return
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+            hybridAdmission ? nullptr :
+#endif
+            texture;
     }
 
-    tex->uScale = static_cast<float>(effW) / static_cast<float>(capW);
-    tex->vScale = static_cast<float>(effH) / static_cast<float>(capH);
+    // Linear textures use texel coordinates; swizzled textures use normalized UVs.
+    tex->uScale = linearQuality ? static_cast<float>(effW) : static_cast<float>(effW) / capW;
+    tex->vScale = linearQuality ? static_cast<float>(effH) : static_cast<float>(effH) / capH;
 
     s_effectCache.emplace(key, EffectEntry{tex, currentFrame});
     s_effectCacheBytes += tex->allocationSize;
@@ -1666,6 +1904,9 @@ NV2ATexture *Image_NV2A::acquireEffectTexture(const ImageRenderParams &params) {
 
 #ifdef SE_NV2A_PROFILE
     bakeProfile.success = true;
+#endif
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    hueBake.success = true;
 #endif
     return tex;
 }
@@ -2300,6 +2541,63 @@ void Image_NV2A::render(ImageRenderParams &params) {
     const bool hasPixelate = (std::abs(params.pixelateEffect) > 0.001f);
     const bool hasEffects = (hasWhirl || hasFisheye || hasMosaic || hasPixelate || hasColor);
 
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    // Eligibility is independent of the future cache-admission policy. Combined
+    // Positive brightness and geometric effects retain the CPU path. Dimming
+    // uses the existing vertex RGB modulation after the hue transformation.
+    bool gpuHue = hasColor && std::isfinite(params.colorEffect) &&
+        params.brightness <= 0 && !hasWhirl && !hasFisheye && !hasMosaic && !hasPixelate &&
+        params.subrect == nullptr;
+    NV2ATexture *residentHueTexture = nullptr;
+    const NV2ATexture *rejectedHueTexture = nullptr;
+    bool hueTextureRejected = false;
+    if (gpuHue) {
+        if (!tiles.empty()) {
+            for (const auto &tile : tiles) {
+                if (!Renderer_NV2A::supportsHueTexture(tile.texture)) {
+                    rejectedHueTexture = tile.texture;
+                    hueTextureRejected = true;
+                    gpuHue = false;
+                    break;
+                }
+            }
+        } else {
+            gpuHue = Renderer_NV2A::supportsHueTexture(texture);
+            hueTextureRejected = !gpuHue;
+            rejectedHueTexture = hueTextureRejected ? texture : nullptr;
+        }
+    }
+    const bool eligibleHue = gpuHue;
+    if (eligibleHue) {
+        residentHueTexture = acquireEffectTexture(params, true);
+        if (residentHueTexture) gpuHue = false;
+    }
+#if defined(SE_XBOX_TRACE_RENDERER) && defined(SE_NV2A_PROFILE)
+    if (hasColor && !eligibleHue) {
+        static uint32_t fallbacks = 0, lastReport = 0;
+        const uint32_t frame = Renderer_NV2A::getFrameCounter();
+        ++fallbacks;
+        if (fallbacks == 1 || frame - lastReport >= 120) {
+            char message[256];
+            std::snprintf(message, sizeof(message),
+                "NV2A_HYBRID_CPU: draws=%u frame=%u brightness=%d mesh=%d pixelate=%d subrect=%d textureRejected=%d format=%u data=%d width=%d height=%d tiles=%u",
+                fallbacks, frame, params.brightness, hasWhirl || hasFisheye || hasMosaic,
+                hasPixelate, params.subrect != nullptr, hueTextureRejected,
+                rejectedHueTexture ? rejectedHueTexture->format : 0,
+                rejectedHueTexture && rejectedHueTexture->data != nullptr,
+                rejectedHueTexture ? rejectedHueTexture->texWidth : 0,
+                rejectedHueTexture ? rejectedHueTexture->texHeight : 0,
+                static_cast<unsigned>(tiles.size()));
+            NV2A_LOG(message);
+            lastReport = frame;
+        }
+    }
+#endif
+    if (gpuHue && !tiles.empty()) {
+        renderTiled(params, true);
+        return;
+    }
+#endif
     const uint32_t currentFrame = Renderer_NV2A::getFrameCounter();
 
     if (!hasEffects && !tiles.empty()) {
@@ -2335,6 +2633,9 @@ void Image_NV2A::render(ImageRenderParams &params) {
 
     const bool hasMeshEffects = (hasWhirl || hasFisheye || hasMosaic);
     NV2ATexture *activeTex = texture;
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+    if (residentHueTexture) activeTex = residentHueTexture;
+#endif
     bool needsPixelateTexture = false;
     bool pixelateBaked = false;
 
@@ -2348,7 +2649,11 @@ void Image_NV2A::render(ImageRenderParams &params) {
         }
     }
 
-    if (hasColor || needsPixelateTexture) {
+    if ((hasColor || needsPixelateTexture)
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+        && !gpuHue && !residentHueTexture
+#endif
+    ) {
         NV2ATexture *effTex = acquireEffectTexture(params);
         if (effTex) {
             activeTex = effTex;
@@ -2386,9 +2691,9 @@ void Image_NV2A::render(ImageRenderParams &params) {
         const int originalScale = texture ? static_cast<int>(texture->scaleMode) : -1;
         const int requestedScale = static_cast<int>(drawScaleMode);
         const int effectW = usesEffectTexture
-            ? static_cast<int>(std::lround(activeTex->texWidth * activeTex->uScale)) : 0;
+            ? static_cast<int>(std::lround(activeTex->swizzled || activeTex->isDXT ? activeTex->texWidth * activeTex->uScale : activeTex->uScale)) : 0;
         const int effectH = usesEffectTexture
-            ? static_cast<int>(std::lround(activeTex->texHeight * activeTex->vScale)) : 0;
+            ? static_cast<int>(std::lround(activeTex->swizzled || activeTex->isDXT ? activeTex->texHeight * activeTex->vScale : activeTex->vScale)) : 0;
         const unsigned int effectBytes = usesEffectTexture
             ? static_cast<unsigned int>(activeTex->allocationSize) : 0;
 
@@ -2518,18 +2823,33 @@ void Image_NV2A::render(ImageRenderParams &params) {
             {{p_bl.first, p_bl.second}, {cr, cg, cb, ca}, {u0, v1}}
         };
 
+#ifdef SE_XBOX_NV2A_HYBRID_HUE
+        if (gpuHue) {
+            nv2aRenderer->drawHueQuad(activeTex, drawScaleMode, verts, params.colorEffect);
+            return;
+        }
+#endif
         nv2aRenderer->bindTexture(activeTex, drawScaleMode);
         nv2aRenderer->setBlendMode(blendMode);
+#ifdef SE_XBOX_NV2A_HARDWARE_COLOR_ADJUSTMENTS
+        if (brightness > 0 && blendMode == NV2ABlendMode::Blend) {
+            const auto amount = static_cast<uint8_t>(255.0f * std::clamp(brightness * 0.01f, 0.0f, 1.0f));
+            nv2aRenderer->drawBrightnessTriangles(verts, 6, amount);
+            return;
+        }
+#endif
         nv2aRenderer->drawTriangles(verts, 6);
     };
 
     if (brightness > 0) {
         float b = brightness * 0.01f;
         drawQuad(255, 255, 255, alpha, NV2ABlendMode::Blend);
+#ifndef SE_XBOX_NV2A_HARDWARE_COLOR_ADJUSTMENTS
         uint8_t addA = static_cast<uint8_t>(255.0f * b * opacity);
         if (addA > 0) {
             drawQuad(255, 255, 255, addA, NV2ABlendMode::Add);
         }
+#endif
     } else if (brightness < 0) {
         float b = brightness * 0.01f;
         uint8_t dim = static_cast<uint8_t>(255.0f * std::clamp(1.0f + b, 0.0f, 1.0f));
@@ -3273,6 +3593,7 @@ Image_NV2A::Image_NV2A(std::string filePath, bool fromScratchProject, bool bitma
     const auto potentialError = setInitialTexture();
     if (!potentialError.has_value()) error = potentialError.error();
 }
+
 
 Image_NV2A::~Image_NV2A() {
     releaseEffects();
