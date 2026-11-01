@@ -1,9 +1,10 @@
 #include "bytecode_executor.hpp"
-#include "xbox_frame_profile.hpp"
 #include "blockExecutor.hpp"
 #include "math.hpp"
 #include "renderer.hpp"
 #include "runtime.hpp"
+#include "thread_lifetime.hpp"
+#include "xbox_frame_profile.hpp"
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
@@ -199,14 +200,28 @@ bool legacyThreadFinished(uint64_t legacyId) {
     return true;
 }
 
-void killLegacyThread(uint64_t legacyId) {
+void killLegacyThread(uint64_t legacyId, bool restarting = false) {
     for (ScriptThread *t : BlockExecutor::threads) {
         if (t->id == legacyId) {
-            t->finished = true;
+            if (restarting) ThreadExecutionFrame::finishAfterCurrentQuantum(t);
+            else t->finished = true;
             return;
         }
     }
 }
+
+void disposeRetiredBytecodeThread(BytecodeThread *thread) {
+    if (thread->bridgeThread) releaseScriptThread(thread->bridgeThread);
+    delete thread;
+}
+
+void collectRetiredBytecodeThreads() {
+    RetiredThreads<BytecodeThread>::collect(disposeRetiredBytecodeThread);
+}
+
+struct BytecodeThreadCleanup {
+    ~BytecodeThreadCleanup() { collectRetiredBytecodeThreads(); }
+};
 
 void fillBridgeBlock(Block &block, BytecodeThread &thread, BytecodeIndex opSlot) {
     const BytecodeIndex start = thread.chunk->paramKindsStart[opSlot];
@@ -486,6 +501,7 @@ double mathOpApply(BytecodeMathOp op, double value) {
 
 void BytecodeExecutor::runThread(BytecodeThread &thread) {
     if (thread.finished || thread.escapedToLegacy) return;
+    ThreadExecutionScope<BytecodeThread> execution(thread);
 
     Timer executionTimer(false);
     bool timerStarted = false;
@@ -1664,6 +1680,7 @@ void BytecodeExecutor::stopThread(Sprite *sprite, Block *hat) {
 }
 
 void BytecodeExecutor::stopAllThreads() {
+    collectRetiredBytecodeThreads();
     for (BytecodeThread *t : threads) {
         if (t->bridgeThread) releaseScriptThread(t->bridgeThread);
         delete t;
@@ -1736,7 +1753,7 @@ BytecodeThread *BytecodeExecutor::startThread(Sprite *sprite, Block *hat, bool s
     for (ScriptThread *t : BlockExecutor::threads) {
         if (t->sprite == sprite && t->blockHat == hat && !t->finished) {
             if (!shouldRestart) return nullptr;
-            t->finished = true;
+            ThreadExecutionFrame::finishAfterCurrentQuantum(t);
         }
     }
 
@@ -1752,16 +1769,20 @@ BytecodeThread *BytecodeExecutor::startThread(Sprite *sprite, Block *hat, bool s
 
     if (restartIndex != static_cast<size_t>(-1)) {
         BytecodeThread *old = threads[restartIndex];
-        old->finished = true;
+        threads[restartIndex] = newThread;
+        ThreadExecutionFrame::finishAfterCurrentQuantum(old);
         old->killed = true;
-        if (old->escapedToLegacy) killLegacyThread(old->legacyThreadId);
+        if (old->escapedToLegacy) killLegacyThread(old->legacyThreadId, true);
+        RetiredThreads<BytecodeThread>::retire(old, disposeRetiredBytecodeThread);
+    } else {
+        threads.push_back(newThread);
     }
-    threads.push_back(newThread);
 
     return newThread;
 }
 
 void BytecodeExecutor::runThreads() {
+    BytecodeThreadCleanup cleanup;
     size_t i = 0;
     while (i < threads.size()) {
         BytecodeThread *thread = threads[i];
