@@ -7,14 +7,14 @@ fully read back. Three diagnostic projects were preserved as `.fixture` files.
 | Project | Physical Xbox result / remaining work |
 | --- | --- |
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** prepared Easy CPU mode, movement/jump, two points, natural 2–5 loss, Green Flag/X replay, clean browser return. Independent 2P, audio, smoothness and extended play pending. |
-| [GlowBall](https://scratch.mit.edu/projects/112176502/) | **U:** original installed; prepared CPU shortcut passes emulator play/replay/return. Prepared copy not installed on Xbox yet. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** initial launch after Beach shows only blue; runtime Green Flag restores scene. Walk/jump, two blocks eaten, fall/recovery, Y reset and browser return work. Investigate initialization, finish level, qualify audio/smoothness. |
+| [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** prepared CPU mode, movement/jump, natural 2–5 loss, automatic title return/X replay, Green Flag replay and clean browser return on Xbox. Independent 2P, player win, audio/smoothness and extended play pending. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** initial launch after Beach shows only blue; Green Flag restores scene. A later automatic launch succeeds. Walk/jump, two blocks eaten, fall/recovery, Y reset and browser return work. Investigate initialization and final-block eating with continued movement; finish level and qualify audio/smoothness. |
 | [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **U:** gameplay, menus and independent character controls pending. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **U:** puzzle progression, reset/menu and replay pending. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **U:** menus, mining/combat, progression and loss/retry pending. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **U:** menus, movement/slam/dash, scored round and retry pending. |
-| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **U:** movement/jump/dash, climb progression and death/retry pending. |
-| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) | **U:** jump/release, obstacles, score and death/retry pending. |
+| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **C:** X starts; direction/A jump/X dash, natural death/recovery, Green Flag/X replay and browser return observed on Xbox. Opening section not cleared; sustained progression, audio/smoothness and stability pending. |
+| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) | **B:** A charge/release clears two platforms, Score 2 and natural loss. Prepared copy adds A retry, confirmed fresh zero/alternate character and renewed jump, then browser return. Longer play, normal-build prepared-copy recheck and audio/smoothness pending. |
 
 U means no hardware gameplay qualification. All nine original projects pass
 native xemu browser selection, load, pause and Exit, restoring 30 entries each
@@ -54,3 +54,23 @@ separate test launcher. The older primary launcher is unchanged, and original
 settings were restored after testing. No 64 MB, measured smoothness or audio
 qualification is claimed. Detailed controller traces, live MJPEG evidence and
 FTP receipts are retained privately in the shared ESP-KVM observations.
+
+## Mushroom Valley controller retry
+
+The original uses Space to jump but requires clicking its Retry icon after a
+loss. [The preparer](../scripts/prepare-mushroom-valley.py) lets Space/A activate
+that existing gate, preserves its restart sequence, physics, assets and mouse
+control, and adds an ending-screen hint:
+
+```sh
+python3 scripts/prepare-mushroom-valley.py Mushroom-Valley.sb3 prepared/Mushroom-Valley.sb3
+```
+
+Upload the archive and `.sb3.json` sidecar together. The prepared archive hash is
+`eba8ae08dcedd1e031f558f13bd8b7901ce42faf0f94afe38b11b34a51b8e883`.
+The physical scored loss, A retry, renewed jump and browser return use separate
+diagnostic executable `a57d47e0…`, with existing read-only UDP watch/pause logging.
+Repeat the prepared-copy loop with ordinary `84d60d94…` before final acceptance.
+The emulator also enters a fresh alternate-character round after A; its initial
+fixed jump sequence did not establish a scored replay. The KVM currently reports
+audio capture unavailable; that is not evidence of a game audio fault.
