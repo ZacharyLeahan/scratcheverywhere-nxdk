@@ -5,7 +5,7 @@ This fork starts from `ScratchEverywhere/ScratchEverywhere` at
 `ScratchEverywhere-OGXbox` fork was archived on October 19, 2026; its README
 directs users to upstream, which now includes the Xbox port.
 
-Current main includes the [October 29 upstream integration](xbox-upstream-nv2a-integration.md)
+Current main includes the [upstream release 1.3 integration](xbox-upstream-1.3.md)
 and supports both the native NV2A renderer/window with dedicated Xbox audio and
 the legacy Xbox SDL path. Compatibility patches remain in `cmake/patches`;
 the SDK revision matches `docker/Dockerfile.xbox`. Existing saved renderer
@@ -75,6 +75,15 @@ docker build --file docker/Dockerfile.xbox --target exporter \
 
 The Xbox workflow is `.github/workflows/nightly-xbox.yml` and supports manual
 dispatch. Forks may require enabling GitHub Actions first.
+
+## Native renderer options
+
+Upstream 1.3 enables `SE_XBOX_NV2A_HARDWARE_COLOR_ADJUSTMENTS` by default.
+`SE_XBOX_NV2A_HYBRID_HUE` is experimental and remains `OFF`; the normal regression
+results do not qualify that opt-in path. Frame capture and the NV2A startup test
+suite are diagnostic options and remain disabled for normal gameplay builds.
+See the [integration notes](xbox-upstream-1.3.md) for retained fork behavior and
+validation limits. These compile options do not override saved renderer choices.
 
 ## Running projects
 
