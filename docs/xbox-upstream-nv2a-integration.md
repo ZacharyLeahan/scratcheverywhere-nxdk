@@ -1,5 +1,8 @@
 # Upstream Xbox integration
 
+The latest synchronization is the [November 1 release 1.3 integration](xbox-upstream-1.3.md).
+The original integration and its separately identified tests follow.
+
 This work integrates upstream through
 [`ec2400eb`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/ec2400ebca42b7060795ff2c3d426c63a0c89687),
 including [PR 816](https://github.com/ScratchEverywhere/ScratchEverywhere/pull/816):
