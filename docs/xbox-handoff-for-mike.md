@@ -1,84 +1,84 @@
-# Scratch Everywhere on Original Xbox — notes for Mike
+# Original Xbox follow-up for Mike
 
-[Game clips](#games-in-action) · [Key fixes](#fixes-worth-reviewing) · [Adding games](#what-i-meant-by-adding-games-is-tricky)
+Updated November 1, 2026. **This recap and its GIFs stay on a feature branch.**
+[Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) has the
+latest code; the [game status](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-status.md)
+tracks what actually passed.
 
-This recap and its GIFs live on a feature branch. For the latest code and
-ongoing fixes, see **[main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main)**.
+## Upstream baseline
 
-We've installed twenty games on a **128MB Xbox** using NXDK. The normal build
-opens the project browser, launches installed games and returns after exit.
-There is real gameplay progress below; twenty installed does not mean every
-level, replay path or audio check is finished. Retail 64MB support is untested.
+Our main now includes upstream through
+[`1d606eb4`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/1d606eb47e18b96a82349fea83e9cdf060ea88d2),
+including [release 1.3](https://github.com/ScratchEverywhere/ScratchEverywhere/releases/tag/1.3).
+The native NV2A/window/audio work is upstream's baseline. Earlier input-default,
+SB2 parsing and resampler fixes are already incorporated; their implementation
+files match upstream. They are not being proposed again.
+
+## What remains in our fork beyond upstream
+
+These follow-ups remain beyond upstream. Some predate the 1.3 tag; this is the
+**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/1d606eb47e18b96a82349fea83e9cdf060ea88d2...main).
+
+| Scope | Follow-up / review link |
+| --- | --- |
+| Shared core | [Exact subject alpha for color sensing](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7f6015cf8a6d8083eb4939ccd9cffc06fb55048b), with an expanded 58-case reproducer. [Monitor number formatting](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/d0cbbbfdb29ff5bd08ec7556f4c33efbd44406c9) removes distracting decimal tails. Other platforms still need review. |
+| Xbox graphics | Retain exact collision colors, SVG filtering, alpha-correct brightness/pen compositing and clamped texture uploads around your newer effect cache. [1.3 merge/adaptations](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/61) and [evidence](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-upstream-1.3.md). Experimental GPU hue stays off by default. |
+| Xbox input | [Pause before the next game frame](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/300b42ddf7ea36e31dce89970deb3b2bfbe06998) and [retain short SDL Back taps](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/75da9c5b7d485a04a338c234ed1dfb76c6c4133a). Native controller handoff and confirmation-release gating remain. Slow work already running can still delay pause. |
+| Xbox homebrew controls | Return to game list/launcher, short Start replay for stopped projects, Restart Xbox / Shut down menus, and **LT + RT + Back + Start** held two seconds. [Implementation](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7bd8152f0f8e9d031875e28ca50add7db9aaab9f). A three-second test hold reaches XBMC while the runtime responds; disconnected controls or a hard hang cannot guarantee reset. |
+| Individual projects | Reproducible prepared copies, separate from engine changes: [Jumper post-win timer restart](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/2a52b3114e24c8e35d57976d986fab82c4516730), [Sokoban full-set map/goal repairs](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/1ecd8978f78cf78c6caa1566e7c0e19cda209492), and the other [preparation scripts](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main/scripts). Controller sidecars only map existing keys. |
+
+For upstream review, the small shared fixes and their reproducers are the best
+starting point. Keep Xbox backend changes and prepared Scratch projects separate;
+the full fork comparison is context, not a request to pull every commit.
+
+## What testing establishes
+
+The 1.3 integration builds, passes native/SDL regressions and both GPU fixtures,
+and launches/exits all **21 games** in native xemu. Separate emulator runs complete
+Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban puzzles.
+
+On the physical **128 MB Xbox**, native Maze passes win/replay/two clean returns;
+Sokoban completes puzzles 1–11 and is paused in twelve. These use the earlier
+tested executable; the new 1.3 binary is not yet hardware-tested. The primary
+launcher remains the older SDL build. **Full 21-game and 64 MB qualification are open.**
+
+Open: native startup/handoffs, later levels/replay, audio and Appel smoothness.
+A short Appel sample near 29 FPS does not establish a speed improvement; the
+transform-cache experiment stays unmerged. KVM delivery is tracked separately
+from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md).
 
 ## Games in action
 
-These are short **captures from our physical Xbox**, including footage saved
-during earlier tests. GIFs keep the recorded pace; they are silent. The results
-beside them summarize testing across sessions, not just what each clip shows.
-Game titles link to their Scratch sources. **Prepared** means we changed a
-separate game copy; a **profile** only maps controller buttons to existing keys.
+These are **physical Xbox captures**, including older sessions, at their recorded
+pace. GIFs are silent; written milestones can come from later tests. Scratch
+source links and credits are retained. [Capture provenance](mike-gameplay/README.md).
 
 | | |
 | --- | --- |
 | **[Ultra Bird](https://discord.com/channels/428359196719972353/428399682239332354)**<br>![Ultra Bird gameplay on the physical Xbox](mike-gameplay/ultra-bird.gif)<br>Six pipes scored; original archive. | **[Hopper Heros](https://scratch.mit.edu/projects/1184969400/)**<br>![Hopper Heros gameplay on the physical Xbox](mike-gameplay/hopper.gif)<br>Movement/jump and replay; original Everywhere variant. |
-| **[Catch Apples](https://scratch.mit.edu/projects/124652800/)**<br>![Catch Apples gameplay on the physical Xbox](mike-gameplay/catch-apples.gif)<br>22 points at timer expiry; original + profile. | **[Maze Starter](https://scratch.mit.edu/projects/10128431/)**<br>![Maze Starter gameplay on the physical Xbox](mike-gameplay/maze.gif)<br>Full maze/replay; prepared copy. |
-| **[Snake](https://scratch.mit.edu/projects/511466864/)**<br>![Snake gameplay on the physical Xbox](mike-gameplay/snake.gif)<br>Four directions, fruit and loss; original + profile. | **[Appel](https://scratch.mit.edu/projects/60917032/)**<br>![Appel gameplay on the physical Xbox](mike-gameplay/appel.gif)<br>Terrain restored; clip shows seven apples. Original + profile. |
+| **[Catch Apples](https://scratch.mit.edu/projects/124652800/)**<br>![Catch Apples gameplay on the physical Xbox](mike-gameplay/catch-apples.gif)<br>22 points at timer expiry; native ending/replay also checked. | **[Maze Starter](https://scratch.mit.edu/projects/10128431/)**<br>![Maze Starter gameplay on the physical Xbox](mike-gameplay/maze.gif)<br>Native Xbox win/replay and two clean returns; prepared copy. |
+| **[Snake](https://scratch.mit.edu/projects/511466864/)**<br>![Snake gameplay on the physical Xbox](mike-gameplay/snake.gif)<br>Score 225, loss/replay and four-direction steering. | **[Appel](https://scratch.mit.edu/projects/60917032/)**<br>![Appel gameplay on the physical Xbox](mike-gameplay/appel.gif)<br>Hardware: 21/35 apples and checkpoints; older clip shows seven. |
 | **[Tetris](https://scratch.mit.edu/projects/469540467/)**<br>![Tetris gameplay on the physical Xbox](mike-gameplay/tetris.gif)<br>Ten lines/Level 1; original + profile. | **[Frogger](https://scratch.mit.edu/projects/12221773/)**<br>![Frogger gameplay on the physical Xbox](mike-gameplay/frogger.gif)<br>Six pads in one round; prepared copy. |
 | **[Breakout](https://scratch.mit.edu/projects/11007566/)**<br>![Breakout gameplay on the physical Xbox](mike-gameplay/breakout.gif)<br>Full board at 1,940; prepared copy. | **[PacMan](https://scratch.mit.edu/projects/13701368/)**<br>![PacMan gameplay on the physical Xbox](mike-gameplay/pacman.gif)<br>Walls, pellets and replay; original + profile. |
-| **[Space Invaders](https://scratch.mit.edu/projects/253610111/)**<br>![Space Invaders gameplay on the physical Xbox](mike-gameplay/space-invaders.gif)<br>450 points, loss/replay; original scripts + profile. | **[Asteroids](https://scratch.mit.edu/projects/32219470/)**<br>![Asteroids gameplay on the physical Xbox](mike-gameplay/asteroids.gif)<br>9,200 points and replay; original scripts + profile. |
-| **[Sokoban](https://scratch.mit.edu/projects/24490009/)**<br>![Sokoban gameplay on the physical Xbox](mike-gameplay/sokoban.gif)<br>Puzzles 1–3 and repaired ten completed; prepared copy. | **[2048](https://scratch.mit.edu/projects/19554088/)**<br>![2048 gameplay on the physical Xbox](mike-gameplay/2048.gif)<br>Unseeded 2,048-tile win; prepared A acknowledgement. |
+| **[Space Invaders](https://scratch.mit.edu/projects/253610111/)**<br>![Space Invaders gameplay on the physical Xbox](mike-gameplay/space-invaders.gif)<br>Hardware: 1,230 points and loss/replay. | **[Asteroids](https://scratch.mit.edu/projects/32219470/)**<br>![Asteroids gameplay on the physical Xbox](mike-gameplay/asteroids.gif)<br>9,200 points and replay; original scripts + profile. |
+| **[Sokoban](https://scratch.mit.edu/projects/24490009/)**<br>![Sokoban gameplay on the physical Xbox](mike-gameplay/sokoban.gif)<br>Native Xbox: puzzles 1–11 complete; checkpoint paused in twelve. | **[2048](https://scratch.mit.edu/projects/19554088/)**<br>![2048 gameplay on the physical Xbox](mike-gameplay/2048.gif)<br>Unseeded 2,048-tile win; prepared A acknowledgement. |
 | **[Retro Racing](https://scratch.mit.edu/projects/26999060/)**<br>![Retro Racing gameplay on the physical Xbox](mike-gameplay/retro-racing.gif)<br>Acceleration, braking and steering; original scripts + profile. | **[Hill Climb Racing](https://scratch.mit.edu/projects/56667360/)**<br>![Hill Climb Racing gameplay on the physical Xbox](mike-gameplay/hill-climb.gif)<br>Jeep/motorcycle, crash/replay; original scripts + profile. |
 | **[Super Mario Bros.](https://scratch.mit.edu/projects/196684240/)**<br>![Super Mario Bros. gameplay on the physical Xbox](mike-gameplay/mario.gif)<br>Opening pipes and death recovery; prepared copy. | **[Doodle Jump](https://scratch.mit.edu/projects/399123680/)**<br>![Doodle Jump gameplay on the physical Xbox](mike-gameplay/doodle-jump.gif)<br>1,044 m and automatic replay; original scripts + profile. |
 | **[Jumper](https://scratch.mit.edu/projects/103069687/)**<br>![Jumper gameplay on the physical Xbox](mike-gameplay/jumper.gif)<br>Levels 1–4 cleared; prepared controls/readiness copy. | **[Connect Four](https://scratch.mit.edu/projects/52769452/)**<br>![Connect Four gameplay on the physical Xbox](mike-gameplay/connect-four.gif)<br>Both colors and three win directions; prepared copy. |
+| **[Spider Adventure](https://scratch.mit.edu/projects/1396458859/)**<br>Game 21: hardware Level 6 / Score 7,516; all ten levels in xemu. [Details](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md). | |
 
-Hopper links to the original Scratch game; we tested its Everywhere variant.
-Ultra Bird's link is the Discord example channel; its standalone project URL
-was not recorded. See the [full test matrix](xbox-game-qualification.md) for
-versions, hashes and outstanding checks. Appel's full Level 1 win used a
-diagnostic build; the normal-build repeat currently reaches checkpoint two.
+Hopper links to the original game; we tested its Everywhere variant. Ultra Bird's
+link is the example Discord channel because its standalone project URL was not
+recorded. Full Appel Level 1 completion is currently emulator evidence; the
+normal physical run has not yet repeated that win.
 
-## Fixes worth reviewing
+## Why adding games is cumbersome
 
-Since your Xbox fork points users toward upstream, the most useful handoff is
-small fixes with reproducers, grouped by where they apply. These links are
-commits in our fork, not requests to pull the entire branch.
+**The browser selects installed games. There is no in-app Scratch search,
+download or add flow.** Download the `.sb2`/`.sb3` on a computer, return to XBMC,
+FTP it (and any controller sidecar) into `E:\ScratchEverywhere\`, then relaunch.
+That transfer/setup loop is what I meant by tricky when playing with my daughter.
 
-| Area | Change and commit |
-| --- | --- |
-| Shared runtime | [Default absent inputs to false/zero/empty](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/30b0f84cb9588ce9d13966312756099c0baaa855). Fixed Appel's extra setup/clone overflow without raising the clone limit. This commit also contains a separate Xbox GPU-range patch. |
-| Shared SB2 compatibility | [Computed list selectors in both engines](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/08523f82cef42babb478e6a2a2d4d5ad4e153d2b), [localized stage monitors](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/63f2b65ea259dea2d51971d1a429decd613661d7) and [named costumes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/55708a6bf854c43850e52570fbf60b476d2d289f). Helped Connect Four, Breakout and PacMan. |
-| Shared audio | [Keep resampler phase and decoder lookahead](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/72fd448e82dca3c4c44f323d0205c0c213b15824). Deterministic fixture checked on host, xemu and Xbox. |
-| Xbox rendering | [Deterministic vertex setup](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/f217b0b1fcaaaf93fddcf7c808720b0d26378070); GPU allocations stay within the DMA-addressable range on expanded-RAM hardware. [Background](xbox-startup-rendering.md). |
-| Xbox color sensing | [Include pen pixels](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/b83fe88c6dae4a89cc77760ceeac3e053a460f83) and [sample exact bitmap texels](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/e0acbc881187907c1ee4a44ef0874e03445b78b6). Final 38-case fixture passed in xemu and on Xbox; earlier collision-mask edge retention is shared. |
-| Xbox input | [Controller switching/replay/reset](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/9d5e5adfe65ec834c893eec3a991c38e2e65e2b4), [SB2 profiles](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/985f0a72adc723a1795548d34865a0ee0b8536e6) and [menu confirmation isolation](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/54e668e1d9eab378f42b3e48535f9b99fd0e95c5). |
-| Xbox homebrew controls | Added the usual homebrew conveniences: [Return to launcher, Restart Xbox and Shut down Xbox](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7bd8152f0f8e9d031875e28ca50add7db9aaab9f), confirmation prompts, and an **LT + RT + Back + Start** reset shortcut. These are Xbox-specific; [hardware checks for the new system actions remain pending](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-menu-input.md#console-pause-and-system-actions). |
-| Individual games | Reproducible [preparation scripts](../scripts) repair the separate copies marked above. These are project adaptations, not engine fixes; keep them separate in upstream review. |
-
-Some commits mix shared and Xbox changes and would need splitting before an
-upstream PR. The [build/sync notes](xbox-fork-build.md) explain how our changes
-were adapted around upstream's VM and ROMFS work.
-
-## What I meant by “adding games is tricky”
-
-**Selecting installed games works. Adding a new game requires a computer:**
-get the `.sb3`/`.sb2`, return the Xbox to XBMC, FTP it to
-`E:\ScratchEverywhere\`, optionally copy its controller profile, then relaunch.
-That transfer/setup loop is the cumbersome part when playing with my daughter.
-
-There is already a per-project **Controls editor** in the code; our test
-mappings were supplied as reproducible sidecars. Useful next steps would be
-an in-app archive receiver/import screen, clearer access to that editor and
-simple arrows/WASD presets. This would improve installation without promising
-that every downloaded Scratch project is compatible.
-
-## How we can make this useful upstream
-
-- Start with the [empty-input reproducer](../examples/make-empty-input-test.py)
-  or [resampler tests](../tests/audio_resampler_test.py): one small fix, expected
-  result and exact test scope. Shared fixes still need other-platform review.
-- Keep Xbox backend/dependency changes separate from prepared game copies.
-- Use the [detailed matrix](xbox-game-qualification.md) for unfinished gameplay,
-  audio and intermittent menu handoff issues. Remote KVM input delivery also
-  remains unresolved; it is not proof of the same fault on physical controllers.
-
-[Build instructions](xbox-fork-build.md) · [Gameplay capture provenance](mike-gameplay/README.md)
+An archive receiver/import screen and easy arrows/WASD presets would help. A
+per-project Controls editor already exists; make it easier to find. Importing a
+project would not guarantee its compatibility.

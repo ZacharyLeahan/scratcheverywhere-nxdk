@@ -82,3 +82,63 @@ The shared intermittent KVM delivery concern remains separate.
 Ignored local evidence: `hardware/pen-regression-maze-verification.json`,
 `pen-regression-maze-route-inputs.json` and the corresponding
 `pen-regression-maze-*.jpg` images/client reports.
+
+
+## Current-main hardware win — October 31, 2026
+
+The separate normal `eb3492c2…` executable completes the full prepared maze on
+the physical 128 MB Xbox with NV2A graphics/windowing and Xbox audio requested
+in saved settings. Two Right holds (1.6 and 0.8 seconds) stop at the same first
+blue wall, `(83.5, 44)` in HDMI pixels. Camera-guided D-pad play then traverses
+all seven waypoints and displays **You win!** at `(651.5, 457.5)`. The archive
+and profile are unchanged; no debugger or game-state writes are used.
+
+One controller HTTP timeout stops the route and releases input. Fresh neutral
+status and video permit a separately recorded continuation of that same round.
+After the win, the small boards disconnect/restart and the KVM loses HDMI
+signal. The retained win image is cached after signal loss and proves no later
+liveness. A main-wired Back request completes without visible recovery.
+**Current-run hardware replay/Exit and the retrieved startup log remain open.**
+No game crash or renderer fix is inferred from loss of console output.
+The original renderer settings are backed up; restoring them requires XBMC FTP.
+Private evidence is shared observations `scratch-native-round2-20261031T101526Z`,
+`maze-physical-review.json`, its original captures/plans and failed-input logs.
+
+
+### Separate current-native emulator check
+
+The same normal `eb3492c2…` build completes the full maze through emulated USB
+D-pad input in a private 128 MB Vulkan xemu guest. Read-only GDB checks confirm
+renderer/window `3/0`, the wall stop and every waypoint. The winning scene runs
+for 7,200 further video frames (two simulated minutes at 60 Hz), then accepts
+Back pause. Green Flag restores a **pixel-identical start image**, with the old
+win bubble gone; Down moves the ball again. Held-A Exit returns to zero game
+sprites and the exact 21-game/42-button browser. The guest closes and its base
+HDD hash is unchanged. No gameplay-state writes are used; only the initial
+backend is selected before loading the project. This verifies the emulator
+path, not the physical console's missing replay or the cause of HDMI loss.
+Ignored evidence: `build-xbox/maze-native-20261031/review.json`, source-matched
+symbols, GDB snapshots, QMP input journal and `review-contact-sheet.jpg`.
+
+
+## Native hardware replay and Exit (November 1, 2026)
+
+Normal build `c7c0a9d9…` completes the full maze on the physical 128 MB Xbox.
+After **You win!**, a short Back tap opens pause; Green Flag restores the
+starting ball and removes the old win bubble. Down then moves the ball again.
+Return to game list, a fresh browser launch, renewed Right movement and a
+second return all pass. The three-second homebrew reset chord restores XBMC.
+The retrieved log confirms NV2A graphics/windowing and Xbox audio.
+
+The archive and controller profile match the previous physical backups. The
+regular dashboard launcher is preserved, and the exact original settings were
+restored after this batch. Input uses the small adapter's documented HTTP path
+at `.243`, with no KVM firmware change; physical controller-port numbering is
+not established. One Wi-Fi request timed out, stopped and released input; fresh
+video and neutral status allowed a separately recorded continuation.
+
+Private evidence is shared observations
+`scratch-sokoban-availability-20261101T134004Z/maze-physical-review.json`, with
+282 original JPEG hashes verified. This closes this build's missing physical
+Maze replay/Exit checks. It does not establish repeated-start reliability,
+other games' handoffs or FPS. The project has no authored sound playback.

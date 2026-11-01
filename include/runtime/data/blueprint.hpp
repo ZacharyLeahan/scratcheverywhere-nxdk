@@ -1,4 +1,5 @@
 #pragma once
+#include "broadcast_index.hpp"
 #include "bytecode.hpp"
 #include "runtime/data/entity_components.hpp"
 #include "small_string_map.hpp"
@@ -436,6 +437,10 @@ class SE_EXPORT Sprite {
     bool toDelete;
     bool shouldDoSpriteClick = false;
     int currentCostume;
+#ifdef __XBOX__
+    int loadedCostumeIndex = -1;
+    float loadedCostumeRequestScale = -1.0f;
+#endif
     double xPosition;
     double yPosition;
     float size;
@@ -492,6 +497,7 @@ class SE_EXPORT Sprite {
     std::unordered_map<std::string, Broadcast> broadcasts;
 
     std::unordered_map<std::string, std::unordered_set<Block *>> hats;
+    BroadcastHatIndex broadcastHatIndex;
     std::unordered_map<std::string, Block *> customHatBlock;
 
     std::unique_ptr<BytecodeChunk> bytecode;

@@ -6,6 +6,10 @@
 #include <string>
 #endif
 
+#ifdef __XBOX__
+void showXboxSystemMenu();
+#endif
+
 class SE_EXPORT PauseMenu : public Menu {
   private:
     enum class Action { None, Resume, Exit, GreenFlag, Stop };
@@ -14,8 +18,14 @@ class SE_EXPORT PauseMenu : public Menu {
     void finishAction(Action action);
 #ifdef __XBOX__
     std::map<std::string, std::string> gameControls;
+    bool backReleased = false;
+    std::unique_ptr<MenuText> pointerMoveHelp;
+    std::unique_ptr<MenuText> pointerClickHelp;
 #endif
   public:
+#ifdef __XBOX__
+    ButtonObject *systemButton = nullptr;
+#endif
     ControlObject *pauseControl = nullptr;
     ButtonObject *backButton = nullptr;
     ButtonObject *exitProjectButton = nullptr;

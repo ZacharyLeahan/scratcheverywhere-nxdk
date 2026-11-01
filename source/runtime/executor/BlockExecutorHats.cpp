@@ -1,6 +1,7 @@
 #include "blockExecutor.hpp"
 #include "collision.hpp"
 #include <algorithm>
+#include <audio.hpp>
 #include <input.hpp>
 #include <renderer.hpp>
 #include <runtime.hpp>
@@ -8,8 +9,12 @@
 #include <unordered_map>
 #include <vector>
 
-// ToDo: That could be optimized, but it works for now and i want to move on to other stuff
 void BlockExecutor::executeKeyHats() {
+    // Reuse long lookup keys instead of allocating temporary strings for every
+    // sprite/clone on every input poll (including sprites with no matching hat).
+    static const std::string keyOpcode = "event_whenkeypressed";
+    static const std::string makeyKeyOpcode = "makeymakey_whenMakeyKeyPressed";
+    static const std::string makeyCodeOpcode = "makeymakey_whenCodePressed";
 #if defined(__XBOX__) && defined(ENABLE_MENU)
     const bool paused = Scratch::pauseMenu != nullptr;
 #else
@@ -40,17 +45,18 @@ void BlockExecutor::executeKeyHats() {
     if (paused) return;
 
     for (Sprite *currentSprite : Scratch::sprites) {
-        if (!currentSprite->hats["event_whenkeypressed"].empty()) {
-            for (Block *block : currentSprite->hats["event_whenkeypressed"]) {
+        const auto keyHats = currentSprite->hats.find(keyOpcode);
+        if (keyHats != currentSprite->hats.end()) {
+            for (Block *block : keyHats->second) {
                 std::string key = Scratch::getFieldValue(*block, "KEY_OPTION");
                 if (Input::keyHeldDuration.find(key) != Input::keyHeldDuration.end() && (Input::keyHeldDuration.find(key)->second == 1 || Input::keyHeldDuration.find(key)->second > 15 * (Scratch::FPS / 30.0f))) {
                     BlockExecutor::startThread(currentSprite, block, false);
                 }
             }
         }
-        BlockExecutor::runAllBlocksByOpcodeInSprite("makeymakey_whenMakeyKeyPressed", currentSprite);
+        BlockExecutor::runAllBlocksByOpcodeInSprite(makeyKeyOpcode, currentSprite);
     }
-    BlockExecutor::runAllBlocksByOpcode("makeymakey_whenCodePressed");
+    BlockExecutor::runAllBlocksByOpcode(makeyCodeOpcode);
 }
 
 namespace {
@@ -63,9 +69,10 @@ void BlockExecutor::resetWhenGreaterThanHats() {
 
 void BlockExecutor::executeWhenGreaterThanHats() {
     static ScriptThread conditionThread;
+    static const std::string opcode = "event_whengreaterthan";
 
     for (Sprite *currentSprite : Scratch::sprites) {
-        auto hatIt = currentSprite->hats.find("event_whengreaterthan");
+        auto hatIt = currentSprite->hats.find(opcode);
         if (hatIt == currentSprite->hats.end()) continue;
 
         for (Block *block : hatIt->second) {
@@ -74,6 +81,7 @@ void BlockExecutor::executeWhenGreaterThanHats() {
 
             double current = 0;
             if (menu == "timer") current = BlockExecutor::timer.getTimeMs() / 1000.0;
+            else if (menu == "loudness") current = SoundPlayer::getLoudness();
 
             double threshold = 0;
             Scratch::getInputValueAs(block, "VALUE", &conditionThread, currentSprite, threshold);
@@ -101,7 +109,7 @@ void BlockExecutor::doSpriteClicking() {
         Input::mousePointer.heldFrames++;
 
         bool blockedByMonitor = false;
-#if defined(__PC__) // basically the only platform with mouse input and i don't want to waste perf on other platforms.
+#if !defined(__NDS__) && !defined(__3DS__) && !defined(__OGC__) && !defined(__PSP__)
         if (Input::draggingSprite == nullptr) {
             std::array<int, 2> touchPos = Input::getTouchPosition();
             blockedByMonitor = Render::isPointOverMonitor(touchPos[0], touchPos[1]);

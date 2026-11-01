@@ -67,3 +67,40 @@ After the physical checks, Retro Racing exited to the game list and the
 controller combo returned to XBMC. The final log was retrieved. The temporary
 fixture and profile were retained under `.fixture` extensions, removing their
 entry from the game browser. The dashboard launcher was not replaced.
+
+## Capture transport limits — October 27
+
+Appel's later normal build (`98c93665…`, profiling OFF) ran continuously at
+checkpoint three during a four-minute HDMI recording, without runtime menu
+pauses or controller input. The exact 240-second PCM file took 258.26 seconds
+of wall time to receive. The KVM's own stream log reports 875,040 missing frames
+between transmitted blocks: **18.23 seconds at 48 kHz**, accounting for the
+extra recording time within 30 ms. Its I2S overrun counter stayed zero; the
+stream's queue-loss and gap counters are separate from that producer counter.
+
+Forty-three of 49 sampled one-second windows match the unchanged music source
+at correlation >= 0.9. Their source offsets contain jumps, consistent with the
+recorded transport loss. This recording cannot establish uninterrupted Xbox
+playback or subjective sound quality. Earlier captures with runtime pauses
+also cannot certify a gapless authored music loop: the playing sound can end
+while scripts are paused and restart when scripts resume.
+
+Local evidence is under ignored `build-xbox/hardware/`:
+`appel-normal98-active-loop-audio3{.wav,.json,-continuity.json}`,
+`-kvm-end.log`, `-transport-analysis.json`, and the 1,611 original JPEGs in its
+frame-history manifest. No KVM firmware or persistent settings were changed.
+
+A second 240-second recording closed the MJPEG viewer and sent no controller
+input. It took 248.43 seconds; the KVM logged 402,960 gap frames (**8.395
+seconds**), again with zero I2S overruns. Removing video reduced losses in this
+bounded comparison but did not eliminate them. Evidence is
+`appel-normal98-audio-only4{.wav,.json,-continuity.json,-kvm-end.log}` and
+`-transport-analysis.json`. The before/after console images show Appel still
+active at checkpoint three with eighteen apples; it was then paused safely.
+The user subsequently listened directly to the TV and confirmed clean Appel
+music without crackles or dropouts in this normal-build session. That passes
+the subjective listening check for this session; it does not make the KVM
+files gapless or qualify other games. The response is retained in
+`appel-normal98-tv-listening-confirmation.json`. Loss-accounted long-run audio
+continuity verification remains open. The local recorder also reported that its
+current mode needs H.264; no codec setting was changed for these tests.

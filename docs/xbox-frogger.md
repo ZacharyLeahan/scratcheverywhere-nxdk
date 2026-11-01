@@ -169,3 +169,35 @@ Local evidence is under ignored `build-xbox/`: sprite-watch
 `frogger-river-long-audio{.wav,.json,-match.json}`. The diagnostic build does
 not establish a complete normal-build playthrough. Seven-pad victory, replay
 from victory, and subjective sound checks remain open.
+
+## Native emulator full round — October 29, 2026
+
+The same normal prepared archive `6c747a92...` completes all seven pads in one
+unseeded round on native `807d1928...` (renderer/window 3/0) in private 128 MB
+Vulkan xemu. Actual emulated USB D-pad play scores pads at X=208, 140, 71, 2,
+−137, −67 and −203, in that order. Read-only observations guide crossings;
+there are no gameplay-state writes, physics changes, mid-round restarts,
+input-poll bypasses or save-state restores. All original assets remain present.
+
+After the seventh point, neutral input allows the authored green **You Win!**
+screen and timer to appear with all seven pads occupied. The internal `alive`
+flag is then zero, so the helper's strict `alive=1` check initially reports a
+stop. That raw result is retained. The visible victory succeeds: authored death
+scripts suppress Game Over and loss sound at score seven, and victory hides
+itself after five seconds. The particular assignment that clears `alive` was
+not localized. No engine or project change was made solely to force that flag.
+
+Pause-menu Green Flag resets the score to zero, all seven pads and both ending
+screens; all four directions work again. A subsequent normal traffic death
+shows Game Over with victory hidden. Exit returns to the populated browser;
+a fresh selection launches Frogger, moves the frog and exits again. Both
+read-only cleanup checks find zero game sprites and all 21 projects/42 buttons.
+The guest closes with neutral input and the saved shared HDD remains unchanged.
+
+Ignored evidence is in `build-xbox/frogger-native-fullrun-20261029/review.json`,
+`seven-point-ending-settle.png`, `victory-replay-controls.json`,
+`normal-loss-after-victory-replay.json`, `round-input-audit.json`, both browser
+cleanup receipts and `shutdown.json`. Host route forecasts are provisional:
+long-wrap errors are retained and actual positions are reread before crossing.
+This is emulator gameplay evidence, not physical seven-pad victory/replay,
+audio, frame-pacing or retail 64 MB acceptance. Those hardware gates remain open.

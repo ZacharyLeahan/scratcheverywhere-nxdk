@@ -344,3 +344,38 @@ KVM delivery concerns already existed in earlier installed builds and remain
 open in the overall twenty-game qualification; their affected layer is still
 uncertain. The verified color/Breakout fixes can be reviewed and merged with
 that limitation recorded, while regular-launcher deployment remains separate.
+
+### Native NV2A candidate, October 29
+
+The upstream-integration candidate `2dd1b385...`, after restoring native
+original-color and pen-query hooks, clears the complete final `fac657fc...`
+archive in the private Vulkan emulator. The current preparation script
+recreates that archive exactly; all sixteen original assets and the existing
+controller profile are unchanged. GDB confirms native renderer/window IDs 3/0.
+
+This run uses the actual emulated USB controller driver. A read-only observer
+steers with D-pad Left/Right; it does not bypass input polling, call key hats,
+seed randomness, or write game positions, headings, scores, lives or bricks.
+It reaches **Score 1920 with all three lives**. Three separately captured images
+have zero pixels matching any of the five initially verified brick colors.
+The score remains 1920 for at least **960 further video frames**, with the ball
+traversing Y=-162.07 through 176 across the empty field. Video-frame counts are
+not script-step counts; observation pauses make this unsuitable as an FPS test.
+
+After steering is released, ordinary life loss reaches the authored Game Over.
+Short Start does not replay this project because its ending leaves scripts
+running. Back → Click Green Flag restores an observed **Score 0, three lives,
+all five complete bands and a new ball**. Right then moves the paddle to X=201,
+and Left moves it back to X=25. The following held-confirmation exit capture
+still shows the menu and is excluded from browser-return evidence. A separate
+fresh launch with short Back/A press-and-release returns to the populated list.
+The DVD-root launch does not qualify normal browser selection of the final
+physical archive.
+
+Some VBlank observations catch the eraser's visible property inside its warp
+procedure. They do not establish visibility in a drawn frame, so this run makes
+no all-frame eraser-invisibility claim. No new physical installation was made;
+physical full-board play, input handoff and broader native qualification remain
+open. Receipts, read-only layouts, controller logs, image/color counts, natural
+ending and replay evidence are retained under ignored
+`build-xbox/upstream-nv2a-20261029/native-breakout/` in the primary checkout.

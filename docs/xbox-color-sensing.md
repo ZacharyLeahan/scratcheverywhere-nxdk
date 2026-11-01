@@ -1,5 +1,9 @@
 # Xbox color-sensing compatibility
 
+The current generator has 58 checks after the
+[fractional subject-alpha correction](xbox-color-self-alpha.md). Historical
+results below retain their then-current fixture counts and archive hashes.
+
 The Maze starter reproduced a collision defect: the player crossed the entire
 blue wall while left-stick input worked. The normal Xbox loader frees backdrop
 RGBA after upload. Compressed PNG caches also keep GPU data and optional alpha

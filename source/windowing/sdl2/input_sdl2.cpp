@@ -1,4 +1,7 @@
 #include "input_sdl2.hpp"
+#ifdef __XBOX__
+#include <hal/xbox.h>
+#endif
 #include "log.hpp"
 #include "window_sdl2.hpp"
 #ifdef __SWITCH__
@@ -225,10 +228,27 @@ void InputDevice_SDL2::getInput() {
         if (SDL_GameControllerGetButton(controller, SDL2_GAMEPAD_KEYS[static_cast<int>(SCRATCH_KEY_INDEX::SHOULDER_L)]) && Input::mousePointer.isMoving) Input::mousePointer.isPressed = true;
 #endif
     }
+#ifdef __XBOX__
+    // Raw physical chord: independent of project mappings and available in menus.
+    static Uint32 resetSince = 0;
+    static bool resetHeld = false;
+    const bool resetChord = SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_START) &&
+        SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK) &&
+        SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERLEFT) > 24000 &&
+        SDL_GameControllerGetAxis(controller, SDL_CONTROLLER_AXIS_TRIGGERRIGHT) > 24000;
+    if (resetChord) {
+        if (!resetHeld) resetSince = SDL_GetTicks();
+        resetHeld = true;
+        if (Uint32(SDL_GetTicks() - resetSince) >= 2000) XReboot();
+    } else resetHeld = false;
+#endif
     button_handler(SCRATCH_KEY_INDEX::START, SDL_CONTROLLER_BUTTON_INVALID);
-    // if (SDL_GameControllerGetButton(controller, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_START)) Input::buttonPress("start");
-    if (SDL_GameControllerGetButton(controller, SDL_GameControllerButton::SDL_CONTROLLER_BUTTON_BACK)) {
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK)) {
+#ifdef __XBOX__
+        Input::inputButtons.push_back("back");
+#else
         Input::buttonPress(CONTROLLER_STRINGS[static_cast<int>(SCRATCH_KEY_INDEX::BACK)]);
+#endif
 #ifdef WII
         OS::toExit = true;
 #endif

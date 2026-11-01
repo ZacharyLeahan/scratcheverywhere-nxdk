@@ -1,6 +1,6 @@
 """Build a runtime regression for cached/backdrop color sensing and culling.
 
-Expected on Xbox: PASSES=38, ERRORS=0. This fixture is not a qualification game.
+Expected on Xbox: PASSES=58, ERRORS=0. This fixture is not a qualification game.
 Uses only the Python standard library. Includes 90 distant visible sprites to
 exercise query culling, opaque PNG cache restoration, an uploaded SVG backdrop,
 masked colors, layered colors, transparent candidates and pen composition.
@@ -122,16 +122,34 @@ check('exact-left-not-white',False,'#ffffff','#ff0000')
 command('outside-left','motion_setx',{'X':num(-241)})
 check('outside-not-blue',False,'#1505ff','#ff0000')
 check('outside-not-white',False,'#ffffff','#ff0000')
+# Every opaque pixel of this subject is white. The plain and white-masked
+# reporters must agree at its fractional upper edge. A reduced alpha grid used
+# to report contact beyond the rendered image at y=-0.5 and y=-0.25 on Xbox.
+blue_row = b'\x00' + bytes([21,5,255,255])*480
+red_row = b'\x00' + bytes([255,0,0,255])*480
+edge_png = (b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR',struct.pack('>IIBBBBB',480,360,8,6,0,0,0))
+            + chunk(b'IDAT',zlib.compress(blue_row*172+red_row+blue_row*187)) + chunk(b'IEND',b''))
+alpha_background = asset('Alpha edge',edge_png,'png',240,180)
+white16 = asset('White16',b'<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><rect width="16" height="16" fill="#ffffff"/></svg>','svg',8,8)
+command('alpha-clear','pen_clear')
+command('alpha-backdrop','looks_switchbackdropto',{'BACKDROP':text('Alpha edge')})
+command('alpha-subject','looks_switchcostumeto',{'COSTUME':text('White16')})
+command('alpha-settle','control_wait',{'DURATION':num(.2)})
+for i,y in enumerate([-2,-1,-.75,-.5,-.25,0,.25,.5,1,2]):
+    key='alpha-'+str(i)
+    command(key+'-position','motion_gotoxy',{'X':num(0),'Y':num(y)})
+    check(key+'-plain',y>=0,'#ff0000')
+    check(key+'-masked',y>=0,'#ff0000','#ffffff')
 command('done','control_stop',fields={'STOP_OPTION':['all',None]})
 for i,key in enumerate(chain):
     blocks[key]['next']=chain[i+1] if i+1<len(chain) else None
     if i:blocks[key]['parent']=chain[i-1]
 
 common=dict(variables={},lists={},broadcasts={},blocks={},comments={},currentCostume=0,sounds=[],volume=100)
-stage=dict(common,isStage=True,name='Stage',costumes=[background,vector_background],layerOrder=0,tempo=60,videoTransparency=50,videoState='off',textToSpeechLanguage=None)
+stage=dict(common,isStage=True,name='Stage',costumes=[background,vector_background,alpha_background],layerOrder=0,tempo=60,videoTransparency=50,videoState='off',textToSpeechLanguage=None)
 stage['variables']={n:[n,0] for n in ['PASSES','ERRORS','FAIL CASE']}
 stage['broadcasts']={n:n for n in ['show-overlay','transparent-overlay','far-overlay']}
-subject=dict(common,isStage=False,name='Subject',blocks=blocks,costumes=[red,pixel_probe],layerOrder=100,visible=True,x=-100,y=0,size=100,direction=90,draggable=False,rotationStyle='all around')
+subject=dict(common,isStage=False,name='Subject',blocks=blocks,costumes=[red,pixel_probe,white16],layerOrder=100,visible=True,x=-100,y=0,size=100,direction=90,draggable=False,rotationStyle='all around')
 overlay=dict(common,isStage=False,name='Overlay',costumes=[green],layerOrder=1,visible=False,x=100,y=0,size=100,direction=135,draggable=False,rotationStyle='all around')
 overlay['blocks']={
     'flag':block('event_whenflagclicked','reset-hide',top=True),

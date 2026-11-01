@@ -1,6 +1,9 @@
 #include "renderer_xbox.hpp"
 #include "speech_manager_xbox.hpp"
+#ifdef WINDOWING_SDL3
 #include "window_sdl3.hpp"
+#endif
+#include "xbox_frame_profile.hpp"
 #include <os.hpp>
 #include <window.hpp>
 
@@ -14,22 +17,6 @@
 
 #undef min
 #undef max
-
-#ifndef VENC_MODE_WIDESCREEN
-#define VENC_MODE_WIDESCREEN VIDEO_WIDESCREEN
-#endif
-#ifndef VENC_MODE_720P
-#define VENC_MODE_720P VIDEO_MODE_720P
-#endif
-#ifndef VENC_MODE_1080I
-#define VENC_MODE_1080I VIDEO_MODE_1080I
-#endif
-#ifndef VENC_MODE_480P
-#define VENC_MODE_480P VIDEO_MODE_480P
-#endif
-#ifndef VENC_MODE_LETTERBOX
-#define VENC_MODE_LETTERBOX VIDEO_LETTERBOX
-#endif
 #endif
 
 #include <algorithm>
@@ -43,6 +30,7 @@
 #include <log.hpp>
 #include <math.hpp>
 #include <runtime.hpp>
+#include <xbox_pointer_help.hpp>
 #include <string>
 #include <text.hpp>
 #include <types.hpp>
@@ -284,9 +272,9 @@ void Renderer_Xbox::initVideo() {
         case AV_PACK_HDTV:
             // Component (HDTV):
             // 720p and 1080i are digital/HDTV modes without CRT raster crop (0% overscan).
-            // Standard 480i through component may be on early HD CRTs with overscan (4%).
+            // Standard 480i through component may be on early HD CRTs with overscan (5%).
             if (xboxVideoSettings.width == 640 && xboxVideoSettings.height == 480 && !xboxVideoSettings.supports480p) {
-                autoOverscan = 0.04f;
+                autoOverscan = 0.05f;
             } else {
                 autoOverscan = 0.0f;
             }
@@ -298,9 +286,9 @@ void Renderer_Xbox::initVideo() {
         case AV_PACK_SCART:    // Advanced SCART (RGB)
         default:
             // Standard-definition analog CRT formats:
-            // Almost all consumer CRTs crop borders by ~3-5%. Apply 4% centered safe margin.
+            // Almost all consumer CRTs crop borders by ~3-5%. Apply 5% centered safe margin.
             if (xboxVideoSettings.width == 640 && xboxVideoSettings.height == 480) {
-                autoOverscan = 0.04f;
+                autoOverscan = 0.05f;
             } else {
                 autoOverscan = 0.0f;
             }
@@ -611,6 +599,7 @@ Renderer_Xbox::Renderer_Xbox() {
     int windowWidth = xboxVideoSettings.width;
     int windowHeight = xboxVideoSettings.height;
 
+#ifdef WINDOWING_SDL3
     window = createWindow(windowWidth, windowHeight, "Scratch Everywhere!", WindowingBackends::SDL3);
     if (window->error.has_value()) {
         error = "Failed to init window: " + window->error.value();
@@ -635,6 +624,9 @@ Renderer_Xbox::Renderer_Xbox() {
     applyVideoSettings();
 #ifdef SE_XBOX_TRACE_RENDERER
     traceStartupPixels(Sdlrenderer);
+#endif
+#else
+    error = "Renderer_Xbox requires SDL3 windowing backend (WINDOWING_SDL3)";
 #endif
 }
 
@@ -1135,6 +1127,9 @@ void Renderer_Xbox::drawRoundedBox(int w, int h, int x, int y, int radius, uint8
 }
 
 void Renderer_Xbox::renderSprites() {
+#ifdef SE_XBOX_PROFILE_FRAMES
+    Timer profileDraw;
+#endif
     // Everything below draws to the main target; pen operations may have left the pen texture active.
     ensureMainTarget(Sdlrenderer);
 
@@ -1194,6 +1189,38 @@ void Renderer_Xbox::renderSprites() {
     drawBlackBars(Sdlrenderer, getWidth(), getHeight());
     Render::renderMonitors();
 
+    // Once per app session, only after pointer mode is used during a project.
+    // This is an overlay: it never consumes input or pauses game scripts.
+    static bool pointerHelpSeen = false;
+    static Uint64 pointerHelpStarted = 0;
+    static std::unique_ptr<TextObject> pointerMoveHelp, pointerClickHelp, pointerReminder;
+    if (!pointerHelpSeen && Input::mousePointer.isMoving) {
+        pointerHelpSeen = true;
+        pointerHelpStarted = SDL_GetTicks();
+        pointerMoveHelp = createTextObject(XboxPointerHelp::move, 0, 0);
+        pointerClickHelp = createTextObject(XboxPointerHelp::click, 0, 0);
+        pointerReminder = createTextObject(XboxPointerHelp::reminder, 0, 0);
+    }
+    if (pointerMoveHelp) {
+        if (SDL_GetTicks() - pointerHelpStarted < XboxPointerHelp::durationMs) {
+            const float sx = getWidth() / 400.0f;
+            const float sy = getHeight() / 240.0f;
+            drawBox(370 * sx, 54 * sy, getWidth() / 2, 201 * sy, 24, 24, 32, 255);
+            int y = 183;
+            for (TextObject *line : {pointerMoveHelp.get(), pointerClickHelp.get(), pointerReminder.get()}) {
+                line->setCenterAligned(true);
+                line->setColor(Math::color(255, 255, 255, 255));
+                line->setScale(0.65f * sy);
+                line->render(getWidth() / 2, y * sy);
+                y += 15;
+            }
+        } else {
+            pointerMoveHelp.reset();
+            pointerClickHelp.reset();
+            pointerReminder.reset();
+        }
+    }
+
 #if !defined(PLATFORM_HAS_MOUSE) && !defined(PLATFORM_HAS_TOUCH)
     if (Input::mousePointer.isMoving) {
         SDL_SetRenderDrawColor(Sdlrenderer, 0, 0, 255, 255);
@@ -1207,7 +1234,14 @@ void Renderer_Xbox::renderSprites() {
     }
 #endif
 
+#ifdef SE_XBOX_PROFILE_FRAMES
+    const double drawMs = profileDraw.getTimeMsDouble();
+    Timer profilePresent;
+#endif
     SDL_RenderPresent(Sdlrenderer);
+#ifdef SE_XBOX_PROFILE_FRAMES
+    XboxFrameProfile::render(drawMs, profilePresent.getTimeMsDouble());
+#endif
 #ifdef SE_XBOX_TRACE_RENDERER
     traceEffectCache();
 #endif

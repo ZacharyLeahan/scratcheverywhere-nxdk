@@ -5,8 +5,12 @@ This fork starts from `ScratchEverywhere/ScratchEverywhere` at
 `ScratchEverywhere-OGXbox` fork was archived on October 19, 2026; its README
 directs users to upstream, which now includes the Xbox port.
 
-The Xbox target uses NXDK, the Ryzee119 SDL3 port, and the compatibility
-patches in `cmake/patches`. The SDK revision matches `docker/Dockerfile.xbox`.
+Current main includes the [upstream release 1.3 integration](xbox-upstream-1.3.md)
+and supports both the native NV2A renderer/window with dedicated Xbox audio and
+the legacy Xbox SDL path. Compatibility patches remain in `cmake/patches`;
+the SDK revision matches `docker/Dockerfile.xbox`. Existing saved renderer
+preferences are respected. Build success does not qualify either path on hardware;
+see the [21-game status and known issues](xbox-game-status.md).
 
 ## Native build
 
@@ -40,12 +44,19 @@ Expected outputs are `build-xbox/default.xbe` for a modded Xbox and
 `build-xbox/scratch-xbox.iso` for xemu. Producing these files does not establish
 that a build boots or works on hardware; test separately.
 
+The Xbox SDL source cache includes the local `nxdk-sdl3.patch` hash. Editing
+that patch triggers reconfiguration and selects a new patched SDL checkout,
+so incremental builds cannot silently keep an earlier driver patch. Existing
+cache revisions are retained. See the [texture-retirement regression](xbox-texture-retirement.md)
+for the driver change that exposed this cache issue.
+
 ### First successful local build
 
 On October 25, 2026, `bash scripts/build-xbox.sh` completed on macOS with
 Homebrew Clang 23.1.2 and Rust 1.99.1, using the default Xbox options. The XBE
 header begins with `XBEH`; packaging added that XBE to the XISO successfully.
-No emulator or hardware boot test has been performed.
+That initial build had not yet been boot-tested. Later, separately identified
+emulator and physical results are recorded in the [game status](xbox-game-status.md).
 
 | Output | Bytes | SHA-256 |
 | --- | ---: | --- |
@@ -65,6 +76,15 @@ docker build --file docker/Dockerfile.xbox --target exporter \
 The Xbox workflow is `.github/workflows/nightly-xbox.yml` and supports manual
 dispatch. Forks may require enabling GitHub Actions first.
 
+## Native renderer options
+
+Upstream 1.3 enables `SE_XBOX_NV2A_HARDWARE_COLOR_ADJUSTMENTS` by default.
+`SE_XBOX_NV2A_HYBRID_HUE` is experimental and remains `OFF`; the normal regression
+results do not qualify that opt-in path. Frame capture and the NV2A startup test
+suite are diagnostic options and remain disabled for normal gameplay builds.
+See the [integration notes](xbox-upstream-1.3.md) for retained fork behavior and
+validation limits. These compile options do not override saved renderer choices.
+
 ## Running projects
 
 Put Scratch projects in `E:\ScratchEverywhere` on the console or emulated HDD.
@@ -78,18 +98,29 @@ additional RAM; it does not add RAM to a retail console. Python 3 is required
 for this packaging step. Set the option to `OFF` to retain CXBE's original
 memory-limit flag for comparison.
 
-The 128MB hardware test loaded Appel with complete map lists using NXDK's
-native allocator. Reproduce that configuration with:
+Earlier 128MB hardware tests loaded Appel's complete map lists with NXDK's
+native allocator. Upstream has since removed the Xbox lwmem override;
+`SE_USE_LWMEM` is no longer a current Xbox build option. Historical lwmem
+investigations in older test notes do not describe the current allocator.
+
+The combined October 29 source tree builds with:
 
 ```sh
-bash scripts/build-xbox.sh -DSE_XBOX_FORCE_480P=ON -DSE_MENU=ON \
-  -DSE_LOADSCREEN=OFF -DSE_USE_LWMEM=OFF
+BUILD_JOBS=4 bash scripts/build-xbox.sh \
+  -DSE_XBOX_FORCE_480P=ON -DSE_XBOX_ALLOW_EXPANDED_RAM=ON \
+  -DSE_XBOX_DEBUG_SYMBOLS=ON \
+  -DSE_XBOX_PROFILE_FRAMES=OFF -DSE_XBOX_PROFILE_THREADS=OFF \
+  -DSE_XBOX_TRACE_GAME_STATE=OFF -DSE_XBOX_TRACE_MENU_INPUT=OFF
 ```
 
-The default lwmem configuration remains available and needs a separate Appel
-loading investigation. For diagnostics only, `SE_XBOX_TRACE_GAME_STATE=ON`
-logs stage variables when the runtime pause menu opens. It defaults to `OFF`.
-See `xbox-game-qualification.md` for the test limitations and outstanding bugs.
+This produces a Release XBE and matching debug symbols with profiling/input
+tracing disabled. The merged build and 21 affected host checks pass; that does
+not replace native-backend physical acceptance or establish FPS. The latest
+physical test launcher remains separate from the newly merged build.
+
+For diagnostics only, `SE_XBOX_TRACE_GAME_STATE=ON` logs stage variables when
+the runtime pause menu opens. It defaults to `OFF`. See the
+[hardware checklist](xbox-game-qualification.md) for remaining tests.
 
 
 ## Upstream synchronization (October 26, 2026)
@@ -185,3 +216,39 @@ At this sync checkpoint the regular Games launcher remains the preceding
 was changed. Build/dependency manifests, decoder probes, and hardware evidence
 are retained under ignored `build-xbox/upstream-wiiu-audio-20261027` and
 `build-xbox/hardware/upstream-wiiu-*` paths.
+
+## Upstream synchronization (October 30, 2026)
+
+Merged upstream `main` through
+[`59057691`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/59057691)
+from fork main `d35d77e7`. This imports eleven upstream commits after `ec2400eb`,
+including microphone/loudness support, the NV2A effect-cache allocation retry,
+NDS audio/assets fixes, PSP SDL3 migration and other platform build fixes.
+The merge preserves the complete fork history and all existing Xbox/game work;
+`backup/pre-upstream-20261030` retains the previous main locally. Existing
+unmerged feature branches remain separate and unchanged.
+
+The host event-dispatch harness now provides the new loudness dependency and
+checks unavailable microphones and rising threshold crossings. Audio resampling
+(160 streaming cases plus EOF/gain/pitch/reset), hat dispatch/allocation,
+typed arithmetic/logic bytecode and costume-cache lifetime checks passed.
+
+A native-only renderer configuration exposed the existing cross-renderer texture
+cache dependency on `Image_Xbox` and SDL headers. Use the documented dual-backend
+configuration (`SE_RENDERER=all`, `SE_WINDOWING=all`, `SE_AUDIO_ENGINE=all`)
+for this validation. Native Xbox audio returns -1 for an unsupported microphone.
+No console deployment or new hardware acceptance is implied by this sync.
+
+The dual-backend NXDK Release build passed with forced 480p, native allocator,
+and frame/thread profiling disabled. The resulting `build-xbox/default.xbe`
+SHA-256 is `eb3492c2b7149a14200d02486a5d12b95cf886ebdb26655c255ac5f738a24535`.
+Build logs are retained locally in `/tmp/upstream-sync-20261030-build-all.log`.
+
+### Checking the disc image used for testing
+
+When the build cache sets `EXTRACT_XISO_BIN=OFF`, a successful build updates the
+XBE without regenerating `scratch-xbox.iso`; an older ISO may still be present.
+Check the disc's embedded `default.xbe` against the executable under test before
+using matching debugger symbols. The October 30 native regression uses a fresh
+separate image with complete embedded-XBE byte comparison, not the stale primary
+ISO. This does not change the cache's intentional packaging setting.

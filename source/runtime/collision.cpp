@@ -300,7 +300,7 @@ bool collision::spriteInSprite(Sprite *a, Sprite *b) {
     return false;
 }
 
-static bool colorAt(Sprite *sprite, float x, float y, uint8_t &outR, uint8_t &outG, uint8_t &outB) {
+static bool colorAt(Sprite *sprite, float x, float y, uint8_t &outR, uint8_t &outG, uint8_t &outB, bool alphaOnly = false) {
     auto &costume = sprite->costumes[sprite->currentCostume];
     std::shared_ptr<CollisionMask> mask = getValidCollisionMask(sprite, true);
     if (mask == nullptr) return false;
@@ -333,10 +333,11 @@ static bool colorAt(Sprite *sprite, float x, float y, uint8_t &outR, uint8_t &ou
     // to that reduced grid. NXDK roundf also rounds -0.5 to zero, which made a
     // query one unit outside a backdrop read its first colored column.
     const auto &image = mask->image;
-    if (!image || !image->ensureColorData()) return false;
+    if (!image || (!alphaOnly && !image->ensureColorData())) return false;
     const int px = static_cast<int>(std::floor((localX + costume.rotationCenterX) * mask->sourceScale));
     const int py = static_cast<int>(std::floor((localY + costume.rotationCenterY) * mask->sourceScale));
     if (px < 0 || py < 0 || px >= image->getPixelWidth() || py >= image->getPixelHeight() || image->getAlphaAt(px, py) == 0) return false;
+    if (alphaOnly) return true;
     image->getColorAt(px, py, outR, outG, outB);
 #else
     const float invertedScaleFactor = 1.0f / mask->scaleFactor;
@@ -441,7 +442,15 @@ bool collision::isTouchingColor(Sprite *sprite, uint8_t r, uint8_t g, uint8_t b)
     uint8_t er, eg, eb;
     for (float y = minY; y <= maxY; y++) {
         for (float x = minX; x <= maxX; x++) {
+#ifdef __XBOX__
+            // The reduced sprite-collision mask can extend past a fractional
+            // costume edge. Use the same source texel as color/mask sensing,
+            // without restoring RGB data just to test the subject's alpha.
+            uint8_t unusedR, unusedG, unusedB;
+            if (!colorAt(sprite, x, y, unusedR, unusedG, unusedB, true)) continue;
+#else
             if (!pointInSprite(sprite, x, y)) continue;
+#endif
             if (environmentColorAt(environment, x, y, er, eg, eb) && scratchColorMatches(er, eg, eb, r, g, b)) {
                 return true;
             }

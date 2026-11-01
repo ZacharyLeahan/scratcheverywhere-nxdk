@@ -64,6 +64,15 @@ class SE_EXPORT Image {
   private:
 #ifdef ENABLE_SVG
     std::unique_ptr<lunasvg::Document> svgDocument = nullptr;
+#ifdef __XBOX__
+    // Keep the source location, rather than every parsed SVG tree, for growth.
+    std::string svgSourcePath;
+    ZipArchive *svgSourceZip = nullptr;
+    bool svgSourceArchived = false;
+    bool svgSourceFromProject = false;
+    float svgRequestedScale = 0.0f;
+    bool svgUploadPending = false;
+#endif
     static std::unordered_map<std::string, SVGFont> loadedFonts;
 #endif
 
@@ -76,6 +85,7 @@ class SE_EXPORT Image {
   protected:
     ImageData imgData;
     std::pair<float, float> svgViewOffset = {0, 0};
+    bool isSVGImage = false;
 
     virtual nonstd::expected<void, std::string> refreshTexture() = 0;
 
@@ -84,7 +94,7 @@ class SE_EXPORT Image {
   public:
     bool isOpaque = false;
 
-    static unsigned char *resizeRaster(const unsigned char *srcPixels, int srcW, int srcH, int &outW, int &outH);
+    static unsigned char *resizeRaster(const unsigned char *srcPixels, int srcW, int srcH, int &outW, int &outH, const Image *keep = nullptr);
 
 #ifdef __XBOX__
     const unsigned int maxFreeTimer = 30;

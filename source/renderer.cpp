@@ -12,6 +12,9 @@
 #ifdef RENDERER_XBOX
 #include "renderer_xbox.hpp"
 #endif
+#ifdef RENDERER_NV2A
+#include "renderer_nv2a.hpp"
+#endif
 #ifdef RENDERER_GX2
 #include "renderer_gx2.hpp"
 #endif
@@ -74,6 +77,9 @@ const std::vector<RendererInfo> Render::getAvailableRenderers() {
 #endif
 #ifdef RENDERER_D3D9
     add(Renderers::D3D9);
+#endif
+#ifdef RENDERER_NV2A
+    add(Renderers::NV2A);
 #endif
 #ifdef RENDERER_XBOX
     add(Renderers::Xbox);
@@ -166,6 +172,15 @@ bool Render::init() {
 #ifdef RENDERER_D3D9
             Render::currentRenderer = Renderers::D3D9;
             globalRenderer = new Renderer_D3D9;
+            break;
+#else
+            continue;
+#endif
+        }
+        case Renderers::NV2A: {
+#ifdef RENDERER_NV2A
+            Render::currentRenderer = Renderers::NV2A;
+            globalRenderer = new Renderer_NV2A;
             break;
 #else
             continue;
@@ -591,7 +606,14 @@ bool Render::checkFramerate() {
 
 std::string Render::getVariableValueString(Value value) {
     if (value.isDouble()) {
-        return Math::toString(std::round(value.get<double>() * 1e6) / 1e6); // js Number(value.toFixed(6))
+        const double number = value.get<double>();
+        // Above 2^33, double spacing exceeds a millionth. Rounding cannot
+        // change the result, and scaling very large values can overflow.
+        if (std::abs(number) >= 0x1p33) return Math::toString(number);
+        // Fast-math otherwise multiplies by an inexact reciprocal, exposing
+        // tails such as 0.19999999999999998 after rounding the monitor to 0.2.
+        volatile double decimalScale = 1e6;
+        return Math::toString(std::round(number * 1e6) / decimalScale);
     } else if (value.isUndefined()) {
         return ""; // Scratch keeps the original value, leave blank for now
     } else {

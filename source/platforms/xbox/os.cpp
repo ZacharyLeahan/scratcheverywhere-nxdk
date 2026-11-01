@@ -1,5 +1,6 @@
 #include <errno.h>
 #include <hal/debug.h>
+#include <hal/xbox.h>
 #include <hal/video.h>
 #include <log.hpp>
 #include <lwip/debug.h>
@@ -17,9 +18,6 @@
 
 extern "C" {
 extern struct netif *g_pnetif;
-#if defined(SE_USE_LWMEM)
-void se_lwmem_get_info(size_t *heap_size, size_t *total_ram, int *is_expanded);
-#endif
 }
 
 namespace OS {
@@ -60,6 +58,13 @@ bool initNetworking() {
     return true;
 }
 
+static OS::SystemAction systemAction = OS::SystemAction::None;
+
+void OS::requestSystemAction(SystemAction action) {
+    systemAction = action;
+    toExit = true;
+}
+
 bool OS::init() {
     XVideoSetMode(640, 480, 32, REFRESH_DEFAULT);
 
@@ -94,37 +99,16 @@ bool OS::init() {
     remove("E:\\ScratchEverywhere\\debug.txt");
 
     Log::log("OS initialized.");
-#if defined(SE_USE_LWMEM)
-    size_t heap_size = 0, total_ram = 0;
-    int is_expanded = 0;
-    se_lwmem_get_info(&heap_size, &total_ram, &is_expanded);
 
-    char memMsg[256];
-    if (is_expanded) {
-        isExpanded = true;
-        snprintf(memMsg, sizeof(memMsg),
-                 "Expanded RAM configuration detected.\n Total: %u MB\n Heap: %u MB\n Reserved for GPU: %u MB",
-                 (unsigned int)(total_ram / (1024 * 1024)),
-                 (unsigned int)(heap_size / (1024 * 1024)),
-                 (unsigned int)((total_ram > heap_size ? (total_ram - heap_size) : 0) / (1024 * 1024)));
-    } else {
-        snprintf(memMsg, sizeof(memMsg),
-                 "Stock RAM configuration detected.\n Total: %u MB\n Heap: %u MB\n Reserved for GPU: %u MB",
-                 (unsigned int)(total_ram / (1024 * 1024)),
-                 (unsigned int)(heap_size / (1024 * 1024)),
-                 (unsigned int)((total_ram > heap_size ? (total_ram - heap_size) : 0) / (1024 * 1024)));
-    }
-    Log::log(memMsg);
-#else
     // Expanded-RAM detection must not depend on the optional heap override.
     MM_STATISTICS stats = {};
     stats.Length = sizeof(stats);
     if (NT_SUCCESS(MmQueryStatistics(&stats))) {
         isExpanded = stats.TotalPhysicalPages > (64u * 1024u * 1024u / 4096u);
-        Log::log("NXDK native allocator; physical RAM: " + std::to_string(stats.TotalPhysicalPages / 256u) +
+        Log::log("Detected RAM: " + std::to_string(stats.TotalPhysicalPages / 256u) +
                  " MB; available: " + std::to_string(stats.AvailablePages / 256u) + " MB");
     }
-#endif
+
     initNetworking();
     return true;
 }
@@ -134,7 +118,14 @@ void OS::deinit() {
     Log::closeNetworkTrace();
 #endif
     nxNetShutdown();
-    return;
+    if (systemAction == SystemAction::None) return;
+    fflush(NULL);
+    if (systemAction == SystemAction::Launcher) XLaunchXBE("E:\\Dashboard\\default.xbe");
+    if (systemAction == SystemAction::Shutdown) {
+        if (NT_SUCCESS(HalWriteSMBusValue(0x20, 0x02, FALSE, 0x80)))
+            for (;;) Sleep(1000);
+    }
+    XReboot();
 }
 
 std::string OS::getPlatform() {

@@ -1,13 +1,41 @@
-# Twenty-game hardware qualification
+# Xbox game hardware qualification
 
-For a concise game list, source links, change-scope breakdown and explanation
-of the Xbox installation workflow, see [the handoff for Mike](xbox-handoff-for-mike.md).
+For a short current summary of hardware versus emulator results, measured
+performance and known issues, see [Xbox game status](xbox-game-status.md).
+This checklist retains the detailed physical acceptance gates.
+The [October 30 native launch regression](xbox-upstream-nv2a-integration.md#current-main-launch-regression--october-30)
+repeats the common 21-game emulator cycle after the latest upstream sync; no new
+physical checks are implied. PacMan has a separately tested optional ending repair.
+The latest [native hardware follow-up](xbox-native-hardware-followup.md) covers
+normal-main Catch gameplay, recovery and the still-open startup investigation.
+Older sections describe their then-current builds, including historical lwmem
+checks; current upstream removes the Xbox lwmem override. Use the
+[current build guide](xbox-fork-build.md) for main.
 
-The goal is twenty playable games, with actual Xbox testing and fixes until each
-works. Downloads, successful builds, and a title screen are not full passes.
-Twenty distinct projects are now packaged and installed with archive readback
+The [October 31 color-boundary correction](xbox-color-self-alpha.md) has native
+and SDL diagnostic coverage plus normal-emulator browser/maze checks. Mario's
+native intro Back request is delivered but can be delayed; the initial observation
+window was too short. See the [timing follow-up](xbox-native-back-taps.md#pause-before-the-next-game-frame--october-31-2026). These add no physical
+acceptance, and expanded graphics coverage uses an explicit diagnostic override
+documented in that note.
+
+The [SDL Back-tap repair](xbox-sdl-back-taps.md) adds 21 normal SDL emulator
+menu cycles, release-gated Green Flag replay, reset and virtual USB reconnect
+checks. The same normal executable is now staged separately on the Xbox, with
+physical native Maze coverage; this does not qualify its SDL driver path.
+
+November 1 hardware checks on the separately staged normal `c7c0a9d9…` build
+add Maze win/replay/two returns and the installed full-set Sokoban copy
+through puzzle eight. Later Sokoban puzzles and the other outstanding gates
+remain open.
+
+The goal is all twenty-one installed games thoroughly tested on the physical
+Xbox, with fixes until each works. Downloads, successful builds, and a title
+screen are not full passes.
+Twenty-one distinct game projects are now packaged and installed with archive readback
 verification. Installation is not qualification; outstanding gameplay checks
-remain listed below. The current console has 128MB RAM; this does not
+remain listed below. Older dated sections retain their then-current twenty-game
+scope. The current console has 128MB RAM; this does not
 establish retail 64MB support.
 
 For each game, establish selection from the normal browser, correct visuals,
@@ -19,25 +47,26 @@ neutralize all reports afterwards.
 
 | Game | Evidence so far | Still needed |
 | --- | --- | --- |
+| [Zach's Spider Adventure](xbox-spider-adventure.md) | Installed as game 21 with unchanged project/assets and controller sidecar; full FTP readback; normal browser launch, D-pad/A gameplay reaches Level 6 / Score 7,516 / Best combo 6 and Game Over; Y replay, stick controls, Back/Select pause, clean browser return and confirmed second launch; 15-second non-clipping HDMI audio signal | Full ten-level victory; subjective and long-run audio |
 | [Hopper Heros Everywhere](xbox-hopper.md) | Normal-build browser launch; added missing D-pad/arrow profile without archive changes; D-pad/stick Left/Right and A jump; post-profile losses at 3 and 8 points, Start replay to zero, B to authored menu, browser returns and fresh-launch gameplay/movement; 8s non-clipping HDMI audio | One early short Start missed after relaunch; sustained progression and subjective/long-run audio; shared KVM handoff |
 | [Ultra Bird](xbox-ultra-bird.md) | Current normal-build browser selection; A flap, loss, Score 2 and another Score 1; short Start restarts a scored stopped round to zero with new moving pipes and another A flap; browser return and fresh launch with two more A flaps; long Start opens pause; original archive has no sound assets or sound/music blocks; installed normal pen-color build reaches Score 6 through camera-only controller play, with live sixth-pipe clearance and seventh approach; natural loss and short-Start replay to zero/new pipes; fresh normal-browser launch/A flap, two clean exits, eight seconds of digital silence and complete unchanged-archive/XBE readback | Shared KVM delivery |
-| [Catch Apples](xbox-catch-apples.md) | Fixed missing D-pad profile; synchronized build D-pad/stick steering, directed collection to Score 22/Timer 0, short Start replay to 0/30, pause/exit, fresh launch and second exit; 8s non-clipping HDMI audio | Intermittent exit launches 2048; isolated bonus/rotten-apple scoring; subjective/long-run audio |
-| [Maze Starter](xbox-maze-replay.md) | D-pad/stick profile; repaired color wall collision; prepared one-frame Goal startup yield fixes stale win text; three full-route wins across traced and normal builds, three clean Green Flag replays, browser return and fresh launch; no authored sound blocks/assets; combined pen/exact-pixel normal build repeats blocked-wall check, full-route win, clean Green Flag replay, renewed movement and browser Exit | Shared intermittent browser handoff remains open |
-| [Snake](xbox-snake.md) | Four stick directions in prior trace; synchronized build browser launch, sustained D-pad movement in all four directions, fruit collection/Score 125 and loss screen, Green Flag replay to later Score 0, pause/exit, fresh browser launch with four D-pad directions and second exit; 8s non-clipping HDMI audio | Explicit self-collision, clock/blade pickups, subjective/long-run audio |
-| Appel v1.4 (griffpatch) | Clone/GPU fixes; normal route reaches checkpoint two; controller-only diagnostic play completes Level 1 with 18 apples and actual WIN; hidden tunnel, short jumps, deaths/checkpoint respawns; win-menu Try Again resets to zero and permits movement/jumping; browser return; quick restart and repeat launch; 30s HDMI music/completion-sound capture; live watch agrees with pause snapshots | Repeat extended route with diagnostics disabled; lwmem loading; subjective listening and longer audio stability |
-| [Tetris (Tech-Coder)](xbox-tetris.md) | Hardware color/pen fix; browser movement/rotation/hard drop; diagnostic run clears ten lines in 28 matched placements using all seven piece families; Score 400/Level 1, faster gravity and explicit Down soft drop; installed normal dashboard build repeats ten lines/400/Level 1 in 32 matched placements and scores a triple for 300; merged normal pen-color build repeats ten lines/420/Level 1 in 27 matched placements, including a double, with two fresh Green Flag resets; Green Flag replay, natural top-out/title, eight seconds of digital silence, short-Start replay to zero, renewed movement/hard drop and clean browser exit; 30s source-matched audio and 120s capture with two sampled music restarts; normal-build xemu seeded exact cap probes verify `Winner!`/title ending and Green Flag replay | Four-line scoring through controller play; subjective listening/capture-start sample anomaly. The 100-million-point cap was tested with diagnostic state seeding, not a normal playthrough |
+| [Catch Apples](xbox-catch-apples.md) | Fixed missing D-pad profile; synchronized build D-pad/stick steering, directed collection to Score 22/Timer 0, short Start replay to 0/30, pause/exit, fresh launch and second exit; 8s non-clipping HDMI audio; prepared-copy special-apple race repair passes normal hardware +2 green and two −2 brown catches with paired native scores | Intermittent exit launches 2048; subjective/long-run audio |
+| [Maze Starter](xbox-maze-replay.md) | D-pad/stick profile; repaired color wall collision; prepared one-frame Goal startup yield fixes stale win text; three full-route wins across traced and normal builds, three clean Green Flag replays, browser return and fresh launch; no authored sound blocks/assets; combined pen/exact-pixel normal build repeats blocked-wall check, full-route win, clean Green Flag replay, renewed movement and browser Exit; current native `c7c0a9d9…` full route/You win, post-win Green Flag, renewed Down movement, fresh browser launch/Right movement, two clean returns and dashboard reset; retrieved log confirms NV2A graphics/windowing and Xbox audio | Repeated-start reliability and shared browser/controller handoffs; no authored sound |
+| [Snake](xbox-snake.md) | Four stick directions in prior trace; synchronized build browser launch, sustained D-pad movement in all four directions, fruit collection/Score 125 and loss screen, Green Flag replay to later Score 0, pause/exit, fresh browser launch with four D-pad directions and second exit; 8s non-clipping HDMI audio; normal-build clock pickup and roughly doubled observed movement interval; later natural boundary loss at Score 175, Green Flag replay and source-matched Game Over cue followed by silence; October 29 unchanged-game normal SDL follow-up verifies blade pickup/one-segment reduction, clock slowdown and restoration during uninterrupted play (observed cell medians 0.155→0.287→0.150 s), tail-collision ending at Score 225 inferred from the visible enclosed head/occupied next cell and immediate post-resume ending, fresh launch/Green Flag steering and one clean browser return | Subjective/long-run active-game audio; second Exit unverified after all four KVM adapters became stale again; native NV2A hardware qualification |
+| [Appel v1.4 (griffpatch)](xbox-appel.md) | Clone/GPU fixes; controller-only diagnostic play completes Level 1 with 18 apples and actual WIN; hidden tunnel, short jumps, deaths/checkpoint respawns; win-menu Try Again resets to zero and permits movement/jumping; browser return; quick restart and repeat launch; 30s HDMI music/completion-sound capture; live watch agrees with pause snapshots; later normal build with prepared controller menus repeats both moving lifts/roof, hidden-passage collection and escape, upper-ledge enemy hop and lower spikes, checkpoint three at 16/35, upper/lower platforms and repeated further jumps to 19/35, and enemy/spike death with checkpoint-three recovery retaining nineteen apples; no live game-state access; later ground-enemy clearance, crouch-tunnel traversal in both directions and bonus alcove collection to 21/35 followed by death/checkpoint recovery retaining twenty-one; four-minute active-game audio capture identifies KVM stream loss; user confirms clean music on the TV in this normal-build session | Movement smoothness/frame pacing; complete Level 1 and victory replay with diagnostics disabled; later platform gaps and finish approach; lwmem loading; longer audio continuity verification with capture loss accounted for |
+| [Tetris (Tech-Coder)](xbox-tetris.md) | Hardware color/pen fix; browser movement/rotation/hard drop; diagnostic run clears ten lines in 28 matched placements using all seven piece families; Score 400/Level 1, faster gravity and explicit Down soft drop; installed normal dashboard build repeats ten lines/400/Level 1 in 32 matched placements and scores a triple for 300; merged normal pen-color build repeats ten lines/420/Level 1 in 27 matched placements, including a double, with two fresh Green Flag resets; Green Flag replay, natural top-out/title, eight seconds of digital silence, short-Start replay to zero, renewed movement/hard drop and clean browser exit; 30s source-matched audio and 120s capture with two sampled music restarts; normal-build xemu seeded exact cap probes verify `Winner!`/title ending and Green Flag replay; a separate fresh input-only normal xemu run clears four lines for 1200 points in 15 placements, with every colored board independently replayed; normal physical Xbox follow-up clears four lines in eleven HDMI-verified controller placements at Score 1200/Level 0, then Green Flag resets to zero, movement/hard drop resumes and Exit returns to the browser | Subjective listening/capture-start sample anomaly. The 100-million-point cap was tested with diagnostic state seeding, not a normal playthrough |
 | [Frogger (cs50)](xbox-frogger.md) | SB2 profile fixed; D-pad/stick movement, collision/death, pause Green Flag restart, exit and repeat launch; prepared win/replay repair passes targeted xemu collision probes; controller-only hardware river crossings score six pads in one live round; Green Flag replay scores the remaining far-right pad and two more, so all seven pad positions have scored across rounds; prepared copy passes two launches/two exits; 30s HDMI music has continuous source offsets, with one unresolved full-scale initial capture frame | Seven-pad win in one hardware round, replay from victory, extended normal-build repetition; initial audio-frame anomaly and subjective sound; shared KVM delivery |
 | Atari Breakout (LVRS) | Localized stage monitor crash and bitmap text layers fixed; prepared D-pad/stick controls; hardware browser launch, Score 100, life loss/full Game Over, Green Flag replay, held-confirmation exit and second browser launch; Player One pause works after delayed Player Three KVM route; combined pen-aware/exact-pixel engine passes the identical 38-case fixture in xemu and on the physical Xbox; prepared eraser clears all five bands through ordinary unseeded controller play at Score 1800/three lives, then 600 stable-score ceiling-traversal frames; native Green Flag replay to 0, Right to X=201 and browser Exit; physical prior prepared-copy run clears blue/green and reaches 1080 before normal Game Over; descending-only paddle repair passes eight clean-boot seeded contact cases and latest-copy unseeded xemu full clear at 1960/three lives plus 600 stable-score traversal frames; paddle-fix physical copy reaches 640, Green Flag restores 0/three lives, repeated round ends at 60; read-only-guided hardware reaches 1040/all three lives, then exposes impossible horizontal respawn at 1060; new serve guard passes seeded initial/respawn and four valid-angle probes; final serve-fixed ordinary unseeded xemu full clear at 1880/all three lives plus 600 stable-score traversal frames; final normal-copy hardware full clear at 1940/one life, three unobscured raw-zero images across 237 stable-score seconds and 1304 live observations with ceiling/paddle traversal; earlier rounds score 460, 180 and 720 with natural Game Over, and native Green Flag visibly restores 0/three lives/full field | Intermittent KVM navigation/confirmation/commanded paddle delivery; final-copy post-clear Green Flag reset and two fresh launch/steering/exit cycles now pass; faint scaled boundary line; no authored audio-playback blocks |
-| [PacMan (cdaniels7088)](xbox-pacman.md) | Browser selection/launch; turns/walls; 70 points before name fix; repaired Game Over; Start replay to Score 0, then 20 points; pause/exit; no authored sound playback; combined pen/exact-pixel normal build repeats wall blocking, corridor turns/pellet scoring, natural Game Over, short-Start reset to zero/renewed scoring, browser Exit and fresh launch with another 20 points | Power-pellet/ghost interaction and board win; failed bonus-route host detector positions excluded |
-| Space Invaders (RokCoder) | Hardware browser launch; D-pad left/right, A start/fire, Score 450, shield damage and life loss; A replay to 0/three lives; pause/exit, verified fresh launch and second exit; HDMI audio signal | Full wave; subjective/long-run audio |
+| [PacMan (cdaniels7088)](xbox-pacman.md) | Browser selection/launch; turns/walls; 70 points before name fix; repaired Game Over; Start replay to Score 0, then 20 points; pause/exit; no authored sound playback; combined pen/exact-pixel normal build repeats wall blocking, corridor turns/pellet scoring, natural Game Over, short-Start reset to zero/renewed scoring, browser Exit and fresh launch with another 20 points; normal hardware upper-left power pellet changes Score 100→200 and both ghosts visibly turn blue | Eating a frightened ghost and board win; failed bonus-route host detector positions excluded |
+| [Space Invaders (RokCoder)](xbox-space-invaders.md) | Hardware browser launch; D-pad left/right, A start/fire, Score 450, shield damage and life loss; later normal-build endings at 260 and 1,230, with no full-wave claim; A replay to 0/three lives; pause/exit, verified fresh launch and second exit; HDMI audio signal | Full wave; subjective/long-run audio |
 | Asteroids (Will_Wam) | Hardware browser launch, thrust/turn/fire, 9,200 points and game over; repaired SB2 ending text; pause Green Flag replay to 0; exit, fresh browser relaunch and second exit; captured HDMI audio | Subjective/long-run audio; further level progression |
-| [Sokoban (Gammastr20)](xbox-sokoban.md) | Hardware completion of puzzles 1–3; four D-pad directions, crate/goal updates, Black/R puzzle restart; 7.995s HDMI audio; hardware pause/exit on the new candidate; three-cell level-ten repair passes independent replay, full xemu completion and controller-only Xbox completion (698 moves/171 pushes, every player/map state matched, natural level eleven); physical Black restart after twenty moves restores all crates/player; prepared archive installed with original backup/full readback and passes first three puzzles, Black restart, two launches/two short exits; 120s source-matched music loop and prepared 8s repeat capture, with scripts and nine assets preserved | Later puzzles and complete normal playthrough; subjective audio and shared initial capture-frame anomaly |
+| [Sokoban (Gammastr20)](xbox-sokoban.md) | Hardware completion of puzzles 1–3; four D-pad directions, crate/goal updates, Black/R puzzle restart; 7.995s HDMI audio; hardware pause/exit on the new candidate; three-cell level-ten repair passes independent replay, full xemu completion and controller-only Xbox completion (698 moves/171 pushes, every player/map state matched, natural level eleven); physical Black restart after twenty moves restores all crates/player; prepared archive installed with original backup/full readback and passes first three puzzles, Black restart, two launches/two short exits; 120s source-matched music loop and prepared 8s repeat capture, with scripts and nine assets preserved; separate full-set candidate passes all 13 puzzles, 2,728 moves/628 pushes and natural wrap in SDL and current native-graphics xemu runs, with every player/map state checked; native run also passes exact initial/restart images, Green Flag, renewed push/Black restart, fresh browser launch/two clean returns and a source-matched 10s SDL3 APU music excerpt; full-set archive installed with backup/readback; current native hardware completes puzzles 1–8, 283 route moves and eight Black restarts with every board checked | Physical puzzles 9–13, natural wrap and post-wrap replay/Exit; subjective audio and initial capture-frame anomaly; native XboxAudio/FPS/64MB qualification remain open |
 | [2048 (JereTheJuggler)](xbox-2048.md) | Four directions; prepared A victory acknowledgement; installed normal build completes an unseeded 2048 win at Score 20264 through 927 direction commands with independent legal board/score checks; A continues to Score 20276 and moves the 2048 tile; Green Flag replay to 0 then merge/Score 4; two clean short-confirmation exits with a fresh browser launch between them; that launch reaches natural Game Over/388, A replays to 0 and Up moves/spawns; 12s exact digital silence, matching no authored sound playback | Shared missed/duplicate KVM delivery and held-confirmation browser handoff |
-| Retro Racing (griffpatch) | Hardware browser launch, car/road/HUD/map, acceleration to 108 MPH, A braking to 27, D-pad/stick steering, off-road slowdown, Green Flag replay, two launches/two exits and controller dashboard reset; 8s non-clipping HDMI audio; xemu clone count 191 across replay and zero after exit; audio-fix build reaches 100 MPH, Y pause/resume and Green Flag to zero pass, extended driving progresses around opening bend | Full lap/traffic/drift; subjective/long-run audio |
-| Hill Climb Racing (griffpatch) | Hardware jeep Score 1,000, motorcycle Score 420/+200 airtime; crash and fuel loss; A replay, X vehicle swap, active Black/R restart; repaired full messages; pause/exit and repeat launch; HDMI audio signal | Extended terrain, precise brake/air control, fuel pickup, authored Y pause, subjective/long-run audio |
-| [Super Mario Bros. (Will_Wam)](xbox-mario.md) | Calendar startup fix; normal-build controller play crosses four opening pipes; prepared-copy death/restart and audio ordering repair; final normal build passes ordinary Goomba and first-pit deaths across two browser launches, automatic visible recovery and renewed walk/jump/landing; two clean browser exits; complete death cues in 120s/60s non-clipping recordings match at 0.96033/0.99994, with resumed music; GDB verifies two recovery cycles, ordered cue starts and stable controls | Full level and subjective audio |
-| Doodle Jump (xamuil2) | Hardware browser launch, left/right platform steering, at least 1,044 m; fall and automatic replay; pause/exit, fresh launch and second exit; HDMI audio signal | Edge wrapping, monsters, extended play and subjective audio |
-| Jumper (Depicklator) | Fixed SVG bounds; hardware A-to-play/jump, levels 1–4 cleared, level 5 rendered, lava death/respawn, Black level restart, Green Flag full replay, fresh launch and Y+Black full restart, browser exit and HDMI audio signal | Intermittent second Exit launches 2048; new readiness guard passes quick A start and two subsequent exits; later levels, subjective/long-run audio |
+| [Retro Racing (griffpatch)](xbox-retro-racing.md) | Hardware browser launch, car/road/HUD/map, acceleration to 108 MPH, A braking to 27, D-pad/stick steering, off-road slowdown, Green Flag replay, two launches/two exits and controller dashboard reset; 8s non-clipping HDMI audio; xemu clone count 191 across replay and zero after exit; audio-fix build reaches 100 MPH, Y pause/resume and Green Flag to zero pass, extended driving progresses around opening bend; separate current-native emulator completes a normal 02:02.00 lap, deliberate handbrake drift/smoke, Y pause, off-road slowdown, Green Flag and two clean returns | Physical full lap, traffic visuals/drift and subjective/long-run audio; source contains no traffic-collision handler |
+| [Hill Climb Racing (griffpatch)](xbox-hill-climb.md) | Hardware jeep Score 1,000, motorcycle Score 420/+200 airtime; crash and fuel loss; A replay, X vehicle swap, active Black/R restart; repaired full messages; pause/exit and repeat launch; HDMI audio signal; normal-build Y pause freezes scene/fuel despite held gas and resumes at Score 420; visible fuel-can pickup restores the gauge, Score 900/+200 airtime, authored neck-break ending and clean browser return | Extended terrain, precise brake/air control, subjective/long-run audio |
+| [Super Mario Bros. (Will_Wam)](xbox-mario.md) | Calendar startup fix; normal-build controller play crosses four opening pipes; prepared-copy death/restart and audio ordering repair; final normal build passes ordinary Goomba and first-pit deaths across two browser launches, automatic visible recovery and renewed walk/jump/landing; two clean browser exits; complete death cues in 120s/60s non-clipping recordings match at 0.96033/0.99994, with resumed music; GDB verifies two recovery cycles, ordered cue starts and stable controls; separate current-native emulator normal play completes the full level without deaths, flagpole/fireworks/fade, natural replay, Green Flag and two clean returns | Physical full level/native Back behavior; subjective audio and performance |
+| Doodle Jump (xamuil2) | Hardware browser launch, left/right platform steering, at least 1,044 m; fall and automatic replay; pause/exit, fresh launch and second exit; HDMI audio signal; normal-build HDMI frame pairs confirm right-to-left and left-to-right edge wrapping within their respective rounds, followed by clean browser return | Monsters, extended play and subjective audio |
+| [Jumper (Depicklator)](xbox-jumper.md) | Fixed SVG bounds; hardware A-to-play/jump, levels 1–4 cleared, level 5 rendered, lava death/respawn, Black level restart, Green Flag full replay, fresh launch and Y+Black full restart, browser exit and HDMI audio signal; separate current native `c7c0a9d9…` clears all 20 courses with both the installed and timer-fixed archives, visible win/stopped timer, fixed post-win Y+Black clock restart, Green Flag replay and clean browser return | Physical later levels/victory/replay and installation of post-win Y+Black timer repair; intermittent second Exit launches 2048; new readiness guard passes quick A start and two subsequent exits; decimal monitor tails ([repair awaiting hardware check](xbox-monitor-number-formatting.md)); subjective/long-run audio |
 | Connect Four (aaronzoll) | Archive uploaded/readback verified; arrows/WASD profile; computed-list loader fix passes 19 checks in both engines; prepared initial state/monitor repair; hardware both control sets/colors, stacking, vertical/horizontal/diagonal wins, full-column rejection, Green Flag replay and repeated browser launch; exit | One initial mouse-mode launch remains unexplained; no authored sound-playback blocks |
 
 Sources, authors, instructions, packaging details and hashes for the additional
@@ -50,6 +79,16 @@ Mario now has a verified prepared-copy restart/audio repair; see its linked
 qualification notes for the original/prepared hashes and preserved assets.
 The current browser's first page shows 2048, Appel, Asteroids, Atari Breakout
 and Catch Apples.
+
+## Texture-retirement candidate (October 28, 2026)
+
+The separate normal candidate `78cb682a...` includes an Xbox SDL texture
+lifetime repair. [Reproduction and evidence](xbox-texture-retirement.md) cover
+a standalone control/fix comparison, 100 exact-pixel Sokoban redraws, the
+38-case native color/pen regression, and twenty physical controller restart
+commands with 21 clean settled board captures and return to the game list.
+The primary Games launcher remains `b75e9beb...`. These selected diagnostic
+projects do not qualify any complete game or close the all-twenty-one goal.
 
 ## Installed normal dashboard launcher — October 27, 2026
 
@@ -113,33 +152,6 @@ placements, ten lines, Score 420 and Level 1, including one double-line clear.
 Four-line scoring remains open. See [the Tetris evidence](xbox-tetris.md).
 These installation and regression checks do not complete the other games'
 remaining qualification requirements or the shared KVM input-delivery work.
-
-## Appel normal-build repeat before testing paused — October 27, 2026
-
-The installed diagnostics-off `b75e9beb…` launcher ran the unchanged full Appel
-archive `4affb3db…` through the browser. Controller-only play repeated seven
-apples and checkpoint two. After a fall, the player returned to that flag with
-seven apples retained. Testing paused at the ground edge before the first
-moving lift; this run does not establish a full normal-build level completion.
-The previously documented diagnostic Level 1 win remains a separate result.
-No game-state writes or diagnostic live-variable feedback were used for this
-normal repeat.
-
-Retained images in ignored `build-xbox/hardware/` include
-`appel-normal-overhead-landing2.jpg`,
-`appel-normal-checkpoint2-respawn-paused.jpg` and
-`appel-normal-cp2-edge1-live.jpg`. The final view was left in Appel's authored
-pause, and the owned camera observer was stopped when testing was paused.
-
-The associated 120-second HDMI capture contains exactly 5,760,000 stereo frames
-at 48kHz, with peak 0.24823 and no full-scale samples. Most sampled segments
-match the original music, but source offsets do not consistently advance with
-elapsed capture time; the 30-second probe is weak (correlation 0.418). The first
-frame is also the capture's peak. Cause is not isolated, and this is not a
-gapless-loop, continuity or subjective-listening pass. Metadata and sampled
-comparisons are `appel-normal-full-route-audio1.json` and
-`appel-normal-full-route-audio1-match.json`; PCM SHA-256 is
-`11822d22076c15bfa67d7bee4c151f8e9fcb159546e80a1e4238473f222fccb6`.
 
 ## Appel controller route follow-up — October 26, 2026
 
@@ -952,3 +964,22 @@ passed D-pad/right and left-stick/left steering, ±201 edge limits, Score 60,
 loss, Green Flag replay with mode reset and renewed direct steering, and Exit
 to the browser in xemu. Its original assets and non-input scripts are retained.
 It has not yet been installed on the physical Xbox.
+
+## Twenty-one-game follow-up — October 28, 2026
+
+All twenty-one installed games, including Zach's Spider Adventure, are now the
+explicit qualification scope. The matrix above remains the acceptance checklist;
+installation, emulator results and partial gameplay do not close its open checks.
+
+On normal Xbox executable `ac3142d7…`, [Tetris](xbox-tetris.md#physical-four-line-clear--october-28-2026)
+passed the physical four-line objective, zero-state Green Flag replay, renewed
+movement/hard drop and browser return. Doodle Jump passed both horizontal edge
+wraps: raw HDMI pairs show right-edge X≈699→68 at 199 m and left-edge X≈28→680
+at 191 m, with the scene/height consistent within each pair. Those pairs belong
+to different rounds; they do not establish extended play or monster interactions.
+Doodle also returned cleanly to the browser.
+
+Doodle evidence is in ignored `build-xbox/hardware/doodle-wrap-20261028-frames/`,
+`doodle-wrap-audit-20261028.json`, the corresponding controller receipt and
+`doodle-wrap-browser-return-20261028.jpg`. The original frames were visually
+inspected independently of the yellow-head classifier.

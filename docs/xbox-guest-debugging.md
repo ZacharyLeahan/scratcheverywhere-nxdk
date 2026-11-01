@@ -160,3 +160,14 @@ and a generated-config hard link to the source configuration. Python 3.13 syntax
 A complete process quit/relaunch with `--persist-disk` retained the installed
 games and returned to the populated browser
 (`controller-persisted-browser.png`).
+
+
+## Controller disconnect tests
+
+In the private QMP runner, `xemu-input-bind` with source `none` stops input but
+leaves an existing virtual USB pad attached. Verify `pad` in
+`query-xemu-input-bindings` and actual SDL/native device state. A route change
+alone does not qualify unplug/reconnect. The SDL regression reads `info qtree`
+to identify the owned guest's gamepad devices, uses `device_del` for real removal,
+then verifies a new controller ID and resumed navigation after reconnect.
+Never target another emulator or infer physical Xbox behavior from this test.

@@ -223,6 +223,20 @@ const char *mnemonic(BytecodeOp op) {
         return "LengthOfVar";
     case BytecodeOp::MathOp:
         return "MathOp";
+    case BytecodeOp::NumAdd:
+        return "NumAdd";
+    case BytecodeOp::NumSubtract:
+        return "NumSubtract";
+    case BytecodeOp::NumMultiply:
+        return "NumMultiply";
+    case BytecodeOp::NumDivide:
+        return "NumDivide";
+    case BytecodeOp::BooleanAnd:
+        return "BooleanAnd";
+    case BytecodeOp::BooleanOr:
+        return "BooleanOr";
+    case BytecodeOp::BooleanNot:
+        return "BooleanNot";
     case BytecodeOp::NumEquals:
         return "NumEquals";
     case BytecodeOp::NumLess:

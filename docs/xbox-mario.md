@@ -101,7 +101,7 @@ the prepared archive keeps the usual Mario `.sb3` name and unchanged sidecar
 profile. Temporary upload, final archive and backups passed full readback.
 The backups use `.fixture` extensions so they add no selectable projects.
 
-First-level completion and subjective listening remain open.
+First-level completion on the physical Xbox and subjective listening remain open.
 
 ## Audio evidence from the original hardware run
 
@@ -119,3 +119,40 @@ candidate broadcast traces, matching artifacts, preparation/readiness probes)
 and `build-xbox/hardware/` (`mario-normal-*` action receipts, frame histories,
 audio and FTP deployment receipts). Earlier candidates remain recorded as
 failed/incomplete checks, not accepted repairs.
+
+
+## Current native emulator full level — October 31, 2026
+
+Normal main XBE `eb3492c2…`, native NV2A graphics and a 128 MB snapshot guest
+complete the first level using the installed prepared archive `7efb9b52…` above.
+Right, Up and A supply walking, jumping and sprinting. Read-only GDB/QMP
+observations guide the route; no position, level, collision, invincibility or
+random state is written, and the project's J/teleport shortcut is never used.
+The only debugger write selects the native renderer before project load.
+
+The run passes:
+
+- The entire route from the opening through the pits, pipes and final stairs,
+  with no deaths, then the visible flagpole slide and landing.
+- Five visible fireworks, the authored fade, automatic return to the opening
+  and renewed walking/jumping. The opening remains visible and unfrozen across
+  another 948 video frames before the successful movement check.
+- Runtime pause, Green Flag reset and renewed walking/jumping, then held-A Exit.
+- A fresh browser selection/load, the complete intro, walking/jumping and a
+  second held-A Exit. Both returns have zero game sprites and the exact
+  21-game/42-button browser, without starting 2048.
+
+Two pipe approaches initially stalled against their lips. Backing up and
+jumping cleared each on the same run; those failed control sequences are kept
+in the evidence. No game or engine change was needed. The first ending verifier
+also expected an exact zero camera offset; the authored one-pixel initializer
+produces `SCROLL X=-0.03125`. Source inspection, the stable opening images and
+renewed controls establish the reset; the corrected review uses a small range.
+
+Ignored evidence is in `build-xbox/mario-native-fullrun-20261031/`: original
+screenshots and QMP logs, `review.json`, `followup-review.json` and the visual
+contact sheet. The audit checks input keys, read-only memory commands, artifact
+hashes and the unchanged snapshot base HDD. The owned guest was closed cleanly.
+This extends emulator coverage only: physical native level completion, subjective
+audio and performance remain unverified. No console archive, executable or
+saved setting was changed by this run.

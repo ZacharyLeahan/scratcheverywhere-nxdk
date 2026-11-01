@@ -37,6 +37,7 @@ class SE_EXPORT StringPool {
         bool deduped = false;
 
         size_t hash = 0;
+        double numericValue = 0.0;
     };
 
     static constexpr size_t dedupMaxLength = 32;
@@ -70,6 +71,7 @@ class SE_EXPORT StringPool {
     static std::string utf16CharAt(uint32_t id, size_t index);
 
     static bool isNumeric(uint32_t id, bool &hasDot);
+    static double asNumber(uint32_t id);
     static void resetAll();
 };
 

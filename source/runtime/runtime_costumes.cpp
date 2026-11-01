@@ -27,6 +27,32 @@ void Scratch::switchCostume(Sprite *sprite, double costumeIndex) {
     sprite->currentCostume = std::isfinite(costumeIndex) ? (costumeIndex - std::floor(costumeIndex / sprite->costumes.size()) * sprite->costumes.size()) : 0;
 
 #ifdef __XBOX__
+    // A repeated assignment must still request redraw, but it need not reload
+    // unchanged image geometry or sweep the image cache. Size/viewport changes,
+    // eviction, a different costume, and SVG crop changes take the normal path.
+    const auto &current = sprite->costumes[sprite->currentCostume];
+    const int height = Render::renderMode == Render::BOTH_SCREENS ? 480 : Render::getHeight();
+    const float requestedScale = (sprite->size / 100) * std::min(
+        static_cast<float>(Render::getWidth()) / Scratch::projectWidth,
+        static_cast<float>(height) / Scratch::projectHeight);
+    if (sprite->loadedCostumeIndex == sprite->currentCostume &&
+        sprite->loadedCostumeRequestScale == requestedScale) {
+        auto cached = costumeImages.find(current.fullName);
+        if (cached != costumeImages.end()) {
+            cached->second->freeTimer = cached->second->maxFreeTimer;
+            const auto &image = *cached->second;
+            const auto offset = image.getSVGViewOffset();
+            if (sprite->spriteWidth == cached->second->getWidth() &&
+                sprite->spriteHeight == cached->second->getHeight() &&
+                current.imageViewOffsetX == offset.first && current.imageViewOffsetY == offset.second) {
+                if (sprite->visible) Scratch::forceRedraw = true;
+                return;
+            }
+        }
+    }
+#endif
+
+#ifdef __XBOX__
     if (costumeImages.size() >= (sprites.size() + 2)) {
         freeUnusedCostumeImages();
     }
@@ -38,6 +64,9 @@ void Scratch::switchCostume(Sprite *sprite, double costumeIndex) {
 }
 
 void Scratch::loadCurrentCostumeImage(Sprite *sprite) {
+#ifdef __XBOX__
+    sprite->loadedCostumeIndex = -1;
+#endif
     Costume &costume = sprite->costumes[sprite->currentCostume];
     const std::string &costumeName = costume.fullName;
 
@@ -46,6 +75,7 @@ void Scratch::loadCurrentCostumeImage(Sprite *sprite) {
 
     auto it = costumeImages.find(costumeName);
     if (it != costumeImages.end()) {
+        it->second->freeTimer = it->second->maxFreeTimer;
         float cachedScale = (sprite->size / 100);
         cachedScale *= std::min(static_cast<float>(screenWidth) / Scratch::projectWidth, static_cast<float>(screenHeight) / Scratch::projectHeight);
 
@@ -55,6 +85,12 @@ void Scratch::loadCurrentCostumeImage(Sprite *sprite) {
         if (!potentialError.has_value()) Log::logWarning("Error resizing SVG: " + costume.id);
 
         applyImageGeometry(sprite, costume, *it->second);
+#ifdef __XBOX__
+        if (potentialError.has_value()) {
+            sprite->loadedCostumeIndex = sprite->currentCostume;
+            sprite->loadedCostumeRequestScale = cachedScale;
+        }
+#endif
 
         if (it->second->getScale() != oldScale) {
             costume.collisionMask = nullptr;
@@ -83,7 +119,11 @@ void Scratch::loadCurrentCostumeImage(Sprite *sprite) {
 
     auto onErr = [&](std::string error) -> bool {
         const std::string missingName = "SE__Missingno";
-        const bool transient = error.find("emory") != std::string::npos || error.find("outofmem") != std::string::npos;
+        // Allocation failures surface under several wordings ("Failed to allocate SVG pixels buffer",
+        // "LunaSVG failed to render SVG to bitmap" when plutovg cannot get its surface, ...). All of them are memory
+        // pressure, not a broken asset, so they must not blacklist the costume forever in failedCostumeImages.
+        const bool transient = error.find("emory") != std::string::npos || error.find("outofmem") != std::string::npos ||
+                               error.find("llocate") != std::string::npos || error.find("failed to render SVG") != std::string::npos;
         if (failedCostumeImages.count(costumeName) == 0) {
             Log::logWarning("Failed to load image: " + costumeName + ": " + error);
             if (!transient) failedCostumeImages.insert(costumeName);
@@ -146,6 +186,13 @@ void Scratch::loadCurrentCostumeImage(Sprite *sprite) {
 
     if (image) {
         applyImageGeometry(sprite, costume, *image);
+#ifdef __XBOX__
+        // Match the scale used by the cached-image path on the next assignment.
+        sprite->loadedCostumeIndex = sprite->currentCostume;
+        sprite->loadedCostumeRequestScale = (sprite->size / 100) * std::min(
+            static_cast<float>(screenWidth) / Scratch::projectWidth,
+            static_cast<float>(screenHeight) / Scratch::projectHeight);
+#endif
 
         costumeImages[costumeName] = image;
 #ifdef __XBOX__
@@ -168,7 +215,11 @@ void Scratch::flushCostumeImages() {
 
     std::vector<std::string> toDelete;
     for (auto &[id, img] : costumeImages) {
-        if (id == "SE__Missingno" || activeCostumes.count(id)) continue;
+        if (id == "SE__Missingno") continue;
+        if (activeCostumes.count(id)) {
+            img->freeTimer = img->maxFreeTimer;
+            continue;
+        }
         img->freeTimer--;
         if (img->freeTimer <= 0) toDelete.push_back(id);
     }
@@ -191,10 +242,17 @@ void Scratch::flushCostumeImages() {
     }
 }
 
-void Scratch::freeUnusedCostumeImages() {
+void Scratch::freeUnusedCostumeImages(const Image *keep) {
     std::unordered_set<std::string> activeCostumes;
     activeCostumes.reserve(sprites.size() + 1);
     activeCostumes.insert("SE__Missingno");
+    // An allocation retry may evict inactive costumes while the current image is still
+    // building its GPU texture. Never free that image's CPU pixels out from under it.
+    if (keep) {
+        for (const auto &[id, img] : costumeImages) {
+            if (img.get() == keep) activeCostumes.insert(id);
+        }
+    }
     for (Sprite *sprite : sprites) {
         if (sprite->currentCostume >= 0 && (size_t)sprite->currentCostume < sprite->costumes.size()) {
             activeCostumes.insert(sprite->costumes[sprite->currentCostume].fullName);

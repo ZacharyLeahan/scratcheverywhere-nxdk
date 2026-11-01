@@ -240,5 +240,24 @@
     "controls_base": "examples/arrow-game-xbox-controls.json",
     "controls_base_sha256": "46c9f91e50285b71b1bd6aa010b0f5fb2b6ff6605071d60c23736f6be1e1ed39",
     "xbox_path": "E:\\ScratchEverywhere\\Connect-Four-aaronzoll.sb2"
+  },
+  {
+    "id": 1396458859,
+    "title": "Zach's Spider Adventure",
+    "author": "zacharyleahan",
+    "url": "https://scratch.mit.edu/projects/1396458859/",
+    "file": "Zachs-Spider-Adventure.sb3",
+    "sha256": "4d70968739e9aafe19660baed7eb12f153d58189760d37559eafaae1b6fe972c",
+    "project_json_sha256": "d817e55b0965c73ba9ac5af6fad6f514cfad3ece493ce5cfc7b1e2dab04e9fd4",
+    "assets": 125,
+    "scripts_unchanged": true,
+    "asset_hashes_verified": true,
+    "controls": "examples/spider-adventure-xbox-controls.json",
+    "bytes": 1160210,
+    "controls_sha256": "a24f7ed3c2eeac50162b05075e1b7ae45845444e347e891d8964469680cd4497",
+    "status": "Installed game 21; hardware gameplay reached Level 6 / Score 7516 and Game Over; full ten-level victory pending",
+    "controls_readback_verified": true,
+    "archive_readback_verified": true,
+    "xbox_path": "E:\\ScratchEverywhere\\Zachs-Spider-Adventure.sb3"
   }
 ]

@@ -6,6 +6,7 @@
 #include "translation.hpp"
 #include "unzip.hpp"
 #include "xbox_variable_watch.hpp"
+#include "xbox_frame_profile.hpp"
 #include <algorithm>
 #include <input.hpp>
 #include <iostream>
@@ -58,7 +59,17 @@ void Scratch::initializeScratchProject() {
 }
 
 std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayThread) {
-    if (!Render::appShouldRun()) {
+#if defined(ENABLE_MENU) && defined(__XBOX__)
+    static bool backWasHeld = false;
+#endif
+#ifdef SE_XBOX_PROFILE_FRAMES
+    Timer profilePoll;
+#endif
+    const bool appRunning = Render::appShouldRun();
+#ifdef SE_XBOX_PROFILE_FRAMES
+    XboxFrameProfile::poll(profilePoll.getTimeMsDouble());
+#endif
+    if (!appRunning) {
         // appShouldRun() only ever returns false when the platform wants the app
         // to quit (OS::toExit, or the window/ProcUI saying so) -- never because
         // the project merely ended. Mark it explicitly so mainLoop() goes straight
@@ -78,6 +89,11 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
         if (pauseMenu->shouldUnpause) {
             MenuManager::cleanup();
             pauseMenu = nullptr;
+#ifdef __XBOX__
+            // Menu actions finish after Back is released; rearm immediately so
+            // a new tap can pause again before the next scheduled game poll.
+            backWasHeld = false;
+#endif
         }
         return std::make_pair(Render::appShouldRun(), false);
     }
@@ -127,13 +143,42 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
         extensions::runUpdateFunctions(extensions::PRE_UPDATE);
 #endif
 
+#ifdef SE_XBOX_PROFILE_FRAMES
+        Timer profilePhase;
+        double profileInput = 0;
+#endif
         if (checkFPS) {
             Input::getInput();
+#if defined(ENABLE_MENU) && defined(__XBOX__)
+            // Honor the console-menu request before another script/render batch
+            // can block on lazy costume loading. The native input device keeps
+            // short Back taps latched until this poll consumes them.
+            const bool backHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "back") != Input::inputButtons.end();
+            const bool pauseRequested = backHeld && !backWasHeld;
+            backWasHeld = backHeld;
+            if (pauseRequested) {
+                pauseMenu = new PauseMenu();
+                MenuManager::changeMenu(pauseMenu);
+                return std::make_pair(true, false);
+            }
+#endif
             BlockExecutor::executeWhenGreaterThanHats();
         }
+#ifdef SE_XBOX_PROFILE_FRAMES
+        profileInput = profilePhase.getTimeMsDouble();
+        profilePhase.start();
+#endif
         BlockExecutor::runThreads();
         BytecodeExecutor::runThreads();
+        // Bytecode can retire clones after the legacy executor's cleanup pass.
+        BlockExecutor::cleanupSprites();
         XboxVariableWatch::sample();
+        Mixer::drainRetiredStreams();
+#ifdef SE_XBOX_PROFILE_FRAMES
+        const double profileScripts = profilePhase.getTimeMsDouble();
+        XboxFrameProfile::work(profileInput, profileScripts);
+        profilePhase.start();
+#endif
 
 #ifdef ENABLE_INSPECTOR
         if (forcedStep && Inspector::stepsRemaining <= 0) std::cout << "STEP_DONE\n";
@@ -168,6 +213,9 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
 
             Render::renderSprites();
             Scratch::flushCostumeImages();
+#ifdef SE_XBOX_PROFILE_FRAMES
+            XboxFrameProfile::sample(profilePhase.getTimeMsDouble());
+#endif
 
             if (debugVars) stageSprite->variables["SE!__FPS"].value = Value(std::to_string(std::clamp(static_cast<int>(currentFPS), 0, FPS)));
 
@@ -175,28 +223,9 @@ std::pair<bool, bool> Scratch::stepScratchProject(ScriptThread &monitorDisplayTh
             extensions::runUpdateFunctions(extensions::POST_RENDER);
 #endif
         }
-#ifdef ENABLE_MENU
-
+#if defined(ENABLE_MENU) && !defined(__XBOX__)
         const bool browserProject = projectType == ProjectType::UNEMBEDDED || (projectType == ProjectType::UNZIPPED && Unzip::UnpackedInSD);
-#ifdef __XBOX__
-        // Count wall time, not game frames: slow projects must remain escapable.
-        static Timer pauseHoldTimer(false);
-        static bool holdingPauseStart = false;
-        bool pauseRequested = false;
-        const bool startHeld = std::find(Input::inputButtons.begin(), Input::inputButtons.end(), "start") != Input::inputButtons.end();
-        if (browserProject && startHeld) {
-            if (!holdingPauseStart) {
-                pauseHoldTimer.start();
-                holdingPauseStart = true;
-            }
-            pauseRequested = pauseHoldTimer.hasElapsed(3000);
-        } else {
-            holdingPauseStart = false;
-        }
-        if (pauseRequested) holdingPauseStart = false;
-#else
         const bool pauseRequested = browserProject && Input::keyHeldDuration["1"] > 90 * (FPS / 30.0f);
-#endif
         if (pauseRequested) {
             pauseMenu = new PauseMenu();
             MenuManager::changeMenu(pauseMenu);
@@ -256,6 +285,10 @@ void Scratch::stopClicked() {
         currentSprite->ghostEffect = 0.0f;
         currentSprite->brightnessEffect = 0.0f;
         currentSprite->colorEffect = 0.0f;
+        currentSprite->fisheyeEffect = 0.0f;
+        currentSprite->whirlEffect = 0.0f;
+        currentSprite->pixelateEffect = 0.0f;
+        currentSprite->mosaicEffect = 0.0f;
         for (Sound sound : currentSprite->sounds)
             Mixer::stopSound(sound.fullName);
     }

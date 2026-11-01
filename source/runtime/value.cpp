@@ -116,11 +116,20 @@ bool StringPool::isNumeric(uint32_t id, bool &hasDot) {
     auto &pool = storageRef();
     Entry &e = pool[id < pool.size() ? id : 0];
     if (e.numericState == Entry::NumericState::NOT_COMPUTED) {
-        e.numericState = Math::isNumber(e.data) ? Entry::NumericState::NUMERIC : Entry::NumericState::NOT_NUMERIC;
+        const auto number = Math::parseNumber(e.data);
+        e.numericState = number.has_value() ? Entry::NumericState::NUMERIC : Entry::NumericState::NOT_NUMERIC;
+        e.numericValue = number.value_or(0.0);
         e.hasDot = e.data.find('.') != std::string::npos;
     }
     hasDot = e.hasDot;
     return e.numericState == Entry::NumericState::NUMERIC;
+}
+
+double StringPool::asNumber(uint32_t id) {
+    bool hasDot;
+    isNumeric(id, hasDot);
+    auto &pool = storageRef();
+    return pool[id < pool.size() ? id : 0].numericValue;
 }
 
 size_t StringPool::utf16Length(uint32_t id) {
@@ -254,7 +263,7 @@ double Value::asDouble() const {
         if (isNaN()) return 0.0;
         return storage.d;
     } else if (isString()) {
-        return Math::parseNumber(StringPool::get(storage.stringId)).value_or(0);
+        return StringPool::asNumber(storage.stringId);
     } else if (isColor()) {
         const ColorRGBA rgb = CSBT2RGBA(storage.c);
         return rgb.r * 0x10000 + rgb.g * 0x100 + rgb.b;
@@ -428,16 +437,21 @@ bool Value::operator==(const Value &other) const {
     if (isString() && other.isString() && storage.stringId == other.storage.stringId)
         return true;
 
-    std::string scratchA, scratchB;
-    std::string_view svA = asStringView(scratchA);
-    std::string_view svB = other.asStringView(scratchB);
-
+    // Numeric/string comparisons are common in Scratch projects. Avoid
+    // formatting a numeric operand just to test whether it is whitespace.
+    const auto onlyWhitespace = [](const Value &value) {
+        if (!value.isString()) return false;
+        const auto &text = StringPool::get(value.storage.stringId);
+        return std::all_of(text.begin(), text.end(), [](unsigned char c) { return std::isspace(c) && c != '\t'; });
+    };
     if (isNumeric() && other.isNumeric() && !isNaN() && !other.isNaN() &&
-        !std::all_of(svA.begin(), svA.end(), [](unsigned char c) { return (std::isspace(c) && c != '\t'); }) &&
-        !std::all_of(svB.begin(), svB.end(), [](unsigned char c) { return (std::isspace(c) && c != '\t'); })) {
+        !onlyWhitespace(*this) && !onlyWhitespace(other)) {
         return asDouble() == other.asDouble();
     }
 
+    std::string scratchA, scratchB;
+    std::string_view svA = asStringView(scratchA);
+    std::string_view svB = other.asStringView(scratchB);
     return caseInsensitiveEqual(svA, svB);
 }
 

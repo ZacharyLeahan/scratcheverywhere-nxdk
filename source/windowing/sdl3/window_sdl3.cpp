@@ -24,7 +24,11 @@
 #ifdef PLATFORM_HAS_CONTROLLER
 SDL_Gamepad *controller = nullptr;
 #ifdef __XBOX__
+#include "xbox_back_press.hpp"
 static std::vector<SDL_Gamepad *> xboxControllers;
+static XboxSDLInput::BackPresses xboxBackPresses;
+
+bool WindowSDL3::consumeXboxBackPress() { return xboxBackPresses.consume(); }
 
 static void openXboxController(SDL_JoystickID id) {
     for (auto *pad : xboxControllers) {
@@ -32,6 +36,7 @@ static void openXboxController(SDL_JoystickID id) {
     }
     if (auto *pad = SDL_OpenGamepad(id)) {
         xboxControllers.push_back(pad);
+        xboxBackPresses.connect(id);
         if (!controller) controller = pad;
     }
 }
@@ -177,6 +182,7 @@ void WindowSDL3::cleanup() {
 #ifdef __XBOX__
     for (auto *pad : xboxControllers) SDL_CloseGamepad(pad);
     xboxControllers.clear();
+    xboxBackPresses.clear();
     controller = nullptr;
 #else
     if (controller) SDL_CloseGamepad(controller);
@@ -214,6 +220,7 @@ void WindowSDL3::pollEvents() {
             break;
         case SDL_EVENT_GAMEPAD_REMOVED:
 #ifdef __XBOX__
+            xboxBackPresses.disconnect(event.gdevice.which);
             for (auto it = xboxControllers.begin(); it != xboxControllers.end(); ++it) {
                 if (SDL_GetGamepadID(*it) != event.gdevice.which) continue;
                 if (controller == *it) controller = nullptr;
@@ -232,6 +239,7 @@ void WindowSDL3::pollEvents() {
 #ifdef __XBOX__
         case SDL_EVENT_GAMEPAD_BUTTON_DOWN:
             selectXboxController(event.gbutton.which);
+            if (event.gbutton.button == SDL_GAMEPAD_BUTTON_BACK) xboxBackPresses.press(event.gbutton.which);
             break;
         case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
             // Ignore neutral reports and stick drift from other connected pads.
@@ -284,7 +292,7 @@ void WindowSDL3::pollEvents() {
     } else if (!resetHeld) {
         resetHeld = true;
         resetHeldSince = SDL_GetTicks();
-    } else if (SDL_GetTicks() - resetHeldSince >= 750) {
+    } else if (SDL_GetTicks() - resetHeldSince >= 2000) {
         Log::log("Xbox reset combo: rebooting to the configured dashboard.");
         XReboot();
     }

@@ -64,11 +64,18 @@ function(_recipe_SDL3_source)
             set(NXDK_SDL3_REPO "$ENV{NXDK_SDL3_DIR}")
         endif()
 
+        set(NXDK_SDL3_PATCH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/nxdk-sdl3.patch")
+        file(SHA256 "${NXDK_SDL3_PATCH}" NXDK_SDL3_PATCH_HASH)
+        string(SUBSTRING "${NXDK_SDL3_PATCH_HASH}" 0 12 NXDK_SDL3_PATCH_KEY)
+        # Catalog keys source checkouts by repository and ref, excluding patches.
+        # Isolate each local patch revision so an incremental build cannot skip it.
+        set(CATALOG_CACHE_DIR "${CMAKE_BINARY_DIR}/.cache/nxdk-sdl3-${NXDK_SDL3_PATCH_KEY}")
+        set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${NXDK_SDL3_PATCH}")
         cl_import_source(
             NAME SDL3
             REPO "${NXDK_SDL3_REPO}"
             REF "${NXDK_SDL3_REF}"
-            PATCHES "${CMAKE_CURRENT_SOURCE_DIR}/cmake/patches/nxdk-sdl3.patch"
+            PATCHES "${NXDK_SDL3_PATCH}"
         )
         return()
     endif()

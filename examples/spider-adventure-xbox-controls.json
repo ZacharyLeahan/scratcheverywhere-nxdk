@@ -1,0 +1,10 @@
+{
+  "controls": {
+    "left arrow": ["dpadLeft", "LeftStickLeft"],
+    "right arrow": ["dpadRight", "LeftStickRight"],
+    "up arrow": ["dpadUp", "LeftStickUp"],
+    "down arrow": ["dpadDown", "LeftStickDown"],
+    "space": "A",
+    "r": "Y"
+  }
+}

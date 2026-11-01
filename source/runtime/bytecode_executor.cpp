@@ -1,4 +1,5 @@
 #include "bytecode_executor.hpp"
+#include "xbox_frame_profile.hpp"
 #include "blockExecutor.hpp"
 #include "math.hpp"
 #include "renderer.hpp"
@@ -7,6 +8,7 @@
 #include <cmath>
 #include <cstdint>
 #include <random>
+#include <string_view>
 #ifdef ENABLE_AUDIO
 #include <audiostack.hpp>
 #endif
@@ -152,9 +154,18 @@ const std::string &variableIdAt(BytecodeThread &thread, BytecodeIndex varSlot) {
 
 size_t resolveListIndex(const Value &indexValue, size_t size) {
     if (size == 0) return size;
-    std::string indexStr = indexValue.asString();
-    if (indexStr == "last") return size - 1;
-    if (indexStr == "random" || indexStr == "any") return static_cast<size_t>(fastRandomBelow(size));
+    SE_LIKELY_IF(indexValue.isDouble()) {
+        double d = indexValue.get<double>();
+        if (!std::isfinite(d)) return size;
+        double idx = std::floor(d) - 1;
+        if (idx < 0 || idx >= static_cast<double>(size)) return size;
+        return static_cast<size_t>(idx);
+    }
+    if (indexValue.isString()) {
+        std::string_view indexStr = indexValue.asStringView();
+        if (indexStr == "last") return size - 1;
+        if (indexStr == "random" || indexStr == "any") return static_cast<size_t>(fastRandomBelow(size));
+    }
 
     double d = indexValue.get<double>();
     if (!std::isfinite(d)) return size;
@@ -620,14 +631,7 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 List *list = listAt(thread, instr.a);
                 Value index = popValue(thread, BytecodeStackKind::Value);
                 if (list) {
-                    std::string indexStr = index.asString();
-                    if (indexStr == "all") {
-                        list->items.clear();
-                    } else if (indexStr == "last" && !list->items.empty()) {
-                        list->items.pop_back();
-                    } else if ((indexStr == "random" || indexStr == "any") && !list->items.empty()) {
-                        list->items.erase(list->items.begin() + fastRandomBelow(list->items.size()));
-                    } else {
+                    if (index.isDouble()) {
                         double d = index.get<double>();
                         if (std::isfinite(d)) {
                             double idx = std::floor(d) - 1;
@@ -635,6 +639,26 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                                 list->items.erase(list->items.begin() + static_cast<size_t>(idx));
                             }
                         }
+                    } else if (index.isString()) {
+                        std::string_view indexStr = index.asStringView();
+                        if (indexStr == "all") {
+                            list->items.clear();
+                        } else if (indexStr == "last" && !list->items.empty()) {
+                            list->items.pop_back();
+                        } else if ((indexStr == "random" || indexStr == "any") && !list->items.empty()) {
+                            list->items.erase(list->items.begin() + fastRandomBelow(list->items.size()));
+                        } else {
+                            double d = index.get<double>();
+                            if (std::isfinite(d)) {
+                                double idx = std::floor(d) - 1;
+                                if (idx >= 0 && idx < static_cast<double>(list->items.size())) {
+                                    list->items.erase(list->items.begin() + static_cast<size_t>(idx));
+                                }
+                            }
+                        }
+                    } else {
+                        const size_t pos = resolveListIndex(index, list->items.size());
+                        if (pos < list->items.size()) list->items.erase(list->items.begin() + pos);
                     }
                 }
                 thread.pc++;
@@ -651,24 +675,46 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 Value index = popValue(thread, BytecodeStackKind::Value);
                 Value item = popValue(thread, BytecodeStackKind::Value);
                 if (list) {
-                    std::string indexStr = index.asString();
                     size_t pos;
-                    if (indexStr == "last") pos = list->items.size();
-                    else if (indexStr == "random" || indexStr == "any") pos = static_cast<size_t>(fastRandomBelow(list->items.size() + 1));
-                    else {
+                    bool hasPos = false;
+                    if (index.isDouble()) {
                         double d = index.get<double>();
-                        if (!std::isfinite(d)) {
-                            thread.pc++;
-                            SE_NEXT();
+                        if (std::isfinite(d)) {
+                            double idx = std::floor(d) - 1;
+                            if (idx >= 0 && idx <= static_cast<double>(list->items.size())) {
+                                pos = static_cast<size_t>(idx);
+                                hasPos = true;
+                            }
                         }
-                        double idx = std::floor(d) - 1;
-                        if (idx < 0 || idx > static_cast<double>(list->items.size())) {
-                            thread.pc++;
-                            SE_NEXT();
+                    } else if (index.isString()) {
+                        std::string_view indexStr = index.asStringView();
+                        if (indexStr == "last") {
+                            pos = list->items.size();
+                            hasPos = true;
+                        } else if (indexStr == "random" || indexStr == "any") {
+                            pos = static_cast<size_t>(fastRandomBelow(list->items.size() + 1));
+                            hasPos = true;
+                        } else {
+                            double d = index.get<double>();
+                            if (std::isfinite(d)) {
+                                double idx = std::floor(d) - 1;
+                                if (idx >= 0 && idx <= static_cast<double>(list->items.size())) {
+                                    pos = static_cast<size_t>(idx);
+                                    hasPos = true;
+                                }
+                            }
                         }
-                        pos = static_cast<size_t>(idx);
+                    } else {
+                        double d = index.get<double>();
+                        if (std::isfinite(d)) {
+                            double idx = std::floor(d) - 1;
+                            if (idx >= 0 && idx <= static_cast<double>(list->items.size())) {
+                                pos = static_cast<size_t>(idx);
+                                hasPos = true;
+                            }
+                        }
                     }
-                    if (pos <= list->items.size()) {
+                    if (hasPos && pos <= list->items.size()) {
                         list->items.insert(list->items.begin() + pos, item);
                         if (list->items.size() > MAX_LIST_ITEMS) list->items.pop_back();
                     }
@@ -753,6 +799,54 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 SE_NEXT();
             }
 
+            SE_CASE(NumAdd) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() + b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(NumSubtract) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() - b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(NumMultiply) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() * b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(NumDivide) {
+                const double b = thread.numberStack.back();
+                thread.numberStack.pop_back();
+                thread.numberStack.back() = thread.numberStack.back() / b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(BooleanAnd) {
+                const bool b = thread.boolStack.back();
+                thread.boolStack.pop_back();
+                thread.boolStack.back() = thread.boolStack.back() && b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(BooleanOr) {
+                const bool b = thread.boolStack.back();
+                thread.boolStack.pop_back();
+                thread.boolStack.back() = thread.boolStack.back() || b;
+                thread.pc++;
+                SE_NEXT();
+            }
+            SE_CASE(BooleanNot) {
+                thread.boolStack.back() = !thread.boolStack.back();
+                thread.pc++;
+                SE_NEXT();
+            }
+
             SE_CASE(CallNative)
             SE_CASE_ALIAS(CallNativeNumber)
             SE_CASE_ALIAS(CallNativeString)
@@ -760,6 +854,9 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
             SE_CASE_ALIAS(CallNativeColor)
             SE_CASE_ALIAS(CallNativeValue) {
                 BytecodeIndex opSlot = instr.a;
+#ifdef SE_XBOX_PROFILE_THREADS
+                XboxFrameProfile::NativeScope profileNative(stringAt(thread, thread.chunk->opcodeSlots[opSlot]));
+#endif
                 BytecodeIndex start = thread.chunk->paramKindsStart[opSlot];
                 BytecodeIndex count = thread.chunk->paramKindsCount[opSlot];
                 const BytecodePositionalFn &fn = (thread.link && opSlot < thread.link->positional.size()) ? thread.link->positional[opSlot] : BytecodePositionalFn{};
@@ -1233,8 +1330,18 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 thread.numberStack.pop_back();
 
                 std::string result;
-                if (const auto *str = std::get_if<std::shared_ptr<const std::string>>(&variableAt(thread, instr.a)->value)) {
-                    if (indexD >= 0 && indexD < static_cast<double>(Math::utf16Length(*str))) result = Math::utf16CharAt(*str, static_cast<size_t>(indexD));
+                Variable *var = variableAt(thread, instr.a);
+                if (var != nullptr) {
+                    if (const auto *str = std::get_if<std::shared_ptr<const std::string>>(&var->value)) {
+                        if (indexD >= 0 && indexD < static_cast<double>(Math::utf16Length(*str))) {
+                            result = Math::utf16CharAt(*str, static_cast<size_t>(indexD));
+                        }
+                    } else {
+                        const Value strValue = BlockExecutor::getVariableValueAs<Value>(var);
+                        if (indexD >= 0 && indexD < static_cast<double>(strValue.utf16Length())) {
+                            result = strValue.utf16CharAt(static_cast<size_t>(indexD));
+                        }
+                    }
                 }
                 thread.stringStack.push_back(std::move(result));
                 thread.pc++;
@@ -1243,7 +1350,15 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
 
             SE_CASE(LengthOfVar) {
                 size_t units = 0;
-                if (const auto *str = std::get_if<std::shared_ptr<const std::string>>(&variableAt(thread, instr.a)->value)) units = Math::utf16Length(*str);
+                Variable *var = variableAt(thread, instr.a);
+                if (var != nullptr) {
+                    if (const auto *str = std::get_if<std::shared_ptr<const std::string>>(&var->value)) {
+                        units = Math::utf16Length(*str);
+                    } else {
+                        const Value strValue = BlockExecutor::getVariableValueAs<Value>(var);
+                        units = strValue.utf16Length();
+                    }
+                }
                 thread.numberStack.push_back(static_cast<double>(units));
                 thread.pc++;
                 SE_NEXT();
@@ -1684,7 +1799,15 @@ void BytecodeExecutor::runThreads() {
             continue;
         }
 
-        if (!thread->escapedToLegacy) runThread(*thread);
+        if (!thread->escapedToLegacy) {
+#ifdef SE_XBOX_PROFILE_THREADS
+            Timer profileThread;
+#endif
+            runThread(*thread);
+#ifdef SE_XBOX_PROFILE_THREADS
+            XboxFrameProfile::thread(thread->sprite->name, profileThread.getTimeMsDouble(), false);
+#endif
+        }
 
         if (Scratch::shouldStop) return;
         i++;

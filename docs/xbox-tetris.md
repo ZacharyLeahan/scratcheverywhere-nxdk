@@ -151,10 +151,11 @@ resume captures use `normal-primary-tetris-paused-eof-audio*` and
 game-list and condensed verification records are under
 `build-xbox/primary-normal-20261027/`.
 
-Four-line scoring through controller play and subjective listening remain
-open. The focused score-cap test above is not a normal-play score-cap victory.
+At this stage, four-line scoring through controller play and subjective listening
+remained open; the October 28 follow-up below closes the four-line check. The
+focused score-cap test above is not a normal-play score-cap victory.
 Earlier hardware checks and the other nineteen games remain in the
-[twenty-game qualification matrix](xbox-game-qualification.md).
+[game qualification matrix](xbox-game-qualification.md).
 
 ## Regression on the merged pen-color build
 
@@ -188,3 +189,65 @@ Ignored evidence: `build-xbox/hardware/tetris-pen-regression-verification.json`,
 `tetris-pen-normal-lines1*`, and `tetris-pen-normal-four{1,2,3,4,5}*`.
 The verification record identifies the executed helper hashes, original images,
 failed observations and remaining four-line/audio checks.
+
+## Ordinary four-line clear in xemu
+
+A fresh private xemu game on October 27 used the unchanged original project,
+including every audio asset, and the normal diagnostics-off executable from
+the merged runtime improvement (PR #33). Its XBE SHA-256 is
+`99dd3dec7234b5f070014a960000d3066903c6dd00215d9bdb4f7adab922ee27`.
+
+Fifteen ordinary placements used all seven piece families and completed a
+**four-line clear: Lines 4, Score 1200, Level 0**. The initial board and HUD
+were zero. GDB supplied arrow/Space input while native input and key-hat
+functions executed; it did not set the grid, piece sequence, RNG, game
+variables or score. The planner used the current piece and remaining bag
+membership, with no knowledge of future draw order.
+
+After each hard drop, the native grid, line count and score matched the
+placement. A separate auditor replayed the recorded placements from the
+original shape templates using colored coordinate cells, verified every
+recorded board and score, and checked the native post-drop snapshots. The
+original framebuffer independently shows Lines 4 and Score 1200. Native input
+was restored before GDB detached, and the disposable guest was closed.
+
+This verifies the ordinary four-line/scoring path on that executable in xemu.
+At that point, the physical four-line clear and subjective audio checks
+remained open. The hardware follow-up below closes the four-line check.
+The private guest used a dummy host audio driver; it supplies no listening or
+frame-rate evidence. An earlier attempt ended naturally after a debugger
+handoff allowed play to advance; that attempt is preserved separately and is
+not included in the successful run.
+
+Ignored evidence is under `build-xbox/tetris-fourline-20261027/`:
+`fixture.json` and `attempt-02/{result.json,independent-audit.json,gdb.log,
+initial.png,four-line-clear.png}`. The exact executed driver and input helper
+are preserved alongside those records. The independent audit verifies all
+15 colored boards, a four-row clear on placement 15 and the authored
+1200-point award.
+
+## Physical four-line clear — October 28, 2026
+
+The normal diagnostics-off Xbox executable `ac3142d7…` completed a four-line
+clear through the regular browser and Player Three KVM controller. Eleven
+placements matched the locked cells in the HDMI images. The original final
+capture independently shows **Lines 4, Score 1200, Level 0**. No debugger,
+game-state seeding, project edits or future-piece-order access were used.
+
+Green Flag then restored the zero HUD and empty board. Right and A moved and
+hard-dropped the new piece, and Exit returned to the populated browser. The
+controller reset combo subsequently recovered XBMC/FTP. Full readbacks confirmed
+the normal executable and unchanged original project hashes; the primary
+`b75e9beb…` dashboard launcher was not replaced.
+
+Three earlier attempts are retained: one stopped after 26 verified placements,
+a shortened-settle helper duplicated a hard drop before video caught up, and
+another reached its 30-piece bound with an inaccessible hole. The successful
+planner rejects those blocked wells and retains conservative input settling.
+These are test-helper limits, not established Tetris runtime failures.
+
+Ignored evidence: `build-xbox/hardware/tetris-fourline-physical-verification-20261028.json`,
+`tetris-hardware-fourline-noholes-20261028-{results,client}.json`, the matching
+`-before-pause.jpg`, replay/board/browser images, and
+`build-xbox/render-phase-wiring-20261028/hardware-install.json`.
+Subjective audio and the earlier initial capture-sample anomaly remain open.

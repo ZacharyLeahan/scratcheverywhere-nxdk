@@ -19,6 +19,9 @@ class SE_EXPORT WindowSDL3 : public WindowSE {
     void *getHandle() override;
 #if defined(__XBOX__)
     void *getRenderer();
+#ifdef PLATFORM_HAS_CONTROLLER
+    static bool consumeXboxBackPress();
+#endif
 #endif
 
   private:

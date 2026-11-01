@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #if defined(__XBOX__) && defined(SE_XBOX_TRACE_MENU_INPUT)
-#include <SDL3/SDL_timer.h>
+#include <windows.h>
 #include <input.hpp>
 #include <log.hpp>
 
@@ -13,7 +13,7 @@ inline std::vector<std::string> previousButtons;
 inline std::vector<std::string> previousKeys;
 inline bool previousMouse = false;
 inline void snapshot(const std::string &event) {
-    std::string line = "Menu input " + std::to_string(SDL_GetTicks()) + " " + event + " buttons=";
+    std::string line = "Menu input " + std::to_string(GetTickCount()) + " " + event + " buttons=";
     for (const auto &button : Input::inputButtons) line += button + ",";
     line += " keys=";
     for (const auto &key : Input::inputKeys) line += key + ",";

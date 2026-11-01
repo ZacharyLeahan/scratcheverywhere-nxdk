@@ -67,6 +67,9 @@ SE_EXPORT std::string getScratchFolderLocation();
 SE_EXPORT std::string getRomFSLocation();
 
 #if defined(__XBOX__)
+enum class SystemAction { None, Launcher, Restart, Shutdown };
+SE_EXPORT void requestSystemAction(SystemAction action);
+
 /**
  * Normalizes disk paths for Xbox filesystem by converting forward slashes to backslashes.
  */

@@ -114,3 +114,46 @@ a continuous client A hold, with no logged active-controller switch. Player Four
 records main-KVM routing send errors during the hold. This explains the menu's
 new-confirmation edge in those occurrences; the precise transport fault and
 direct physical-pad behavior remain unverified.
+
+## Console pause and system actions
+
+### Shared mouse controls
+
+The Xbox pause menu always shows these instructions, regardless of the project:
+hold **White + D-pad / left stick** to move the pointer, and keep **White** held
+while pressing **RT** to click. Black is also accepted as the click button.
+These are mouse clicks, not separate left/right mouse buttons.
+
+The first use of pointer mode during gameplay shows the same instructions and
+a reminder about Back / Select pause for six seconds. The hint appears once per
+app session, draws above the game, and does not consume input or pause scripts.
+It does not depend on game-specific menu detection or idle timers.
+
+October 27 shared-help validation: Xbox Release build passed with profiling off;
+FTP readback verified `F:\scratch-pointer-help-20261027\default.xbe` with SHA-256
+`98c93665e87f51ce9b503c876b0301155e07084922bb1588dcd777bbbfca807e`.
+KVM checks confirmed both pause lines fit, the first pointer use shows the
+three-line hint, and later pointer use after expiry leaves it hidden. The game
+continued running under the hint. Appel's project archive was unchanged.
+
+### Pause and system actions
+
+- Tap **Back / Select** in a game to pause. Tap Back / Select again, or B, to resume.
+- Choose **Return to game list** in pause to leave the current Scratch project.
+- Choose **Exit / System** in pause, or press **B / Y** from the game list,
+  for Cancel, Return to launcher, Restart Xbox, and Shut down Xbox.
+- System actions have a second confirmation with Cancel selected initially.
+  Launcher return uses `E:\Dashboard\default.xbe`, matching the Slime Volley
+  and Neverball ports. A missing launcher leaves the app running.
+- Hold **LT + RT + Back + Start** together for **two seconds** to reboot the
+  Xbox from gameplay or menus. Release any button to cancel the countdown.
+  This physical shortcut ignores project mappings and deliberately uses a
+  direct firmware reboot; it does not save or wait for normal app cleanup.
+- Back / Select is reserved for pause on Xbox and no longer emits a Scratch game key. Start remains available for game controls and replay.
+  Pause also works for bundled projects.
+
+Hardware validation: tap Start during gameplay, resume with Start/B, leave for
+and launch another game, cancel each system confirmation, check missing-launcher
+handling, then verify launcher return, reboot, and power-off separately. Check
+that partial/brief reset chords do nothing and a two-second chord reboots in
+both gameplay and the game list. Firmware actions require a real Xbox test.

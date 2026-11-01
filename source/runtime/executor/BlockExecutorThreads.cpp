@@ -1,4 +1,5 @@
 #include "blockExecutor.hpp"
+#include "xbox_frame_profile.hpp"
 #include "bytecode_executor.hpp"
 #include <algorithm>
 #include <cstddef>
@@ -35,18 +36,25 @@ uint64_t BlockExecutor::startHat(Sprite *sprite, Block *hat) {
 }
 
 std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
+    static const std::string opcode = "event_whenbroadcastreceived";
+#ifdef SE_XBOX_PROFILE_THREADS
+    Timer profileBroadcast;
+#endif
     std::transform(broadcast.begin(), broadcast.end(), broadcast.begin(), ::tolower);
 
     std::vector<uint64_t> startedThreads;
     for (auto &spr : Scratch::sprites) {
-        if (spr->hats["event_whenbroadcastreceived"].empty()) continue;
-        for (Block *hat : spr->hats["event_whenbroadcastreceived"]) {
-            std::string broadcastOption = Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
-            std::transform(broadcastOption.begin(), broadcastOption.end(), broadcastOption.begin(), ::tolower);
-
-            if (broadcastOption == broadcast) startedThreads.push_back(startHat(spr, hat));
-        }
+        Sprite *definition = spr->cloneOriginal ? spr->cloneOriginal : spr;
+        const auto hats = definition->hats.find(opcode);
+        if (hats == definition->hats.end() || hats->second.empty()) continue;
+        const auto &matching = definition->broadcastHatIndex.lookup(broadcast, hats->second, [](Block *hat) {
+            return Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
+        });
+        for (Block *hat : matching) startedThreads.push_back(startHat(spr, hat));
     }
+#ifdef SE_XBOX_PROFILE_THREADS
+    XboxFrameProfile::thread("dispatch:" + broadcast, profileBroadcast.getTimeMsDouble(), false);
+#endif
     return startedThreads;
 }
 
@@ -108,12 +116,25 @@ void BlockExecutor::runThreads() {
             continue;
         }
 
+#ifdef SE_XBOX_PROFILE_THREADS
+        Timer profileThread;
+#endif
         var = runThread(*thread, *thread->sprite);
+#ifdef SE_XBOX_PROFILE_THREADS
+        XboxFrameProfile::thread(thread->sprite->name, profileThread.getTimeMsDouble(), true);
+#endif
 
         if (Scratch::shouldStop) return;
         i++;
     }
 
+    cleanupSprites();
+    if (stopClicked) {
+        Scratch::stopClicked();
+    }
+}
+
+void BlockExecutor::cleanupSprites() {
     Scratch::sprites.erase(
         std::remove_if(Scratch::sprites.begin(), Scratch::sprites.end(),
                        [](Sprite *s) {
@@ -143,9 +164,6 @@ void BlockExecutor::runThreads() {
             Scratch::sprites[i]->layer = (Scratch::sprites.size() - 1) - i;
         }
         sortSprites = false;
-    }
-    if (stopClicked) {
-        Scratch::stopClicked();
     }
 }
 
@@ -210,8 +228,9 @@ void BlockExecutor::runAllBlocksByOpcode(const std::string &opcode, std::vector<
 }
 
 void BlockExecutor::runAllBlocksByOpcodeInSprite(const std::string &opcode, Sprite *sprite, std::vector<ScriptThread *> *out) {
-    if (sprite->hats[opcode].empty()) return;
-    std::vector<Block *> tempHats(sprite->hats[opcode].begin(), sprite->hats[opcode].end());
+    const auto hats = sprite->hats.find(opcode);
+    if (hats == sprite->hats.end() || hats->second.empty()) return;
+    std::vector<Block *> tempHats(hats->second.begin(), hats->second.end());
 
     for (auto it = tempHats.rbegin(); it != tempHats.rend(); ++it) {
         auto &hat = *it;
