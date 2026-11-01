@@ -56,8 +56,8 @@ from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scr
 
 **Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
 They are conservative, provisional assessments of the tested game/build; they
-are not benchmark scores. Earlier clips use earlier builds. Beach, GlowBall, Ninja Climb, Candy and Paint use the
-separate ordinary 1.3 build; Level EATEN, Fireboy, Mushroom Valley and Bouncy
+are not benchmark scores. Earlier clips use earlier builds. Beach, GlowBall, Candy and Paint use the
+separate ordinary 1.3 build; Ninja uses the merged scheduler build with SDL window/audio; Level EATEN, Fireboy, Mushroom Valley and Bouncy
 Heroes use its diagnostic variant with read-only logging.
 Repeat those loops with the ordinary build before final acceptance. GIF sampling
 does not measure game frame rate.
@@ -347,11 +347,11 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/404349977/">Ninja Climb</a></h3>
-<img src="mike-gameplay/ninja-climb.gif" alt="Ninja Climb gameplay on the physical Xbox" width="180" height="120">
-<p><strong>Playability: C — Controls and recovery; opening uncleared</strong></p>
-<p><strong>Playable:</strong> X starts/dashes, A jumps; direction control, pit death/recovery, Green Flag replay and browser return.</p>
-<p><strong>Got working:</strong> Profile controls on Xbox. Merged shared scheduler repair advances course 1 → 2 in xemu; unchanged original project.</p>
-<p><strong>Left:</strong> Test the scheduler repair/course transition on Xbox; later courses, audio/smoothness and longer play.</p>
+<img src="mike-gameplay/ninja-climb-course-clear.gif" alt="Ninja Climb first-course clear and course two on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — First course cleared twice</strong></p>
+<p><strong>Playable:</strong> X starts/dashes, A jumps; first course cleared twice, natural spike death/respawn, Green Flag replay and browser return.</p>
+<p><strong>Got working:</strong> Merged shared scheduler repair now advances course 1 → 2 on Xbox too, using the unchanged original project.</p>
+<p><strong>Left:</strong> Later courses, measured smoothness, audio and longer sessions; native backend startup remains open.</p>
 </td>
 </tr>
 <tr>
@@ -360,7 +360,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <img src="mike-gameplay/candy-caves.gif" alt="Candy Caves mining after replay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — Mining, loss and replay</strong></p>
 <p><strong>Playable:</strong> Directions + A mine; candy earned, natural Game Over, A replay/new map, renewed mining and browser return.</p>
-<p><strong>Got working:</strong> Prepared project reconnects its detached map-clone initialization; original assets/credits retained.</p>
+<p><strong>Got working:</strong> Project-side compatibility workaround reconnects map-clone initialization; original assets/credits retained. The original loads in the official Scratch VM, so the runtime difference remains under investigation.</p>
 <p><strong>Left:</strong> Later progression/upgrades, measured smoothness, audio and longer sessions.</p>
 </td>
 <td width="50%" valign="top">
@@ -383,7 +383,7 @@ normal physical run has not yet repeated that win.
 ## Next nine: target pack of 30
 
 **All nine are installed; 30 is the target, not a qualified-game count.**
-Candy’s loading repair and Paint’s controller menu now pass their Xbox gameplay
+Candy’s loading workaround and Paint’s controller menu now pass their Xbox gameplay
 loops. All 30 entries have real Xbox clips. No new game has earned an A; smoothness,
 audio and extended stability remain unqualified. This console has 128 MB.
 
@@ -392,25 +392,25 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. No first-level clear or independent 2P yet. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. No first-level clear or independent 2P yet. New SDL test build hit a GPU command error at startup; recovery required. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
-| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Later progression and quality checks open. |
+| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
-| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **C:** Xbox controls/death/replay/return. Merged scheduler repair fixes course 1 → 2 in xemu; Xbox course transition still pending. |
+| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **B:** First course cleared twice on Xbox, natural death/respawn, Green Flag replay and browser return. Later courses and quality checks open. |
 | [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) | **B:** Score 2/loss, prepared A retry, renewed jump/return. |
 
 [Merged project helpers (PR #65)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/65)
 prepare separate controller-ready copies for Beach/GlowBall CPU menus, Mushroom
-retry, Fireboy’s level selector, Candy’s clone repair and Paint’s Play/Home menu.
+retry, Fireboy’s level selector, Candy’s clone workaround and Paint’s Play/Home menu.
 These are **prepared-project/profile changes**, separate from engine changes;
 original assets/credits remain. The named Xbox checks above pass, with quality
 and later-progression limits still open.
 
 [Merged shared core repair (PR #66)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/66)
 fixes Ninja’s Reset → clear sequence. The reference fixture passes both engines
-in xemu and on the Xbox using SDL; Ninja naturally reaches course 2 in xemu.
-No Ninja assets changed. Its actual Xbox course clear, native startup reliability
-and longer runs remain open.
+in xemu and on the Xbox using SDL. Ninja clears course 1 on the Xbox, then
+repeats that clear after Green Flag restart. No Ninja assets changed. Native
+startup reliability, later courses and quality checks remain open.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets

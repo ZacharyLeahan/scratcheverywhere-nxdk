@@ -145,6 +145,25 @@
       "sha256": "e174c651c9987934c53232b3e1c962abdbeec271baee844633e257a4efdda60d",
       "bytes": 863870,
       "scope": "Real Xbox video only; one continuous source-time interval, not a game FPS measurement"
+    },
+    {
+      "gif": "ninja-climb-course-clear.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 7.0,
+      "encoded_seconds": 7.0,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "31f1562c0f3c4cce826d3b0dc4b7f60c7337e13b8e2e14826e133a45d72077d2",
+      "sha256": "309d297a6fab1bc97de6c98ed0f1840db9c6317c46dddd210c8e07315332f920",
+      "bytes": 3174335,
+      "backend": "SDL3 window/audio + Xbox renderer",
+      "scope": "ActualXbox Ninja firstcourseclear afterGreenFlag; one continuous final7secondsourceinterval, not gameFPSmeasurement"
     }
   ]
 }
