@@ -1,12 +1,28 @@
 #include "blockExecutor.hpp"
-#include "xbox_frame_profile.hpp"
 #include "bytecode_executor.hpp"
+#include "thread_lifetime.hpp"
+#include "xbox_frame_profile.hpp"
 #include <algorithm>
 #include <cstddef>
 #include <renderer.hpp>
 #include <runtime.hpp>
 #include <speech_manager.hpp>
 #include <vector>
+
+namespace {
+void disposeRetiredScriptThread(ScriptThread *thread) {
+    thread->clear();
+    Pools::threads.push_back(thread);
+}
+
+void collectRetiredScriptThreads() {
+    RetiredThreads<ScriptThread>::collect(disposeRetiredScriptThread);
+}
+
+struct ScriptThreadCleanup {
+    ~ScriptThreadCleanup() { collectRetiredScriptThreads(); }
+};
+} // namespace
 
 uint64_t BlockExecutor::nextThreadId() {
     static uint64_t id = 0;
@@ -50,7 +66,8 @@ std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
         const auto &matching = definition->broadcastHatIndex.lookup(broadcast, hats->second, [](Block *hat) {
             return Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
         });
-        for (Block *hat : matching) startedThreads.push_back(startHat(spr, hat));
+        for (Block *hat : matching)
+            startedThreads.push_back(startHat(spr, hat));
     }
 #ifdef SE_XBOX_PROFILE_THREADS
     XboxFrameProfile::thread("dispatch:" + broadcast, profileBroadcast.getTimeMsDouble(), false);
@@ -93,17 +110,17 @@ ScriptThread *BlockExecutor::startThread(Sprite *sprite, Block *block, bool shou
     if (restartThreadIndex == -1) {
         threads.push_back(newThread);
     } else {
-        auto &originalThread = threads[restartThreadIndex];
-        originalThread->clear();
-        Pools::threads.push_back(originalThread);
-        threads.erase(threads.begin() + restartThreadIndex);
-        threads.push_back(newThread);
+        ScriptThread *originalThread = threads[restartThreadIndex];
+        threads[restartThreadIndex] = newThread;
+        ThreadExecutionFrame::finishAfterCurrentQuantum(originalThread);
+        RetiredThreads<ScriptThread>::retire(originalThread, disposeRetiredScriptThread);
     }
 
     return newThread;
 }
 
 void BlockExecutor::runThreads() {
+    ScriptThreadCleanup cleanup;
     size_t i = 0;
     while (i < threads.size()) {
         ScriptThread *thread = threads[i];
@@ -128,6 +145,7 @@ void BlockExecutor::runThreads() {
         i++;
     }
 
+    collectRetiredScriptThreads();
     cleanupSprites();
     if (stopClicked) {
         Scratch::stopClicked();
@@ -169,6 +187,7 @@ void BlockExecutor::cleanupSprites() {
 
 BlockResult BlockExecutor::runThread(ScriptThread &thread, Sprite &sprite) {
     if (thread.nextBlock == nullptr) return BlockResult::RETURN;
+    ThreadExecutionScope<ScriptThread> execution(thread);
     BlockResult var = BlockResult::CONTINUE;
     Timer executionTimer(false);
     if (Scratch::warpTimer) executionTimer.start();
