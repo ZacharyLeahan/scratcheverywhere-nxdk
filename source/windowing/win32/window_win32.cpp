@@ -155,10 +155,12 @@ WindowWin32::WindowWin32(int width, int height, const std::string &title) {
     setDarkTheme(this->hWnd, isDarkTheme());
 
     if (Render::currentRenderer == Renderers::GDI) {
+#if defined(RENDERER_GDI)
         this->winDC = GetDC(this->hWnd);
         this->hDC = CreateCompatibleDC(this->winDC);
         this->hBitmap = CreateCompatibleBitmap(this->winDC, width, height);
         SelectObject(this->hDC, this->hBitmap);
+#endif
     } else {
         this->winDC = GetDC(this->hWnd);
         this->hDC = this->winDC;
@@ -251,8 +253,10 @@ void WindowWin32::cleanup() {
     }
 
     if (Render::currentRenderer == Renderers::GDI) {
+#if defined(RENDERER_GDI)
         DeleteObject(this->hBitmap);
         DeleteDC(this->hDC);
+#endif
     }
     ReleaseDC(this->hWnd, this->winDC);
 
@@ -308,9 +312,11 @@ void WindowWin32::resize(int width, int height) {
     AdjustWindowRect(&rc, GetWindowLongPtr(this->hWnd, GWL_STYLE), FALSE);
 
     if (Render::currentRenderer == Renderers::GDI) {
+#if defined(RENDERER_GDI)
         DeleteObject(this->hBitmap);
         this->hBitmap = CreateCompatibleBitmap(this->winDC, width, height);
         SelectObject(this->hDC, this->hBitmap);
+#endif
     }
 
     this->resized = true;
