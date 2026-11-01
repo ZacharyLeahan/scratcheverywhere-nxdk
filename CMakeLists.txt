@@ -164,7 +164,9 @@ endfunction()
 
 cmake_dependent_option(SE_INSPECTOR "Enables the runtime Inspector." ON "SE_PLATFORM STREQUAL pc" OFF)
 
-list(APPEND SE_RENDERER_VALID_OPTIONS "headless" "all")
+if(NOT LIBRETRO)
+    list(APPEND SE_RENDERER_VALID_OPTIONS "headless" "all")
+endif()
 if(NOT DEFINED SE_RENDERER_PRIORITY)
     set(SE_RENDERER_PRIORITY "all" "d3d9" "opengl_core" "nv2a" "xbox" "gx2" "sdl2" "sdl3" "opengl" "gdi" "sdl1" "citro2d" "gl2d" "headless")
 endif()
