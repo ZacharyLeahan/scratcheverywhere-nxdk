@@ -52,6 +52,8 @@ A short Appel sample near 29 FPS does not establish a speed improvement; the
 transform-cache experiment stays unmerged. KVM delivery is tracked separately
 from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md).
 
+Emulator memory check: xemu is configured for 128 MB, but the current guest kernel reports **64 MB**. Memory-sensitive emulator failures need that scope; our physical console has 128 MB.
+
 ## Games in action
 
 **Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
@@ -360,7 +362,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <img src="mike-gameplay/candy-caves.gif" alt="Candy Caves mining after replay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — Mining, loss and replay</strong></p>
 <p><strong>Playable:</strong> Directions + A mine; candy earned, natural Game Over, A replay/new map, renewed mining and browser return.</p>
-<p><strong>Got working:</strong> Project-side compatibility workaround reconnects map-clone initialization; original assets/credits retained. The original loads in the official Scratch VM, so the runtime difference remains under investigation.</p>
+<p><strong>Got working:</strong> Project-side compatibility workaround reconnects map-clone initialization; original assets/credits retained. The original loads in the official Scratch VM; the current 64 MB xemu guest faults during allocation. The cause on Xbox remains under investigation.</p>
 <p><strong>Left:</strong> Later progression/upgrades, measured smoothness, audio and longer sessions.</p>
 </td>
 <td width="50%" valign="top">
@@ -392,7 +394,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. No first-level clear or independent 2P yet. New SDL test build hit a GPU command error at startup; recovery required. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. Native xemu now earns the first red/blue gems and crosses both lower pits; Xbox repeat, first-level clear and independent 2P remain open. SDL startup hit a GPU error on Xbox and also failed in fresh xemu testing. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
