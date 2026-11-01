@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Add controller level selection to a separate Fireboy/Watergirl SB3 copy.
+"""Add controller level/results menus to a separate Fireboy/Watergirl SB3 copy.
 
 Retains authored level locks and the existing click/identify procedure. Supplies
 a single-controller dual-stick profile; this does not add two-controller support.
@@ -49,6 +49,31 @@ def variable(name, key):
     return [3, [12, name, key], [10, ""]]
 
 
+def copy_chain(source, destination, root):
+    """Copy an authored stack and its reporters without changing the original."""
+    mapping = {}
+
+    def clone(key):
+        if key in mapping:
+            return mapping[key]
+        block = copy.deepcopy(source[key])
+        new_key = destination.add(block["opcode"])
+        mapping[key] = new_key
+        destination.blocks[new_key] = block
+        block.update(parent=None, topLevel=False)
+        if block.get("next"):
+            block["next"] = clone(block["next"])
+            destination.blocks[block["next"]]["parent"] = new_key
+        for value in block.get("inputs", {}).values():
+            for index in range(1, len(value)):
+                if isinstance(value[index], str) and value[index] in source:
+                    value[index] = clone(value[index])
+                    destination.blocks[value[index]]["parent"] = new_key
+        return new_key
+
+    return clone(root)
+
+
 def prepare(source, output):
     paths = [output, Path(str(output) + ".json"), Path(str(output) + ".preparation.json")]
     if source.resolve() == output.resolve() or any(path.exists() for path in paths):
@@ -59,6 +84,7 @@ def prepare(source, output):
     original = copy.deepcopy(project)
     stage = next(target for target in project["targets"] if target.get("isStage"))
     home = next(target for target in project["targets"] if target["name"] == "home")
+    sign = next(target for target in project["targets"] if target["name"] == "sign")
     page = next(key for key, value in stage["variables"].items() if value[0] == "page")
     clone_id = next(key for key, value in home["variables"].items() if value[0] == "clone id")
     click = next(block for block in home["blocks"].values()
@@ -67,34 +93,18 @@ def prepare(source, output):
     if home["blocks"][root]["opcode"] != "control_if":
         raise ValueError("Unexpected project revision: expected the authored guarded level click.")
     choice = "xbox_level_choice"
-    if choice in stage["variables"] or any(t["name"] == "Xbox level menu" for t in project["targets"]):
+    results_active = "xbox_results_menu_active"
+    results_ready = "xbox_results_menu_ready"
+    if any(key in stage["variables"] for key in [choice, results_active, results_ready]) or any(t["name"] == "Xbox level menu" for t in project["targets"]):
         raise ValueError("This project already has the Xbox level menu.")
     stage["variables"][choice] = ["Xbox level choice", 1]
+    stage["variables"][results_active] = ["Xbox results menu active", 0]
+    stage["variables"][results_ready] = ["Xbox results menu ready", 0]
 
     # Copy the original guarded click chain, preserving its lock checks and
     # identify call. Only the selected menu clone receives the new key shortcut.
     extra = Blocks("xbox_level_home_")
-    mapping = {}
-
-    def clone_block(key):
-        if key in mapping:
-            return mapping[key]
-        block = copy.deepcopy(home["blocks"][key])
-        new_key = extra.add(block["opcode"])
-        mapping[key] = new_key
-        extra.blocks[new_key] = block
-        block.update(parent=None, topLevel=False)
-        if block.get("next"):
-            block["next"] = clone_block(block["next"])
-            extra.blocks[block["next"]]["parent"] = new_key
-        for value in block.get("inputs", {}).values():
-            for index in range(1, len(value)):
-                if isinstance(value[index], str) and value[index] in home["blocks"]:
-                    value[index] = clone_block(value[index])
-                    extra.blocks[value[index]]["parent"] = new_key
-        return new_key
-
-    body = clone_block(root)
+    body = copy_chain(home["blocks"], extra, root)
     is_menu = extra.add("operator_equals", {"OPERAND1": variable("page", page), "OPERAND2": literal("menu")})
     selected = extra.add("operator_equals", {"OPERAND1": variable("clone id", clone_id),
                                             "OPERAND2": variable("Xbox level choice", choice)})
@@ -105,9 +115,62 @@ def prepare(source, output):
         raise ValueError("Unexpected block ID collision.")
     home["blocks"].update(extra.blocks)
 
+    # B is Watergirl's left key during play. Only the results Menu clone may
+    # handle it here; replay must not also run the separate Retry clone's click.
+    result_click = next(block for block in sign["blocks"].values()
+                        if isinstance(block, dict) and block.get("opcode") == "event_whenthisspriteclicked")
+    result_root = result_click["next"]
+    try:
+        root_block = sign["blocks"][result_root]
+        menu_test = sign["blocks"][root_block["inputs"]["CONDITION"][1]]
+        costume_test = sign["blocks"][menu_test["inputs"]["OPERAND1"][1]]
+        expected_menu = (root_block["opcode"] == "control_if_else" and
+                         menu_test["opcode"] == "operator_equals" and
+                         menu_test["inputs"]["OPERAND2"] == literal("button") and
+                         costume_test["opcode"] == "looks_costumenumbername" and
+                         costume_test["fields"]["NUMBER_NAME"][0] == "name")
+    except (KeyError, IndexError, TypeError):
+        expected_menu = False
+    if not expected_menu:
+        raise ValueError("Unexpected project revision: expected the authored results Menu button.")
+    extra = Blocks("xbox_results_sign_")
+    body = copy_chain(sign["blocks"], extra, result_root)
+    costume_name = extra.add("looks_costumenumbername", fields={"NUMBER_NAME": ["name", None]})
+    menu_button = extra.add("operator_equals", {"OPERAND1": [2, costume_name], "OPERAND2": literal("button")})
+    active = extra.add("operator_equals", {"OPERAND1": variable("Xbox results menu active", results_active), "OPERAND2": literal(1)})
+    ready = extra.add("operator_equals", {"OPERAND1": variable("Xbox results menu ready", results_ready), "OPERAND2": literal(1)})
+    enabled = extra.add("operator_and", {"OPERAND1": [2, active], "OPERAND2": [2, ready]})
+    in_game = extra.add("operator_equals", {"OPERAND1": variable("page", page), "OPERAND2": literal("game")})
+    ending = extra.add("operator_and", {"OPERAND1": [2, enabled], "OPERAND2": [2, in_game]})
+    condition = extra.add("operator_and", {"OPERAND1": [2, ending], "OPERAND2": [2, menu_button]})
+    guard = extra.add("control_if", {"CONDITION": [2, condition], "SUBSTACK": [2, body]})
+    extra.hat("event_whenkeypressed", {"KEY_OPTION": ["a", None]}, guard)
+    if set(extra.blocks) & set(sign["blocks"]):
+        raise ValueError("Unexpected block ID collision.")
+    sign["blocks"].update(extra.blocks)
+
     helper = Blocks("xbox_level_menu_")
     reset = helper.add("data_setvariableto", {"VALUE": literal(1)}, {"VARIABLE": ["Xbox level choice", choice]})
-    helper.hat("event_whenflagclicked", {}, reset)
+    reset_results = helper.add("data_setvariableto", {"VALUE": literal(0)}, {"VARIABLE": ["Xbox results menu active", results_active]})
+    reset_ready = helper.add("data_setvariableto", {"VALUE": literal(0)}, {"VARIABLE": ["Xbox results menu ready", results_ready]})
+    helper.hat("event_whenflagclicked", {}, helper.chain(reset, reset_ready, reset_results))
+    broadcasts = stage["broadcasts"]
+    for message, state in [("ready", 0), ("hide signs", 0), ("game won", 1), ("game lost", 1)]:
+        broadcast = next(key for key, name in broadcasts.items() if name == message)
+        disarm = helper.add("data_setvariableto", {"VALUE": literal(0)}, {"VARIABLE": ["Xbox results menu ready", results_ready]})
+        set_active = helper.add("data_setvariableto", {"VALUE": literal(state)}, {"VARIABLE": ["Xbox results menu active", results_active]})
+        steps = [disarm, set_active]
+        if state:
+            # A Watergirl steering hold must not skip the ending screen. Arm
+            # Menu only after release; its next key edge is a deliberate press.
+            key = helper.add("sensing_keyoptions", fields={"KEY_OPTION": ["a", None]})
+            helper.blocks[key]["shadow"] = True
+            pressed = helper.add("sensing_keypressed", {"KEY_OPTION": [1, key]})
+            released = helper.add("operator_not", {"OPERAND": [2, pressed]})
+            wait = helper.add("control_wait_until", {"CONDITION": [2, released]})
+            arm = helper.add("data_setvariableto", {"VALUE": literal(1)}, {"VARIABLE": ["Xbox results menu ready", results_ready]})
+            steps.extend([wait, arm])
+        helper.hat("event_whenbroadcastreceived", {"BROADCAST_OPTION": [message, broadcast]}, helper.chain(*steps))
     for key, delta, limit, wrap in [("right arrow", 1, 8, 1), ("left arrow", -1, 1, 8)]:
         change = helper.add("data_changevariableby", {"VALUE": literal(delta)}, {"VARIABLE": ["Xbox level choice", choice]})
         outside = helper.add("operator_gt" if delta > 0 else "operator_lt",
@@ -125,8 +188,14 @@ def prepare(source, output):
     say = helper.add("looks_say", {"MESSAGE": [2, hint]})
     clear = helper.add("looks_say", {"MESSAGE": literal("")})
     hide = helper.add("looks_hide")
+    result_costume = helper.add("looks_switchcostumeto", {"COSTUME": literal(1)})
+    result_show = helper.add("looks_show")
+    result_front = helper.add("looks_gotofrontback", fields={"FRONT_BACK": ["front", None]})
+    result_hint = helper.add("looks_say", {"MESSAGE": literal("B: level menu\nBlack: retry")})
+    result_active = helper.add("operator_equals", {"OPERAND1": variable("Xbox results menu active", results_active), "OPERAND2": literal(1)})
+    result_toggle = helper.add("control_if_else", {"CONDITION": [2, result_active], "SUBSTACK": [2, helper.chain(result_costume, result_show, result_front, result_hint)], "SUBSTACK2": [2, helper.chain(hide, clear)]})
     menu = helper.add("operator_equals", {"OPERAND1": variable("page", page), "OPERAND2": literal("menu")})
-    toggle = helper.add("control_if_else", {"CONDITION": [2, menu], "SUBSTACK": [2, helper.chain(costume, show, front, say)], "SUBSTACK2": [2, helper.chain(hide, clear)]})
+    toggle = helper.add("control_if_else", {"CONDITION": [2, menu], "SUBSTACK": [2, helper.chain(costume, show, front, say)], "SUBSTACK2": [2, result_toggle]})
     loop = helper.add("control_forever", {"SUBSTACK": [2, toggle]})
     helper.hat("event_whenflagclicked", {}, loop)
     costumes = []
@@ -159,7 +228,7 @@ def prepare(source, output):
     paths[1].write_text(json.dumps(profile, indent=2) + "\n")
     receipt = {"source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
                "output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
-               "scope": "Controller level selection reuses authored locks/identify; one-controller dual-stick profile",
+               "scope": "Controller level selection and ending Menu reuse authored click paths; B returns from results; one-controller dual-stick profile",
                "all_original_blocks_and_assets_preserved": True, "hardware_tested": False, "emulator_tested": False}
     paths[2].write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt
