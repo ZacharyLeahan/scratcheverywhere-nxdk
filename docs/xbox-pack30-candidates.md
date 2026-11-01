@@ -207,3 +207,31 @@ footprint limit. The emulator has 128 MB configured, but the guest's expanded
 memory flag is false. Confirm the guest kernel's available memory and allocation
 behavior before generalizing this failure to the 128 MB physical Xbox or
 attributing it to the scheduler. No original-project engine repair is claimed.
+
+## Kernel memory and Fireboy follow-up
+
+A startup breakpoint immediately after `MmQueryStatistics` now confirms the
+current emulator kernel exposes **16,384 physical pages (64 MB)**, with 13,181
+pages available at that point. xemu itself has 128 MB configured; the executable's
+64 MB limit bit is already clear (`InitFlags=0x1`). Thus the original Candy
+allocation failure above is a measured **64 MB guest result**, not a verified
+128 MB guest failure. The prepared copy's physical 128 MB Xbox results stand.
+The emulator's [primary documentation](https://github.com/MichaelJSr/xemu-macos#readme)
+also distinguishes machine RAM from kernel-managed RAM.
+
+The same merged executable reaches Fireboy's selector and Level 1 with the
+native renderer. Ordinary controller play naturally earns one red gem and one
+blue gem, crosses both lower pits, loses/retries normally, and repeats those
+objectives. No first-level clear or Xbox gem repeat is claimed. A naturally
+earned checkpoint is used for subsequent route practice; Watergirl now also
+crosses the green pit. This is explicitly separate from a fresh full-level run.
+
+A fresh SDL Fireboy run aborts xemu at `ramht_lookup` in `pfifo.c:1287`, while
+the earlier physical SDL attempt reported invalid GPU DMA data. A read-only
+submission trace survives to the selector but changes timing; the captured
+packets have valid framing, so this is not an untraced reliability pass. Its
+pushbuffer is 512 KiB. A separate render-target DMA-ID experiment builds and
+renders the selector but is **unqualified**: the emulator's held controller
+report is present on the host while SDL's cached raw report remains neutral.
+No graphics repair is merged or claimed. Its source/build are archived privately
+for controlled follow-up; main stays unchanged and clean.
