@@ -315,7 +315,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <h3><a href="https://scratch.mit.edu/projects/704676520/">Level EATEN!</a></h3>
 <img src="mike-gameplay/level-eaten.gif" alt="Level EATEN! gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: C — First level cleared; startup issue open</strong></p>
-<p><strong>Playable:</strong> Walk/jump/eat/grow; first-level win → Level 2; Y reset, Green Flag replay and browser return.</p>
+<p><strong>Playable:</strong> Walk/jump/eat/grow; first-level win → Level 2; Y reset, Green Flag replay and browser return. Candidate xemu also clears Level 2 → Level 3.</p>
 <p><strong>Got working:</strong> Profile only. Stepping aside lets the last cube fall from the player’s head; no eating-runtime fix was needed.</p>
 <p><strong>Left:</strong> Intermittent blue-only startup; repeat win/replay on ordinary build, later levels and audio/smoothness.</p>
 </td>
@@ -324,10 +324,10 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/571560558/">Fireboy and Watergirl</a></h3>
 <img src="mike-gameplay/fireboy-watergirl.gif" alt="Fireboy and Watergirl gameplay on the physical Xbox" width="180" height="120">
-<p><strong>Playability: C — Both characters; first level incomplete</strong></p>
+<p><strong>Playability: C — Xbox startup/results controls open</strong></p>
 <p><strong>Playable:</strong> Both characters move/jump; natural hazard Game Over, Black/R retry and browser return.</p>
-<p><strong>Got working:</strong> Prepared project: controller level selector preserves locks. One-pad dual-stick profile; compact hint now fits on Xbox.</p>
-<p><strong>Left:</strong> Xbox repeat of two-gem progress; first-level exit, independent two-pad support and audio/smoothness. SDL GPU-buffer fix passes xemu; Xbox verification pending.</p>
+<p><strong>Got working:</strong> Prepared project: controller level selector preserves locks. One-pad dual-stick profile; compact hint fits on Xbox. New SDL candidate clears level 1/all seven gems in a fresh xemu run (00:56).</p>
+<p><strong>Left:</strong> Xbox repeat of the full clear; results-menu controller shortcut, later levels, independent two-pad support and audio/smoothness.</p>
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
@@ -393,8 +393,8 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | --- | --- |
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. Native and repaired SDL xemu runs earn the first red/blue gems and cross both lower pits. Xbox repeat, first-level clear and independent 2P remain open. SDL buffer overflow is confirmed; the fix awaits Xbox verification. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Xbox first-level win → Level 2, reset/replay/return. Candidate xemu also reaches Level 3 after Green Flag/Y retry. Intermittent Xbox startup remains open. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox movement, hazard loss/R retry/return. SDL candidate clears level 1/all seven gems in a fresh xemu run (00:56). Xbox startup verification, results-menu controller shortcut, later levels, 2P and quality checks remain open. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
@@ -416,8 +416,9 @@ startup reliability, later courses and quality checks remain open.
 
 [Xbox-only SDL GPU fix in testing (draft PR #67)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/67):
 Fireboy can overrun the 512 KiB GPU command buffer. The capacity guard passes
-a negative-control stress test and xemu selector/level-one gameplay. Hardware
-verification is pending; this fix is not merged into main yet.
+a negative-control stress test and fresh xemu Fireboy full-level clear. Level
+EATEN also reaches Level 3, with Green Flag replay, Y reset and clean return.
+Hardware verification is pending; this fix is not merged into main yet.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
@@ -435,3 +436,5 @@ That transfer/setup loop is what I meant by tricky when playing with my daughter
 An archive receiver/import screen and easy arrows/WASD presets would help. A
 per-project Controls editor already exists; make it easier to find. Importing a
 project would not guarantee its compatibility.
+
+Main is synced through upstream `b81acc16` via [PR #68](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/68): executable/library CMake recipes only; Xbox runtime unchanged.
