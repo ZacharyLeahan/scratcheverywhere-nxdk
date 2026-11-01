@@ -8,10 +8,11 @@ tracks what actually passed.
 ## Upstream baseline
 
 Our main now includes upstream through
-[`e96c3910`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/e96c39103981e7721321c9113235c4da6f4c61ca),
+[`c58ca6e6`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/c58ca6e64d7828a7e8c21373c9ce67ab181e09e6),
 including [release 1.3](https://github.com/ScratchEverywhere/ScratchEverywhere/releases/tag/1.3).
-The [latest fork sync](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/64)
-adds Windows renderer guards; [the previous sync](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/63) adds translation fallbacks and Russian strings. The native
+The latest syncs add [executable/library recipes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/68)
+and a [prebuilt executable phase](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/70);
+these do not change the Xbox runtime. The native
 NV2A/window/audio work is upstream's baseline. Earlier input-default,
 SB2 parsing and resampler fixes are already incorporated; their implementation
 files match upstream. They are not being proposed again.
@@ -19,7 +20,7 @@ files match upstream. They are not being proposed again.
 ## What remains in our fork beyond upstream
 
 These follow-ups remain beyond upstream. Some predate the 1.3 tag; this is the
-**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/e96c39103981e7721321c9113235c4da6f4c61ca...main).
+**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/c58ca6e64d7828a7e8c21373c9ce67ab181e09e6...main).
 
 | Scope | Follow-up / review link |
 | --- | --- |
@@ -44,7 +45,9 @@ Sokoban completes puzzles 1–11; its saved test ends six moves into twelve.
 Those results use the earlier identified executable. The separate 1.3 build now
 boots on hardware and plays the new CPU games. Level EATEN! has cleared its
 first level, though an intermittent blue-only startup is still open. The primary
-dashboard launcher remains the older SDL build. **Full qualification of the existing 21 games and 64 MB support are open.**
+dashboard launcher remains the older SDL build. The separate GPU-repair build
+now loads Fireboy and Level EATEN, returns both to the browser, and returns to
+XBMC normally. This bounded run does not establish repeated startup reliability. **Full qualification of the existing 21 games and 64 MB support are open.**
 Nine more games are approved for testing below: **30 is the target, not a pass count.**
 
 Open: native startup/handoffs, later levels/replay, audio and Appel smoothness.
@@ -324,10 +327,10 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/571560558/">Fireboy and Watergirl</a></h3>
 <img src="mike-gameplay/fireboy-watergirl.gif" alt="Fireboy and Watergirl gameplay on the physical Xbox" width="180" height="120">
-<p><strong>Playability: C — Xbox startup/results controls open</strong></p>
-<p><strong>Playable:</strong> Both characters move/jump; natural hazard Game Over, Black/R retry and browser return.</p>
-<p><strong>Got working:</strong> Prepared project: controller level selector preserves locks. One-pad dual-stick profile; compact hint fits on Xbox. New SDL candidate clears level 1/all seven gems in a fresh xemu run (00:56).</p>
-<p><strong>Left:</strong> Xbox repeat of the full clear; results-menu controller shortcut, later levels, independent two-pad support and audio/smoothness.</p>
+<p><strong>Playability: C — Full Xbox level clear still open</strong></p>
+<p><strong>Playable:</strong> Both characters move/jump; natural Game Over, Black/R retry, B back to the level selector after loss, and browser return on Xbox.</p>
+<p><strong>Got working:</strong> Prepared project: level selector preserves locks; <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/69">B results-menu shortcut</a> reuses the authored action. Release/fresh-press gating prevents held movement from skipping endings. xemu clears level 1/all seven gems and tests the earned Level 2/retry/menu loop.</p>
+<p><strong>Left:</strong> Full Xbox clear and next-level loop; pit-jump/hazard behavior needs comparison after failed timed jumps. Repeated startup, later levels, independent two-pad support and audio/smoothness remain open.</p>
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
@@ -394,7 +397,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Xbox first-level win → Level 2, reset/replay/return. Candidate xemu also reaches Level 3 after Green Flag/Y retry. Intermittent Xbox startup remains open. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox movement, hazard loss/R retry/return. SDL candidate clears level 1/all seven gems in a fresh xemu run (00:56). Xbox startup verification, results-menu controller shortcut, later levels, 2P and quality checks remain open. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox selection/start, hazard loss, Black retry, B results Menu and browser return pass. xemu clears level 1/all gems and the earned Level 2/menu/retry loop. Full Xbox clear, jump/hazard comparison, repeated startup, 2P and quality checks remain open. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
@@ -414,11 +417,16 @@ in xemu and on the Xbox using SDL. Ninja clears course 1 on the Xbox, then
 repeats that clear after Green Flag restart. No Ninja assets changed. Native
 startup reliability, later courses and quality checks remain open.
 
-[Xbox-only SDL GPU fix in testing (draft PR #67)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/67):
-Fireboy can overrun the 512 KiB GPU command buffer. The capacity guard passes
-a negative-control stress test and fresh xemu Fireboy full-level clear. Level
-EATEN also reaches Level 3, with Green Flag replay, Y reset and clean return.
-Hardware verification is pending; this fix is not merged into main yet.
+[Merged Xbox SDL GPU repair (PR #67)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/67):
+Fireboy could overrun the 512 KiB command buffer. The capacity guard passes the
+negative-control stress test, xemu full-level clear, and a real Xbox
+Fireboy → browser → Level EATEN → browser → XBMC run with no DMA error observed.
+This is a startup/cleanup result, not a performance or full-pack pass.
+
+[Merged Fireboy results controls (PR #69)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/69)
+add B Menu to the prepared project. On Xbox, natural loss/Black retry/B Menu pass.
+xemu additionally checks win → earned next level, held-B release gating and replay.
+The original level physics, locks, assets and credits are preserved.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
@@ -437,4 +445,3 @@ An archive receiver/import screen and easy arrows/WASD presets would help. A
 per-project Controls editor already exists; make it easier to find. Importing a
 project would not guarantee its compatibility.
 
-Main is synced through upstream `b81acc16` via [PR #68](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/68): executable/library CMake recipes only; Xbox runtime unchanged.
