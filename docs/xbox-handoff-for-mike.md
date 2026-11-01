@@ -53,19 +53,131 @@ These are **physical Xbox captures**, including older sessions, at their recorde
 pace. GIFs are silent; written milestones can come from later tests. Scratch
 source links and credits are retained. [Capture provenance](mike-gameplay/README.md).
 
-| | |
-| --- | --- |
-| **[Ultra Bird](https://discord.com/channels/428359196719972353/428399682239332354)**<br>![Ultra Bird gameplay on the physical Xbox](mike-gameplay/ultra-bird.gif)<br>Six pipes scored; original archive. | **[Hopper Heros](https://scratch.mit.edu/projects/1184969400/)**<br>![Hopper Heros gameplay on the physical Xbox](mike-gameplay/hopper.gif)<br>Movement/jump and replay; original Everywhere variant. |
-| **[Catch Apples](https://scratch.mit.edu/projects/124652800/)**<br>![Catch Apples gameplay on the physical Xbox](mike-gameplay/catch-apples.gif)<br>22 points at timer expiry; native ending/replay also checked. | **[Maze Starter](https://scratch.mit.edu/projects/10128431/)**<br>![Maze Starter gameplay on the physical Xbox](mike-gameplay/maze.gif)<br>Native Xbox win/replay and two clean returns; prepared copy. |
-| **[Snake](https://scratch.mit.edu/projects/511466864/)**<br>![Snake gameplay on the physical Xbox](mike-gameplay/snake.gif)<br>Score 225, loss/replay and four-direction steering. | **[Appel](https://scratch.mit.edu/projects/60917032/)**<br>![Appel gameplay on the physical Xbox](mike-gameplay/appel.gif)<br>Hardware: 21/35 apples and checkpoints; older clip shows seven. |
-| **[Tetris](https://scratch.mit.edu/projects/469540467/)**<br>![Tetris gameplay on the physical Xbox](mike-gameplay/tetris.gif)<br>Ten lines/Level 1; original + profile. | **[Frogger](https://scratch.mit.edu/projects/12221773/)**<br>![Frogger gameplay on the physical Xbox](mike-gameplay/frogger.gif)<br>Six pads in one round; prepared copy. |
-| **[Breakout](https://scratch.mit.edu/projects/11007566/)**<br>![Breakout gameplay on the physical Xbox](mike-gameplay/breakout.gif)<br>Full board at 1,940; prepared copy. | **[PacMan](https://scratch.mit.edu/projects/13701368/)**<br>![PacMan gameplay on the physical Xbox](mike-gameplay/pacman.gif)<br>Walls, pellets and replay; original + profile. |
-| **[Space Invaders](https://scratch.mit.edu/projects/253610111/)**<br>![Space Invaders gameplay on the physical Xbox](mike-gameplay/space-invaders.gif)<br>Hardware: 1,230 points and loss/replay. | **[Asteroids](https://scratch.mit.edu/projects/32219470/)**<br>![Asteroids gameplay on the physical Xbox](mike-gameplay/asteroids.gif)<br>9,200 points and replay; original scripts + profile. |
-| **[Sokoban](https://scratch.mit.edu/projects/24490009/)**<br>![Sokoban gameplay on the physical Xbox](mike-gameplay/sokoban.gif)<br>Native Xbox: puzzles 1–11 complete; checkpoint paused in twelve. | **[2048](https://scratch.mit.edu/projects/19554088/)**<br>![2048 gameplay on the physical Xbox](mike-gameplay/2048.gif)<br>Unseeded 2,048-tile win; prepared A acknowledgement. |
-| **[Retro Racing](https://scratch.mit.edu/projects/26999060/)**<br>![Retro Racing gameplay on the physical Xbox](mike-gameplay/retro-racing.gif)<br>Acceleration, braking and steering; original scripts + profile. | **[Hill Climb Racing](https://scratch.mit.edu/projects/56667360/)**<br>![Hill Climb Racing gameplay on the physical Xbox](mike-gameplay/hill-climb.gif)<br>Jeep/motorcycle, crash/replay; original scripts + profile. |
-| **[Super Mario Bros.](https://scratch.mit.edu/projects/196684240/)**<br>![Super Mario Bros. gameplay on the physical Xbox](mike-gameplay/mario.gif)<br>Opening pipes and death recovery; prepared copy. | **[Doodle Jump](https://scratch.mit.edu/projects/399123680/)**<br>![Doodle Jump gameplay on the physical Xbox](mike-gameplay/doodle-jump.gif)<br>1,044 m and automatic replay; original scripts + profile. |
-| **[Jumper](https://scratch.mit.edu/projects/103069687/)**<br>![Jumper gameplay on the physical Xbox](mike-gameplay/jumper.gif)<br>Levels 1–4 cleared; prepared controls/readiness copy. | **[Connect Four](https://scratch.mit.edu/projects/52769452/)**<br>![Connect Four gameplay on the physical Xbox](mike-gameplay/connect-four.gif)<br>Both colors and three win directions; prepared copy. |
-| **[Zach’s Spider Adventure](https://scratch.mit.edu/projects/1396458859/)**<br>![Zach’s Spider Adventure gameplay on the physical Xbox](mike-gameplay/spider-adventure.gif)<br>Jumping, spider stomps and scoring; original game + controller profile. Hardware Level 6 / Score 7,516; all ten levels in xemu. [Details](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md). | |
+### [Ultra Bird](https://discord.com/channels/428359196719972353/428399682239332354)
+
+<img src="mike-gameplay/ultra-bird.gif" alt="Ultra Bird gameplay on the physical Xbox" width="480" height="320">
+
+Six pipes scored; original archive.
+
+### [Hopper Heros](https://scratch.mit.edu/projects/1184969400/)
+
+<img src="mike-gameplay/hopper.gif" alt="Hopper Heros gameplay on the physical Xbox" width="480" height="320">
+
+Movement/jump and replay; original Everywhere variant.
+
+### [Catch Apples](https://scratch.mit.edu/projects/124652800/)
+
+<img src="mike-gameplay/catch-apples.gif" alt="Catch Apples gameplay on the physical Xbox" width="480" height="320">
+
+22 points at timer expiry; native ending/replay also checked.
+
+### [Maze Starter](https://scratch.mit.edu/projects/10128431/)
+
+<img src="mike-gameplay/maze.gif" alt="Maze Starter gameplay on the physical Xbox" width="480" height="320">
+
+Native Xbox win/replay and two clean returns; prepared copy.
+
+### [Snake](https://scratch.mit.edu/projects/511466864/)
+
+<img src="mike-gameplay/snake.gif" alt="Snake gameplay on the physical Xbox" width="480" height="320">
+
+Score 225, loss/replay and four-direction steering.
+
+### [Appel](https://scratch.mit.edu/projects/60917032/)
+
+<img src="mike-gameplay/appel.gif" alt="Appel gameplay on the physical Xbox" width="480" height="320">
+
+Hardware: 21/35 apples and checkpoints; older clip shows seven.
+
+### [Tetris](https://scratch.mit.edu/projects/469540467/)
+
+<img src="mike-gameplay/tetris.gif" alt="Tetris gameplay on the physical Xbox" width="480" height="320">
+
+Ten lines/Level 1; original + profile.
+
+### [Frogger](https://scratch.mit.edu/projects/12221773/)
+
+<img src="mike-gameplay/frogger.gif" alt="Frogger gameplay on the physical Xbox" width="480" height="320">
+
+Six pads in one round; prepared copy.
+
+### [Breakout](https://scratch.mit.edu/projects/11007566/)
+
+<img src="mike-gameplay/breakout.gif" alt="Breakout gameplay on the physical Xbox" width="480" height="320">
+
+Full board at 1,940; prepared copy.
+
+### [PacMan](https://scratch.mit.edu/projects/13701368/)
+
+<img src="mike-gameplay/pacman.gif" alt="PacMan gameplay on the physical Xbox" width="480" height="320">
+
+Walls, pellets and replay; original + profile.
+
+### [Space Invaders](https://scratch.mit.edu/projects/253610111/)
+
+<img src="mike-gameplay/space-invaders.gif" alt="Space Invaders gameplay on the physical Xbox" width="480" height="320">
+
+Hardware: 1,230 points and loss/replay.
+
+### [Asteroids](https://scratch.mit.edu/projects/32219470/)
+
+<img src="mike-gameplay/asteroids.gif" alt="Asteroids gameplay on the physical Xbox" width="480" height="320">
+
+9,200 points and replay; original scripts + profile.
+
+### [Sokoban](https://scratch.mit.edu/projects/24490009/)
+
+<img src="mike-gameplay/sokoban.gif" alt="Sokoban gameplay on the physical Xbox" width="480" height="320">
+
+Native Xbox: puzzles 1–11 complete; checkpoint paused in twelve.
+
+### [2048](https://scratch.mit.edu/projects/19554088/)
+
+<img src="mike-gameplay/2048.gif" alt="2048 gameplay on the physical Xbox" width="480" height="320">
+
+Unseeded 2,048-tile win; prepared A acknowledgement.
+
+### [Retro Racing](https://scratch.mit.edu/projects/26999060/)
+
+<img src="mike-gameplay/retro-racing.gif" alt="Retro Racing gameplay on the physical Xbox" width="480" height="320">
+
+Acceleration, braking and steering; original scripts + profile.
+
+### [Hill Climb Racing](https://scratch.mit.edu/projects/56667360/)
+
+<img src="mike-gameplay/hill-climb.gif" alt="Hill Climb Racing gameplay on the physical Xbox" width="480" height="320">
+
+Jeep/motorcycle, crash/replay; original scripts + profile.
+
+### [Super Mario Bros.](https://scratch.mit.edu/projects/196684240/)
+
+<img src="mike-gameplay/mario.gif" alt="Super Mario Bros. gameplay on the physical Xbox" width="480" height="320">
+
+Opening pipes and death recovery; prepared copy.
+
+### [Doodle Jump](https://scratch.mit.edu/projects/399123680/)
+
+<img src="mike-gameplay/doodle-jump.gif" alt="Doodle Jump gameplay on the physical Xbox" width="480" height="320">
+
+1,044 m and automatic replay; original scripts + profile.
+
+### [Jumper](https://scratch.mit.edu/projects/103069687/)
+
+<img src="mike-gameplay/jumper.gif" alt="Jumper gameplay on the physical Xbox" width="480" height="320">
+
+Levels 1–4 cleared; prepared controls/readiness copy.
+
+### [Connect Four](https://scratch.mit.edu/projects/52769452/)
+
+<img src="mike-gameplay/connect-four.gif" alt="Connect Four gameplay on the physical Xbox" width="480" height="320">
+
+Both colors and three win directions; prepared copy.
+
+### [Zach’s Spider Adventure](https://scratch.mit.edu/projects/1396458859/)
+
+<img src="mike-gameplay/spider-adventure.gif" alt="Zach’s Spider Adventure gameplay on the physical Xbox" width="480" height="320">
+
+Jumping, spider stomps and scoring; original game + controller profile. Hardware Level 6 / Score 7,516; all ten levels in xemu. [Details](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md).
 
 Hopper links to the original game; we tested its Everywhere variant. Ultra Bird's
 link is the example Discord channel because its standalone project URL was not
