@@ -40,9 +40,9 @@ Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban puzzles.
 On the physical **128 MB Xbox**, native Maze passes win/replay/two clean returns;
 Sokoban completes puzzles 1–11; its saved test ends six moves into twelve.
 Those results use the earlier identified executable. The separate 1.3 build now
-boots on hardware and plays Beach Volleyball’s CPU mode. Level EATEN! needs a
-Green Flag retry before its scene appears; the primary dashboard
-launcher remains the older SDL build. **Full qualification of the existing 21 games and 64 MB support are open.**
+boots on hardware and plays the new CPU games. Level EATEN! has cleared its
+first level, though an intermittent blue-only startup is still open. The primary
+dashboard launcher remains the older SDL build. **Full qualification of the existing 21 games and 64 MB support are open.**
 Nine more games are approved for testing below: **30 is the target, not a pass count.**
 
 Open: native startup/handoffs, later levels/replay, audio and Appel smoothness.
@@ -54,8 +54,10 @@ from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scr
 
 **Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
 They are conservative, provisional assessments of the tested game/build; they
-are not benchmark scores. Earlier clips use earlier builds; Beach and Level EATEN!
-use the separate 1.3 build.
+are not benchmark scores. Earlier clips use earlier builds. Beach/GlowBall use the separate ordinary 1.3
+build; the other new clips use its diagnostic variant with read-only logging.
+Repeat those loops with the ordinary build before final acceptance. GIF sampling
+does not measure game frame rate.
 
 - **A:** smooth, responsive and stable through the main gameplay/ending/replay checks.
 - **B+:** tested objective or game loop plus replay works; quality/reliability checks remain.
@@ -295,6 +297,60 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <p><a href="#next-nine-target-pack-of-30">New-game progress and limits</a></p>
 </td>
 </tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/112176502/">GlowBall</a></h3>
+<img src="mike-gameplay/glowball.gif" alt="GlowBall gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — CPU match and replay</strong></p>
+<p><strong>Playable:</strong> X starts CPU; directions/A jump; natural 2–5 loss, X replay and browser return.</p>
+<p><strong>Got working:</strong> Prepared project/profile: CPU shortcut and controls hint; original gameplay preserved.</p>
+<p><strong>Left:</strong> Independent 2P, player win, audio/smoothness and longer play.</p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/704676520/">Level EATEN!</a></h3>
+<img src="mike-gameplay/level-eaten.gif" alt="Level EATEN! gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: C — First level cleared; startup issue open</strong></p>
+<p><strong>Playable:</strong> Walk/jump/eat/grow; first-level win → Level 2; Y reset, Green Flag replay and browser return.</p>
+<p><strong>Got working:</strong> Profile only. Stepping aside lets the last cube fall from the player’s head; no eating-runtime fix was needed.</p>
+<p><strong>Left:</strong> Intermittent blue-only startup; repeat win/replay on ordinary build, later levels and audio/smoothness.</p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/571560558/">Fireboy and Watergirl</a></h3>
+<img src="mike-gameplay/fireboy-watergirl.gif" alt="Fireboy and Watergirl gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: C — Both characters; first level incomplete</strong></p>
+<p><strong>Playable:</strong> Both characters move/jump; natural hazard Game Over, Black/R retry and browser return.</p>
+<p><strong>Got working:</strong> Prepared project: controller level selector preserves locks. One-pad dual-stick profile; compact hint awaits hardware check.</p>
+<p><strong>Left:</strong> First-level gems/exit, independent two-pad support, final hint and ordinary-build checks, audio/smoothness.</p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
+<img src="mike-gameplay/mushroom-valley.gif" alt="Mushroom Valley gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Scored run and controller retry</strong></p>
+<p><strong>Playable:</strong> Hold/release A; two scored landings, natural loss, A retry/new round, renewed jump and browser return.</p>
+<p><strong>Got working:</strong> Prepared project: A activates the existing mouse-only Retry gate; ending hint added.</p>
+<p><strong>Left:</strong> Repeat prepared copy on ordinary build; longer runs and audio/smoothness.</p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/173918262/">Bouncy Heroes</a></h3>
+<img src="mike-gameplay/bouncy-heroes.gif" alt="Bouncy Heroes gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Scored combat and replay</strong></p>
+<p><strong>Playable:</strong> Directions + A dash, B slam; Score 10 / four coins; natural Game Over, A menu/replay and browser return.</p>
+<p><strong>Got working:</strong> Existing keys mapped in a controller profile; no project or core patch.</p>
+<p><strong>Left:</strong> Ordinary-build repeat, character/menu coverage, audio/smoothness and longer play.</p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/404349977/">Ninja Climb</a></h3>
+<img src="mike-gameplay/ninja-climb.gif" alt="Ninja Climb gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: C — Controls and recovery; opening uncleared</strong></p>
+<p><strong>Playable:</strong> X starts/dashes, A jumps; direction control, pit death/recovery, Green Flag replay and browser return.</p>
+<p><strong>Got working:</strong> Controller profile only; no demonstrated runtime defect.</p>
+<p><strong>Left:</strong> Clear opening section; sustained progression, audio/smoothness and longer play.</p>
+</td>
+</tr>
 </tbody>
 </table>
 
@@ -306,41 +362,35 @@ normal physical run has not yet repeated that win.
 ## Next nine: target pack of 30
 
 **All nine are installed; 30 is the target, not a qualified-game count.**
-**U = no Xbox gameplay qualification yet.** Beach’s first physical result/GIF is
-above; the other recordings are placeholders. These additions focus on
-controller-friendly Scratch games.
+Seven now have real Xbox clips above. **Paint the Maze is untested (U); Candy
+Caves is blocked at level loading (D).** No new game has earned an A; smoothness,
+audio and extended stability remain unqualified. This console has 128 MB.
 
-All nine original projects pass the limited **native xemu load → pause → Exit**
-check, restoring the exact 30-game list each time. This does not prove gameplay,
-endings, audio or smoothness. Level EATEN also passes emulator movement/jump,
-collection/growth from 100 to 200, Y reset and Green Flag replay/browser return.
+| Game | Current Xbox result / next check |
+| --- | --- |
+| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
+| [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. No first-level clear or independent 2P yet. |
+| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **U:** Gameplay/menu qualification pending; GIF placeholder. |
+| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **D:** Menus work; level loading stops responding. xemu reproduces it; clone-initialization prepared repair under test. GIF placeholder. |
+| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
+| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **C:** Move/jump/dash, death/recovery/replay/return. Opening section uncleared. |
+| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) | **B:** Score 2/loss, prepared A retry, renewed jump/return. |
 
-Beach and GlowBall have prepared **CPU-menu shortcuts**: X starts a CPU game.
-Each adds one helper sprite, a controls hint and a controller profile; original
-gameplay scripts/assets are unchanged. Both pass emulator CPU start, movement,
-jump, scoring, replay and Exit. Beach’s CPU shortcut also passes on hardware;
-GlowBall’s prepared copy is not yet installed on the console.
-[Reproducible helper and test checkpoint](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/fa9a6b5b)
-are saved on a separate development branch; they are not merged into main.
-Independent simultaneous two-player input needs backend/per-port binding work;
-the current backend exposes one active pad. CPU play is the initial target.
+New helpers are on the development branch, **not main yet**:
+[Beach/GlowBall CPU menus](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/fa9a6b5b)
+and [Mushroom Valley retry](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/6c69b63c).
+These are **prepared-project/profile changes**, separate from core/Xbox code.
+Fireboy’s compact menu hint and Candy’s repair are still candidates. Original
+archives/assets/credits are preserved. All nine also passed limited native xemu
+load → pause → Exit checks; that alone does not qualify gameplay.
 
-| Game / creator | Planned controller actions | Xbox result / GIF |
-| --- | --- | --- |
-| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) — Will_Wam | X: Easy CPU; D-pad: move; A: jump | **B — CPU match/replay/return.** Real Xbox GIF above; 2P pending. |
-| [GlowBall](https://scratch.mit.edu/projects/112176502/) — Will_Wam | Prepared copy: X CPU, D-pad move, A jump; independent 2P pending | **U — hardware gameplay pending.** GIF pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) — griffpatch | Move/jump; Y reset | **C — startup workaround required.** After Green Flag: walk/jump, eat two blocks, fall/recover, Y reset and browser return. Initial launch showed only blue; level completion, audio/smoothness and GIF pending. |
-| [Fireboy and Watergirl – Forest Temple](https://scratch.mit.edu/projects/571560558/) — vatsalnewar | Separate move/jump controls for both characters | **U — hardware gameplay pending.** GIF pending. |
-| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) — colinmacc | Directions; reset/menu | **U — hardware gameplay pending.** GIF pending. |
-| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) — theChAOTiC | Move; attack/select; interact | **U — hardware gameplay pending.** GIF pending. |
-| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) — theChAOTiC | Move; slam; dash | **U — hardware gameplay pending.** GIF pending. |
-| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) — pandakun | Move; jump; dash | **U — hardware gameplay pending.** GIF pending. |
-| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) — pandakun | Hold/release jump | **U — hardware gameplay pending.** GIF pending. |
-
-For each: verify menus, a meaningful objective, loss/win and replay, return to
-launcher/relaunch, audio and smoothness. Record each fix as **core**, **Xbox**,
-**controller profile** or **prepared project**. The two-player games also need
-independent and simultaneous controller checks.
+Independent simultaneous two-player input still needs backend/per-port binding
+work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
+on one controller. Repeat diagnostic-build results on the ordinary build before
+final acceptance. Further fresh launches, meaningful progression, endings/replay,
+audio and measured smoothness remain the acceptance work.
 
 ## Why adding games is cumbersome
 

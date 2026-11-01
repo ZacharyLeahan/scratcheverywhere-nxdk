@@ -1,0 +1,114 @@
+{
+  "recorded_utc_date": "2026-11-01",
+  "source": "Physical 128 MB original Xbox via ESP-KVM live MJPEG; two warm frames omitted; each GIF uses one continuous source interval",
+  "clips": [
+    {
+      "gif": "glowball.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 6.739763459,
+      "encoded_seconds": 6.7,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "84d60d948f23d265ad636ecc824e967dafb78a464723833ac137bd1a54c4af07",
+      "sha256": "f4c85da390ba33919edf1e610268b64b518d8b85869cb784bccb8d0959dec346",
+      "bytes": 778600,
+      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    },
+    {
+      "gif": "bouncy-heroes.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 5.810074042,
+      "encoded_seconds": 5.800000000000001,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "a57d47e0ceaabc636d7f3a4c78b48276c2a1d3b23759234ca3f0563999956abe",
+      "sha256": "25d56a756d8cd9c5b5a5d40cc4f9fce7a6686e85fa319a646b3094deff914d3e",
+      "bytes": 1735017,
+      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    },
+    {
+      "gif": "mushroom-valley.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 5.988801875,
+      "encoded_seconds": 5.9,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "a57d47e0ceaabc636d7f3a4c78b48276c2a1d3b23759234ca3f0563999956abe",
+      "sha256": "b2c02305ae5febd69ecb7090459db5541f8fb16f648eba2ecb71da316577b34e",
+      "bytes": 1274714,
+      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    },
+    {
+      "gif": "level-eaten.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 3.710327542,
+      "encoded_seconds": 3.7,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "a57d47e0ceaabc636d7f3a4c78b48276c2a1d3b23759234ca3f0563999956abe",
+      "sha256": "6f048bd7407d378daa1b9a056a3fe4189035c2f963e346005502c50b424600ce",
+      "bytes": 476062,
+      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    },
+    {
+      "gif": "fireboy-watergirl.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 5.439933709,
+      "encoded_seconds": 5.4,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "a57d47e0ceaabc636d7f3a4c78b48276c2a1d3b23759234ca3f0563999956abe",
+      "sha256": "466f2ed80b356168150ec3c51e925a2c5ea89774afd807e24b78cfe8c05ea149",
+      "bytes": 3476353,
+      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    },
+    {
+      "gif": "ninja-climb.gif",
+      "warm_frames_excluded": 2,
+      "continuous_source_interval_seconds": 5.5091821670000005,
+      "encoded_seconds": 5.5,
+      "dimensions": [
+        480,
+        320
+      ],
+      "display": [
+        180,
+        120
+      ],
+      "xbe_sha256": "84d60d948f23d265ad636ecc824e967dafb78a464723833ac137bd1a54c4af07",
+      "sha256": "f7c517f9ec2c5f1f22d89317401a849e2749e9b6787e29fed464f9d914aad83d",
+      "bytes": 2638113,
+      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+    }
+  ]
+}
