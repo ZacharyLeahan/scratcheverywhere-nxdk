@@ -10,7 +10,8 @@ passes native NV2A browser selection and gameplay checks for Catch Apples,
 Appel and PacMan, with three clean returns to the game list. Catch also passes
 ending/replay/steering. Current build `c7c0a9d9…` also passes a native Maze win,
 post-win replay, fresh launch and two clean returns on hardware. The installed
-full-set Sokoban copy also passes native puzzles 1–8 with every board checked.
+full-set Sokoban copy also completes native puzzles 1–11 with every board checked;
+the round is deliberately paused after six moves in twelve.
 Native startup reliability and remaining gameplay, audio and handoff checks
 stay open; see the
 [physical backend follow-up](xbox-native-hardware-followup.md). The installed
@@ -55,7 +56,7 @@ this common cycle does not repeat every full-game objective.
 | [PacMan](xbox-pacman.md) | Turns/walls/scoring; power pellet +100 and blue ghosts; loss/replay; current native turn/Score 40 and clean Exit | All 92 collectibles plus one ghost: 1,380; visible Win; Win/loss replay | Hardware full board/ghost; original final High Score gap; optional prepared repair passes ending probes and natural loss/replay, not installed |
 | [Space Invaders](xbox-space-invaders.md) | Score 1,230; shield/life loss, replay/relaunch | Native full wave: 55 → 0 → fresh 55, Score 990 / three lives; wave-two recovery | Hardware full wave; complete audio/listening |
 | Asteroids ([checklist](xbox-game-qualification.md)) | Thrust/turn/fire; Score 9,200; Game Over/replay/relaunch | Launch cycle | Further level progression; audio |
-| [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch; full-set archive now installed and current native build passes puzzles 1–8 with Black restarts/every board checked | SDL and current native graphics: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; native Green Flag/Black restart, fresh launch and two clean returns; source-matched 10s SDL3 APU music | Physical full-set puzzles 9–13, wrap/replay/Exit, audio/listening and FPS |
+| [Sokoban](xbox-sokoban.md) | Puzzles 1–3; repaired puzzle 10 complete; restart/relaunch; full-set archive now installed and current native build completes puzzles 1–11, 2,188 route moves / 487 pushes; deliberate checkpoint in twelve; twelve Black restarts/every board checked | SDL and current native graphics: all 13 puzzles, 2,728 moves / 628 pushes, natural wrap; native Green Flag/Black restart, fresh launch and two clean returns; source-matched 10s SDL3 APU music | Physical full-set puzzles 12–13, wrap/replay/Exit, audio/listening and FPS |
 | [2048](xbox-2048.md) | Natural 2048 win / Score 20,264; continue, loss/replay and repeated exits | Launch cycle | KVM missed/duplicate input and held-confirmation handoff; no authored playback |
 | [Retro Racing](xbox-retro-racing.md) | 108 MPH, braking/steering/off-road slowdown; pause/replay | Current native full lap 02:02.00, Y pause, deliberate drift/smoke, off-road slowdown, replay and two clean returns | Hardware full lap/drift/traffic visuals; audio. Traffic collision is not authored |
 | [Hill Climb Racing](xbox-hill-climb.md) | Jeep 1,000; motorcycle 420; fuel pickup, airtime/crash, vehicle swap/replay | Launch cycle | Extended terrain; precise brake/air control; audio |
@@ -63,6 +64,11 @@ this common cycle does not repeat every full-game objective.
 | Doodle Jump ([checklist](xbox-game-qualification.md)) | At least 1,044 m; both edge wraps; fall/replay/relaunch | Launch cycle | Monsters, longer play and audio |
 | [Jumper](xbox-jumper.md) | Levels 1–4; lava death, restart/replay; readiness-guard exits | Current native `c7c0a9d9…` clears all 20 courses on both installed and timer-fixed archives; visible win/stopped timer, fixed post-win Y+Black clock restart, Green Flag replay, renewed jumping/Black restart and clean browser return | Timer-fixed archive needs Xbox installation and later-level/victory/replay tests; historical second-Exit handoff; audio |
 | Connect Four ([checklist](xbox-game-qualification.md)) | Both players; horizontal/vertical/diagonal wins; full-column rejection/replay | Launch cycle | One unexplained initial mouse-mode launch; no authored playback |
+
+The [November 1 upstream 1.3 sync](xbox-upstream-1.3.md) passes the normal Xbox
+build, native/SDL diagnostics, GPU fixtures and another 21-game native-emulator
+launch/Exit cycle. Its new binary has not yet been hardware-tested. Existing
+physical results retain their identified earlier executables.
 
 ## Performance and audio
 

@@ -4,8 +4,9 @@ Latest status (November 1): the full prepared set passes both the earlier
 SDL run and a [current native-graphics controller run](#native-full-set-controller-run-october-31-2026)
 from level one through thirteen and natural wrap, with 2,728 moves and 628 pushes
 checked. The full-set archive is now installed on the Xbox, where native build
-`c7c0a9d9…` completes puzzles 1–8 and Black restarts with every board/player
-state checked. Puzzles 9–13, wrap/replay and audio qualification remain open.
+`c7c0a9d9…` completes puzzles 1–11 with every board/player state checked, then
+pauses at a requested checkpoint after six moves in puzzle twelve. Puzzles
+12–13, wrap/replay and audio qualification remain open.
 
 Gammastr20's [Sokoban](https://scratch.mit.edu/projects/24490009/) has passed
 puzzles one through three on the Xbox. The downloaded tenth puzzle contains
@@ -383,5 +384,32 @@ not establish why every individual pulse was missed.
 Private evidence is shared observations
 `scratch-sokoban-availability-20261101T134004Z`, especially
 `sokoban-full-install/receipt.json`, `sokoban-through-eight-review.json` and the
-linked `sokoban-native-full13*` continuation records. Puzzles 9–13, natural wrap,
-post-wrap replay/Exit and listening quality remain open.
+linked `sokoban-native-full13*` continuation records. The later checkpoint below
+extends that first-eight result.
+
+
+### Later checkpoint: eleven puzzles complete
+
+The same physical round continues through puzzle eleven: **2,188 route moves /
+487 pushes** for completed puzzles. At the user's checkpoint request, automation
+stops before sending puzzle-twelve move seven. The first six moves there bring
+the total accepted route prefix to **2,194 moves**. Twelve first-move prefixes
+and twelve Black restarts bring the checked state count to **2,218**.
+
+The offline audit checks every accepted board/player state, both continuation
+boundaries and all **2,292 original JPEG hashes**. All twelve initial/Black
+restart pairs match exactly in the left playfield; the three contact sheets
+were also reviewed visually. The sidebar is excluded from that exact-image
+comparison because the authored cumulative Moves counter retains prior moves.
+
+Back opens the visible runtime pause menu after this deliberate neutral-boundary
+stop. Controls are released and the camera is closed. This is a preserved partial
+round, not a freeze or a thirteen-puzzle pass. Puzzle twelve completion, thirteen,
+natural wrap, post-wrap replay/Exit, new audio listening and FPS remain open.
+Temporary native preferences remain active to preserve the round; restore the
+backed-up settings after dashboard recovery. The primary launcher is unchanged.
+
+Evidence: `sokoban-native-full13-part3/offline-checkpoint-map-audit.json`, the
+linked original run records and `sokoban-checkpoint-pause-video/` in the same
+shared observation directory. This hardware executable predates the separately
+validated upstream 1.3 integration.
