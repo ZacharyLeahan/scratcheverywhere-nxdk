@@ -49,135 +49,242 @@ from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scr
 
 ## Games in action
 
-These are **physical Xbox captures**, including older sessions, at their recorded
-pace. GIFs are silent; written milestones can come from later tests. Scratch
-source links and credits are retained. [Capture provenance](mike-gameplay/README.md).
+**Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
+They are conservative, provisional assessments of the tested game/build; they
+are not benchmark scores or a promise about the new, untested-on-hardware 1.3 binary.
 
-### [Ultra Bird](https://discord.com/channels/428359196719972353/428399682239332354)
+- **A:** smooth, responsive and stable through the main gameplay/ending/replay checks.
+- **B+:** tested objective or game loop plus replay works; quality/reliability checks remain.
+- **B:** real gameplay works, but progression or important checks are incomplete.
+- **C:** playable with significant roughness or limitations. **Appel is C: movement is not yet smooth.**
+- **D:** cannot reliably play. No current entry is rated D.
 
-<img src="mike-gameplay/ultra-bird.gif" alt="Ultra Bird gameplay on the physical Xbox" width="480" height="320">
+**No A grades yet.** Smoothness/responsiveness are not sufficiently qualified for
+an A; unknown does not mean smooth. B+ is not a full-game completion claim.
+KVM dropouts/missed input are recorded separately from demonstrated game faults.
 
-Six pipes scored; original archive.
+The GIFs are **real Xbox footage**, including older sessions, at recorded pace.
+They are silent, consistently displayed at **180 × 120**, two games per row.
+Written results may come from later tests. “Got working” identifies **core/runtime**,
+**Xbox**, **controller profile**, or **prepared-project** work; it does not imply
+that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/README.md).
 
-### [Hopper Heros](https://scratch.mit.edu/projects/1184969400/)
-
-<img src="mike-gameplay/hopper.gif" alt="Hopper Heros gameplay on the physical Xbox" width="480" height="320">
-
-Movement/jump and replay; original Everywhere variant.
-
-### [Catch Apples](https://scratch.mit.edu/projects/124652800/)
-
-<img src="mike-gameplay/catch-apples.gif" alt="Catch Apples gameplay on the physical Xbox" width="480" height="320">
-
-22 points at timer expiry; native ending/replay also checked.
-
-### [Maze Starter](https://scratch.mit.edu/projects/10128431/)
-
-<img src="mike-gameplay/maze.gif" alt="Maze Starter gameplay on the physical Xbox" width="480" height="320">
-
-Native Xbox win/replay and two clean returns; prepared copy.
-
-### [Snake](https://scratch.mit.edu/projects/511466864/)
-
-<img src="mike-gameplay/snake.gif" alt="Snake gameplay on the physical Xbox" width="480" height="320">
-
-Score 225, loss/replay and four-direction steering.
-
-### [Appel](https://scratch.mit.edu/projects/60917032/)
-
-<img src="mike-gameplay/appel.gif" alt="Appel gameplay on the physical Xbox" width="480" height="320">
-
-Hardware: 21/35 apples and checkpoints; older clip shows seven.
-
-### [Tetris](https://scratch.mit.edu/projects/469540467/)
-
-<img src="mike-gameplay/tetris.gif" alt="Tetris gameplay on the physical Xbox" width="480" height="320">
-
-Ten lines/Level 1; original + profile.
-
-### [Frogger](https://scratch.mit.edu/projects/12221773/)
-
-<img src="mike-gameplay/frogger.gif" alt="Frogger gameplay on the physical Xbox" width="480" height="320">
-
-Six pads in one round; prepared copy.
-
-### [Breakout](https://scratch.mit.edu/projects/11007566/)
-
-<img src="mike-gameplay/breakout.gif" alt="Breakout gameplay on the physical Xbox" width="480" height="320">
-
-Full board at 1,940; prepared copy.
-
-### [PacMan](https://scratch.mit.edu/projects/13701368/)
-
-<img src="mike-gameplay/pacman.gif" alt="PacMan gameplay on the physical Xbox" width="480" height="320">
-
-Walls, pellets and replay; original + profile.
-
-### [Space Invaders](https://scratch.mit.edu/projects/253610111/)
-
-<img src="mike-gameplay/space-invaders.gif" alt="Space Invaders gameplay on the physical Xbox" width="480" height="320">
-
-Hardware: 1,230 points and loss/replay.
-
-### [Asteroids](https://scratch.mit.edu/projects/32219470/)
-
-<img src="mike-gameplay/asteroids.gif" alt="Asteroids gameplay on the physical Xbox" width="480" height="320">
-
-9,200 points and replay; original scripts + profile.
-
-### [Sokoban](https://scratch.mit.edu/projects/24490009/)
-
-<img src="mike-gameplay/sokoban.gif" alt="Sokoban gameplay on the physical Xbox" width="480" height="320">
-
-Native Xbox: puzzles 1–11 complete; checkpoint paused in twelve.
-
-### [2048](https://scratch.mit.edu/projects/19554088/)
-
-<img src="mike-gameplay/2048.gif" alt="2048 gameplay on the physical Xbox" width="480" height="320">
-
-Unseeded 2,048-tile win; prepared A acknowledgement.
-
-### [Retro Racing](https://scratch.mit.edu/projects/26999060/)
-
-<img src="mike-gameplay/retro-racing.gif" alt="Retro Racing gameplay on the physical Xbox" width="480" height="320">
-
-Acceleration, braking and steering; original scripts + profile.
-
-### [Hill Climb Racing](https://scratch.mit.edu/projects/56667360/)
-
-<img src="mike-gameplay/hill-climb.gif" alt="Hill Climb Racing gameplay on the physical Xbox" width="480" height="320">
-
-Jeep/motorcycle, crash/replay; original scripts + profile.
-
-### [Super Mario Bros.](https://scratch.mit.edu/projects/196684240/)
-
-<img src="mike-gameplay/mario.gif" alt="Super Mario Bros. gameplay on the physical Xbox" width="480" height="320">
-
-Opening pipes and death recovery; prepared copy.
-
-### [Doodle Jump](https://scratch.mit.edu/projects/399123680/)
-
-<img src="mike-gameplay/doodle-jump.gif" alt="Doodle Jump gameplay on the physical Xbox" width="480" height="320">
-
-1,044 m and automatic replay; original scripts + profile.
-
-### [Jumper](https://scratch.mit.edu/projects/103069687/)
-
-<img src="mike-gameplay/jumper.gif" alt="Jumper gameplay on the physical Xbox" width="480" height="320">
-
-Levels 1–4 cleared; prepared controls/readiness copy.
-
-### [Connect Four](https://scratch.mit.edu/projects/52769452/)
-
-<img src="mike-gameplay/connect-four.gif" alt="Connect Four gameplay on the physical Xbox" width="480" height="320">
-
-Both colors and three win directions; prepared copy.
-
-### [Zach’s Spider Adventure](https://scratch.mit.edu/projects/1396458859/)
-
-<img src="mike-gameplay/spider-adventure.gif" alt="Zach’s Spider Adventure gameplay on the physical Xbox" width="480" height="320">
-
-Jumping, spider stomps and scoring; original game + controller profile. Hardware Level 6 / Score 7,516; all ten levels in xemu. [Details](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md).
+<table>
+<tbody>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://discord.com/channels/428359196719972353/428399682239332354">Ultra Bird</a></h3>
+<img src="mike-gameplay/ultra-bird.gif" alt="Ultra Bird gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Short rounds playable</strong></p>
+<p><strong>Playable:</strong> A flaps; six pipes / Score 6; loss and Start replay.</p>
+<p><strong>Got working:</strong> Xbox: A/flap and stopped-project replay work; original game unchanged.</p>
+<p><strong>Left:</strong> Longer play, input/handoff reliability and smoothness. Silence is authored.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-ultra-bird.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/1184969400/">Hopper Heros</a></h3>
+<img src="mike-gameplay/hopper.gif" alt="Hopper Heros gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Movement and short rounds</strong></p>
+<p><strong>Playable:</strong> D-pad/stick steer; A jumps; Score 8, loss/retry and menu return.</p>
+<p><strong>Got working:</strong> Profile: supplied the missing D-pad arrow mapping; game unchanged.</p>
+<p><strong>Left:</strong> Sustained progression; early short Start miss; audio and feel.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-hopper.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/124652800/">Catch Apples</a></h3>
+<img src="mike-gameplay/catch-apples.gif" alt="Catch Apples gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Timed round and replay</strong></p>
+<p><strong>Playable:</strong> Steer the basket; Score 22, timer ending/replay; native ending also checked.</p>
+<p><strong>Got working:</strong> Profile: D-pad arrows. Project: fixed special-apple +2/−2 scoring race.</p>
+<p><strong>Left:</strong> Repeated native handoffs; sound quality and smoothness.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-catch-apples.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/10128431/">Maze Starter</a></h3>
+<img src="mike-gameplay/maze.gif" alt="Maze Starter gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Win and replay verified</strong></p>
+<p><strong>Playable:</strong> Complete maze, blocked walls, win, Green Flag replay; two native browser returns.</p>
+<p><strong>Got working:</strong> Profile: arrows. Project: removed the stale win bubble after replay.</p>
+<p><strong>Left:</strong> Repeated boot/handoff stability and feel. No authored sound.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-maze-replay.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/511466864/">Snake</a></h3>
+<img src="mike-gameplay/snake.gif" alt="Snake gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Steering and game loop</strong></p>
+<p><strong>Playable:</strong> Four directions, fruit, clock/blade effects; Score 225, collision loss and replay.</p>
+<p><strong>Got working:</strong> Profile: D-pad/stick map to WASD; four-way steering verified; scripts unchanged.</p>
+<p><strong>Left:</strong> Repeat second Exit after adapter disconnect; active audio and feel.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-snake.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/60917032/">Appel</a></h3>
+<img src="mike-gameplay/appel.gif" alt="Appel gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: C — Playable, movement still rough</strong></p>
+<p><strong>Playable:</strong> Walk/jump, collect 21/35 apples, use checkpoints and recover after death.</p>
+<p><strong>Got working:</strong> Core/Xbox: terrain and clone fixes. Project: controller-operated menus.</p>
+<p><strong>Left:</strong> Smooth movement; normal-build Xbox Level 1 win/replay; later levels and audio.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-appel.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/469540467/">Tetris</a></h3>
+<img src="mike-gameplay/tetris.gif" alt="Tetris gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Core loop and replay</strong></p>
+<p><strong>Playable:</strong> Rotate, move and drop; ten lines/level-up, four-line clear at 1,200; top-out/replay.</p>
+<p><strong>Got working:</strong> Profile: arrows and A hard-drop. Original game scripts remain unchanged.</p>
+<p><strong>Left:</strong> Longer-session responsiveness/smoothness and subjective music listening.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-tetris.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/12221773/">Frogger</a></h3>
+<img src="mike-gameplay/frogger.gif" alt="Frogger gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Six-pad round playable</strong></p>
+<p><strong>Playable:</strong> Steer across road/river; six pads in one round; loss, replay and relaunch.</p>
+<p><strong>Got working:</strong> Project: repaired seven-pad ending and replay initialization. Profile: arrows.</p>
+<p><strong>Left:</strong> Seven-pad Xbox win/replay; xemu win/alive-state discrepancy; audio and feel.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-frogger.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/11007566/">Breakout</a></h3>
+<img src="mike-gameplay/breakout.gif" alt="Breakout gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Board clear and replay</strong></p>
+<p><strong>Playable:</strong> Steer paddle, clear the board at 1,940, lose/replay and relaunch.</p>
+<p><strong>Got working:</strong> Core/Xbox: pen/color collision support. Project: brick eraser, paddle and serve repairs.</p>
+<p><strong>Left:</strong> Paddle input delivery; faint scaled edge line; smoothness. No authored playback.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-breakout-controller.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/13701368/">PacMan</a></h3>
+<img src="mike-gameplay/pacman.gif" alt="PacMan gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Pellets, power-ups and loss</strong></p>
+<p><strong>Playable:</strong> Turn through corridors, collect pellets, +100 power pellet/blue ghosts; loss/replay.</p>
+<p><strong>Got working:</strong> Core: SB2 costume-name handling; Xbox collision support; arrow profile.</p>
+<p><strong>Left:</strong> Xbox full board/eaten ghost; optional high-score repair not installed; feel.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-pacman.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/253610111/">Space Invaders</a></h3>
+<img src="mike-gameplay/space-invaders.gif" alt="Space Invaders gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Shooting and scoring</strong></p>
+<p><strong>Playable:</strong> Steer/fire, damage shields, hit saucers, lose lives and replay; Score 1,230.</p>
+<p><strong>Got working:</strong> Profile: arrows plus A for start/fire; original game unchanged.</p>
+<p><strong>Left:</strong> Clear all 55 aliens and reach wave two on Xbox; audio/feel. Score alone proves neither.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-space-invaders.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/32219470/">Asteroids</a></h3>
+<img src="mike-gameplay/asteroids.gif" alt="Asteroids gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Combat and loss/replay</strong></p>
+<p><strong>Playable:</strong> Thrust, turn, fire; Score 9,200, Game Over, replay and relaunch.</p>
+<p><strong>Got working:</strong> Profile: controller actions. Core: repaired cropped SB2 ending text.</p>
+<p><strong>Left:</strong> Further level progression, longer audio listening and smoothness.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/24490009/">Sokoban</a></h3>
+<img src="mike-gameplay/sokoban.gif" alt="Sokoban gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Eleven puzzles complete</strong></p>
+<p><strong>Playable:</strong> Push crates onto goals; puzzles 1–11 complete; twelve Black restarts checked.</p>
+<p><strong>Got working:</strong> Project: repaired trapped crates, missing row, start position and goal scan.</p>
+<p><strong>Left:</strong> Finish 12–13, wrap/replay/Exit, listening and feel. Round paused in twelve.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-sokoban.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/19554088/">2048</a></h3>
+<img src="mike-gameplay/2048.gif" alt="2048 gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Natural win and replay</strong></p>
+<p><strong>Playable:</strong> Reach 2048 / Score 20,264; continue after victory; natural loss/replay.</p>
+<p><strong>Got working:</strong> Project: A acknowledges victory. Profile: arrows/A; board algorithm unchanged.</p>
+<p><strong>Left:</strong> Missed/duplicate KVM input and held-confirmation handoff; feel. No authored playback.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-2048.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/26999060/">Retro Racing</a></h3>
+<img src="mike-gameplay/retro-racing.gif" alt="Retro Racing gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Driving loop playable</strong></p>
+<p><strong>Playable:</strong> 108 MPH, steering, braking, off-road slowdown, pause and replay.</p>
+<p><strong>Got working:</strong> Profile: driving/handbrake/pause keys; shared audio-continuity repair supports engine sound.</p>
+<p><strong>Left:</strong> Xbox full lap/drift/traffic visuals, sound/feel. Full lap is xemu-only; traffic has no authored collision.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-retro-racing.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/56667360/">Hill Climb Racing</a></h3>
+<img src="mike-gameplay/hill-climb.gif" alt="Hill Climb Racing gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Vehicles and recovery</strong></p>
+<p><strong>Playable:</strong> Jeep 1,000; motorcycle 420; fuel pickup, crash, vehicle swap and replay.</p>
+<p><strong>Got working:</strong> Profile: vehicle/restart/pause keys. Core: restored clipped SB2 message artwork.</p>
+<p><strong>Left:</strong> Longer terrain, precise brake/air control, audio and smoothness.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-hill-climb.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/196684240/">Super Mario Bros.</a></h3>
+<img src="mike-gameplay/mario.gif" alt="Super Mario Bros. gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Opening level segment</strong></p>
+<p><strong>Playable:</strong> Walk/jump past four pipes; Goomba/pit deaths recover; replay and relaunch.</p>
+<p><strong>Got working:</strong> Runtime: calendar startup. Project: ordered death, restart and sound cleanup.</p>
+<p><strong>Left:</strong> Full level on Xbox, native Back delay, sound/performance. Full win is xemu-only.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-mario.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/399123680/">Doodle Jump</a></h3>
+<img src="mike-gameplay/doodle-jump.gif" alt="Doodle Jump gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Jumping and edge wraps</strong></p>
+<p><strong>Playable:</strong> Steer above 1,044 m, wrap both edges, fall and automatically replay.</p>
+<p><strong>Got working:</strong> Profile: controller steering; original game unchanged; both wraps verified.</p>
+<p><strong>Left:</strong> Monsters, longer play, audio and smoothness.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/103069687/">Jumper</a></h3>
+<img src="mike-gameplay/jumper.gif" alt="Jumper gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Opening courses and recovery</strong></p>
+<p><strong>Playable:</strong> Levels 1–4, lava death/respawn, level/full restart and browser return.</p>
+<p><strong>Got working:</strong> Core: SVG bounds. Project: controller start/readiness; post-win timer repair ready.</p>
+<p><strong>Left:</strong> Install timer repair; Xbox later levels/victory/replay, audio/feel. Twenty-course completion is xemu-only.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-jumper.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/52769452/">Connect Four</a></h3>
+<img src="mike-gameplay/connect-four.gif" alt="Connect Four gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B+ — Both players and win types</strong></p>
+<p><strong>Playable:</strong> Both colors; horizontal/vertical/diagonal wins; full-column rejection and replay.</p>
+<p><strong>Got working:</strong> Core: computed lists/monitors. Project: starting-state/monitor reset. Profile: both control sets.</p>
+<p><strong>Left:</strong> Investigate initial mouse-mode launch; repeat longer sessions/feel. No authored playback.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md">Evidence / fix details</a></p>
+</td>
+</tr>
+<tr>
+<td width="50%" valign="top">
+<h3><a href="https://scratch.mit.edu/projects/1396458859/">Zach’s Spider Adventure</a></h3>
+<img src="mike-gameplay/spider-adventure.gif" alt="Zach’s Spider Adventure gameplay on the physical Xbox" width="180" height="120">
+<p><strong>Playability: B — Stomps, combos and progression</strong></p>
+<p><strong>Playable:</strong> Move/jump/stomp; Level 6 / Score 7,516; loss/replay and relaunch.</p>
+<p><strong>Got working:</strong> Profile: controller actions and Y restart; original game and 125 assets unchanged.</p>
+<p><strong>Left:</strong> Xbox all-ten-level victory/post-win replay, audio/feel. Full victory is xemu-only.</p>
+<p><a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-spider-adventure.md">Evidence / fix details</a></p>
+</td>
+<td width="50%" valign="top"><p><strong>21 games; one final unpaired clip.</strong></p><p>Grades reflect the linked Xbox evidence. Emulator-only wins do not raise the hardware grade.</p></td>
+</tr>
+</tbody>
+</table>
 
 Hopper links to the original game; we tested its Everywhere variant. Ultra Bird's
 link is the example Discord channel because its standalone project URL was not
