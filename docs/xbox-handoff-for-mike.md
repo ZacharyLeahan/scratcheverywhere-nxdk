@@ -327,7 +327,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <p><strong>Playability: C — Both characters; first level incomplete</strong></p>
 <p><strong>Playable:</strong> Both characters move/jump; natural hazard Game Over, Black/R retry and browser return.</p>
 <p><strong>Got working:</strong> Prepared project: controller level selector preserves locks. One-pad dual-stick profile; compact hint now fits on Xbox.</p>
-<p><strong>Left:</strong> First-level gems/exit, independent two-pad support, later progression and audio/smoothness.</p>
+<p><strong>Left:</strong> Xbox repeat of two-gem progress; first-level exit, independent two-pad support and audio/smoothness. SDL GPU-buffer fix passes xemu; Xbox verification pending.</p>
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
@@ -394,7 +394,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. Native xemu now earns the first red/blue gems and crosses both lower pits; Xbox repeat, first-level clear and independent 2P remain open. SDL startup hit a GPU error on Xbox and also failed in fresh xemu testing. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. Native and repaired SDL xemu runs earn the first red/blue gems and cross both lower pits. Xbox repeat, first-level clear and independent 2P remain open. SDL buffer overflow is confirmed; the fix awaits Xbox verification. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
@@ -413,6 +413,11 @@ fixes Ninja’s Reset → clear sequence. The reference fixture passes both engi
 in xemu and on the Xbox using SDL. Ninja clears course 1 on the Xbox, then
 repeats that clear after Green Flag restart. No Ninja assets changed. Native
 startup reliability, later courses and quality checks remain open.
+
+[Xbox-only SDL GPU fix in testing (draft PR #67)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/67):
+Fireboy can overrun the 512 KiB GPU command buffer. The capacity guard passes
+a negative-control stress test and xemu selector/level-one gameplay. Hardware
+verification is pending; this fix is not merged into main yet.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
