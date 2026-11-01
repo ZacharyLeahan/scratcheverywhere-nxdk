@@ -7,7 +7,7 @@ if(XBOX)
     set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 endif()
 
-project(ScratchEverywhere VERSION 1.3 LANGUAGES CXX C)
+project(ScratchEverywhere VERSION 1.3.0 LANGUAGES CXX C)
 
 if(APPLE)
     enable_language(OBJC)
