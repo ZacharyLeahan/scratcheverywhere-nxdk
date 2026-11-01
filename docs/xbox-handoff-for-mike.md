@@ -320,6 +320,8 @@ Each adds one helper sprite, a controls hint and a controller profile; original
 gameplay scripts/assets are unchanged. Both pass emulator CPU start, movement,
 jump, scoring, replay and Exit. Beach’s CPU shortcut also passes on hardware;
 GlowBall’s prepared copy is not yet installed on the console.
+[Reproducible helper and test checkpoint](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/fa9a6b5b)
+are saved on a separate development branch; they are not merged into main.
 Independent simultaneous two-player input needs backend/per-port binding work;
 the current backend exposes one active pad. CPU play is the initial target.
 
@@ -327,7 +329,7 @@ the current backend exposes one active pad. CPU play is the initial target.
 | --- | --- | --- |
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) — Will_Wam | X: Easy CPU; D-pad: move; A: jump | **B — CPU match/replay/return.** Real Xbox GIF above; 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) — Will_Wam | Prepared copy: X CPU, D-pad move, A jump; independent 2P pending | **U — hardware gameplay pending.** GIF pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) — griffpatch | Move/jump; Y reset | **C — startup workaround required.** After Green Flag: walk/jump, eat two blocks, fall/recover, Y reset. Initial launch showed only blue; level completion, audio/smoothness and GIF pending. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) — griffpatch | Move/jump; Y reset | **C — startup workaround required.** After Green Flag: walk/jump, eat two blocks, fall/recover, Y reset and browser return. Initial launch showed only blue; level completion, audio/smoothness and GIF pending. |
 | [Fireboy and Watergirl – Forest Temple](https://scratch.mit.edu/projects/571560558/) — vatsalnewar | Separate move/jump controls for both characters | **U — hardware gameplay pending.** GIF pending. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) — colinmacc | Directions; reset/menu | **U — hardware gameplay pending.** GIF pending. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) — theChAOTiC | Move; attack/select; interact | **U — hardware gameplay pending.** GIF pending. |
