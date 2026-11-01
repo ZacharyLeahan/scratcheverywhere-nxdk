@@ -8,16 +8,18 @@ tracks what actually passed.
 ## Upstream baseline
 
 Our main now includes upstream through
-[`1d606eb4`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/1d606eb47e18b96a82349fea83e9cdf060ea88d2),
+[`adbd8141`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/adbd8141cb1f0ea98b733fd3ab644e03ade774ec),
 including [release 1.3](https://github.com/ScratchEverywhere/ScratchEverywhere/releases/tag/1.3).
-The native NV2A/window/audio work is upstream's baseline. Earlier input-default,
+The [latest fork sync](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/63)
+adds upstream translation fallbacks and Russian runtime strings. The native
+NV2A/window/audio work is upstream's baseline. Earlier input-default,
 SB2 parsing and resampler fixes are already incorporated; their implementation
 files match upstream. They are not being proposed again.
 
 ## What remains in our fork beyond upstream
 
 These follow-ups remain beyond upstream. Some predate the 1.3 tag; this is the
-**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/1d606eb47e18b96a82349fea83e9cdf060ea88d2...main).
+**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/adbd8141cb1f0ea98b733fd3ab644e03ade774ec...main).
 
 | Scope | Follow-up / review link |
 | --- | --- |
@@ -373,7 +375,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** First level won → Level 2, reset/replay/return. Intermittent blue-only startup remains. |
 | [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Both characters, locked-level guard, hazard loss/R retry/return. No first-level clear or independent 2P yet. |
-| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **U:** Xbox test/GIF pending. Prepared A Play/B Home/Y Reset passes opening menu checks in xemu; opening puzzles under test. |
+| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **U:** Xbox test/GIF pending. Prepared A Play/B Home/Y Reset clears puzzles 1–3 naturally in xemu, then passes Level 4 reset/resume and browser return. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **D:** Menus work; level loading stops responding. xemu reproduces it; a prepared clone-initialization repair passes mining, natural Game Over, replay and browser return there. Xbox retest pending. GIF placeholder. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
 | [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **C:** Move/jump/dash, death/recovery/replay/return. Opening section uncleared. |
@@ -383,8 +385,9 @@ New helpers are on the development branch, **not main yet**:
 [Beach/GlowBall CPU menus](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/fa9a6b5b)
 and [Mushroom Valley retry](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/6c69b63c).
 These are **prepared-project/profile changes**, separate from core/Xbox code.
-Fireboy’s compact menu hint, Candy’s clone-initialization repair and Paint’s
-controller menu are still candidates awaiting physical tests. Original
+[Fireboy’s compact menu hint, Candy’s clone-initialization repair and Paint’s
+controller menu](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7817999e)
+are saved candidates awaiting physical tests. Original
 archives/assets/credits are preserved. All nine also passed limited native xemu
 load → pause → Exit checks; that alone does not qualify gameplay.
 
