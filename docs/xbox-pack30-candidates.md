@@ -196,3 +196,14 @@ controller reset did not restore XBMC. Earlier ordinary-build controls/retry
 results stand; no first-level clear is claimed. The primary dashboard executable
 and original settings were not overwritten. Retrieve the startup log after
 manual recovery and reproduce the game-to-game transition before promoting a build.
+
+The original Candy archive also fails in the SDL comparison. A saved guest
+exception record identifies `C0000005`, a write to `0xc0` at `0x8fa71`, in
+`vector<Value>` growth from the bytecode `PushArg` instruction. The generated
+code is writing at a null allocation result plus its 192-byte element offset;
+the requested allocation was 384 bytes. This strongly indicates allocation
+failure. The allocator footprint is 33,071,104 bytes with no configured
+footprint limit. The emulator has 128 MB configured, but the guest's expanded
+memory flag is false. Confirm the guest kernel's available memory and allocation
+behavior before generalizing this failure to the 128 MB physical Xbox or
+attributing it to the scheduler. No original-project engine repair is claimed.
