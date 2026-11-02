@@ -57,8 +57,10 @@ template <typename ReadA, typename ReadB>
 bool intersects(const View &a, ReadA readA, const View &b, ReadB readB) {
     if (a.width <= 0 || a.height <= 0 || b.width <= 0 || b.height <= 0) return false;
     double ax0, ax1, ay0, ay1, bx0, bx1, by0, by1;
-    bounds(a.x, a.stepX, a.width, ax0, ax1); bounds(a.y, a.stepY, a.height, ay0, ay1);
-    bounds(b.x, b.stepX, b.width, bx0, bx1); bounds(b.y, b.stepY, b.height, by0, by1);
+    bounds(a.x, a.stepX, a.width, ax0, ax1);
+    bounds(a.y, a.stepY, a.height, ay0, ay1);
+    bounds(b.x, b.stepX, b.width, bx0, bx1);
+    bounds(b.y, b.stepY, b.height, by0, by1);
     const auto ax = intersectingCells(bx0, bx1, a.x, a.stepX, a.width);
     const auto ay = intersectingCells(by0, by1, a.y, a.stepY, a.height);
     const auto bx = intersectingCells(ax0, ax1, b.x, b.stepX, b.width);
@@ -69,4 +71,4 @@ bool intersects(const View &a, ReadA readA, const View &b, ReadB readB) {
         return scan(a, readA, b, readB, ax, ay);
     return scan(b, readB, a, readA, bx, by);
 }
-}
+} // namespace CollisionGrid

@@ -1,6 +1,7 @@
 # Xbox alpha collision candidate
 
-This change is under validation on a feature branch. It is not ready to merge.
+This Xbox-specific change is under validation on a feature branch. Broader game
+and performance qualification remains separate from the collision fix.
 
 In [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/), walking
 Fireboy into blue water ends the game in the official Scratch player, our Mac
@@ -25,17 +26,31 @@ Validation so far:
 - The actual baseline and candidate functions were checked against saved
   console masks: the baseline misses all nine queries; the candidate rejects
   the position before the pool and detects the eight overlaps inside it.
-- The NXDK build passes.
+- The NXDK build and Original Xbox CI build pass.
 - On the physical Xbox, Fireboy safely crosses red water, then dies in blue
   water. This passes twice, including a normal Black-button Retry between runs.
   Retry and return to the game list also pass. A briefly lifts the character
   under the starting ceiling; this is not an open-area jump qualification.
+- The official Scratch player, xemu and the physical Xbox all clear the blue
+  pool and reach the upper platform when jumping from matching takeoff points.
+- Fresh xemu runs clear Level One with all seven gems, both exits and all
+  three green medals: 54 seconds with the SDL renderer and 53 seconds with
+  the native Xbox renderer. Both runs also pass normal B Menu, selection
+  of the unlocked Level Two and its startup. An earlier exploratory clear
+  missed the time medal.
+- Level EATEN also loads after Fireboy cleanup, moves, jumps and collects one
+  cube on hardware; a full Level EATEN clear was not established in that run.
 
-The full-level regression is still open. In xemu, the established route clears
-the lower pools but fails to stay on the upper bank; an earlier turn also falls
-back to the lower floor. Input timing, terrain contact and a matched reference
-comparison still need investigation. No full-level clear, performance, audio,
-other-game compatibility or playability-grade improvement is claimed yet.
+The old bank route took off too far from the platform. Moving along the right
+shelf before jumping reaches the platform in all three players; no movement or
+jump physics were changed. The fresh full-level regression uses that route.
+
+A full physical-Xbox clear, broader game checks, performance and audio remain
+open. A timed green-pool jump failed in both the official player and on Xbox;
+that takeoff is not yet qualified. A long exploratory xemu session also showed
+decor artifacts after repeated attempts; the fresh full-level run rendered
+normally. Its cause and relationship to the change remain unverified. No
+playability-grade improvement is claimed yet.
 
 Run the host geometry checks with:
 

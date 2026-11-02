@@ -1,5 +1,7 @@
 #include "collision.hpp"
+#ifdef __XBOX__
 #include "collision_grid.hpp"
+#endif
 #include "color_effects.hpp"
 #include "image.hpp"
 #include "math.hpp"
@@ -245,10 +247,7 @@ bool collision::spriteInSprite(Sprite *a, Sprite *b) {
         // indefinitely (for example, a small platform character over a thin hazard).
         // Intersect source alpha pixels directly. Reduced mask cells also change
         // ground contact, so using them here can lift a character above a hazard.
-        return CollisionGrid::intersects(grid(a, costumeA, *maskA),
-                                         [&](int x, int y) { return maskA->image->getAlphaAt(x, y) != 0; },
-                                         grid(b, costumeB, *maskB),
-                                         [&](int x, int y) { return maskB->image->getAlphaAt(x, y) != 0; });
+        return CollisionGrid::intersects(grid(a, costumeA, *maskA), [&](int x, int y) { return maskA->image->getAlphaAt(x, y) != 0; }, grid(b, costumeB, *maskB), [&](int x, int y) { return maskB->image->getAlphaAt(x, y) != 0; });
     }
 #endif
 
