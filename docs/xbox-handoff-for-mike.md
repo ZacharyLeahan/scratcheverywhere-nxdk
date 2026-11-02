@@ -396,7 +396,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | --- | --- |
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Xbox first-level win → Level 2, reset/replay/return. Candidate xemu also reaches Level 3 after Green Flag/Y retry. Intermittent Xbox startup remains open. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Xbox first-level win → Level 2, reset/replay/return. Collision-candidate native xemu also reaches Level 3 after Green Flag/Y retry. Intermittent Xbox startup remains open. |
 | [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox selection/start, hazard loss, Black retry, B results Menu and browser return pass. xemu clears level 1/all gems and the earned Level 2/menu/retry loop. Main misses blue-water death; [draft PR #71](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) passes it twice on Xbox. Fresh SDL/native xemu clears earn all three medals and start Level 2; broader regression remains open. Full Xbox clear, repeated startup, 2P and quality checks remain open. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
@@ -433,9 +433,9 @@ For unclear behavior, we compare official Scratch, Xbox and selectively our Mac 
 blue-water death passes twice on hardware; red-pool safety, Retry, browser return
 and matched blue-pool/upper-platform jumps also pass. Fresh xemu clears earn all
 seven gems and three medals with SDL (54s) and native rendering (53s); both start
-earned Level 2. Level EATEN moves/jumps and collects a cube on Xbox.
+earned Level 2. Level EATEN clears Level 1 on Xbox; native xemu clears earned Level 2, resets Level 3 and returns cleanly.
 **Still off main:** full Xbox clear, broader regression and quality checks remain.
-A warm xemu decor artifact needs investigation; fresh clears rendered normally.
+One xemu guest has a decor artifact from its first gameplay capture; other fresh clears rendered normally. Cause remains open.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
