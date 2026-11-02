@@ -1,90 +1,113 @@
 # Original Xbox follow-up for Mike
 
 Updated November 2, 2026. **This recap and its GIFs stay on a feature branch.**
-[Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) has the
-latest merged code; the [game status](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-status.md)
+[Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) has
+the latest merged code; the
+[game status](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-status.md)
 tracks what actually passed.
 
 ## Upstream baseline
 
 Our main now includes upstream through
 [`b62d2070`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/b62d207096e32bf05953b7f1d2cef2b9bbb4ca76),
-including [release 1.3](https://github.com/ScratchEverywhere/ScratchEverywhere/releases/tag/1.3).
-The latest syncs add [executable/library recipes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/68)
-and a [prebuilt executable phase](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/70);
-the [catalog CLI/name fixes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/73) are also merged. These do not change the Xbox runtime. The native
-NV2A/window/audio work is upstream's baseline. Earlier input-default,
-SB2 parsing and resampler fixes are already incorporated; their implementation
-files match upstream. They are not being proposed again.
+including
+[release 1.3](https://github.com/ScratchEverywhere/ScratchEverywhere/releases/tag/1.3).
+The latest syncs add
+[executable/library recipes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/68)
+and a
+[prebuilt executable phase](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/70);
+the
+[catalog CLI/name fixes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/73)
+are also merged. These do not change the Xbox runtime. The native
+NV2A/window/audio work is upstream's baseline. Earlier input-default, SB2
+parsing and resampler fixes are already incorporated; their implementation files
+match upstream. They are not being proposed again.
 
 ## What remains in our fork beyond upstream
 
 These follow-ups remain beyond upstream. Some predate the 1.3 tag; this is the
-**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/b62d207096e32bf05953b7f1d2cef2b9bbb4ca76...main).
+**current code difference**, rather than a list of changes authored after
+release.
+[Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/b62d207096e32bf05953b7f1d2cef2b9bbb4ca76...main).
 
-| Scope | Follow-up / review link |
-| --- | --- |
-| Shared core | [Exact subject alpha for color sensing](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7f6015cf8a6d8083eb4939ccd9cffc06fb55048b), with an expanded 58-case reproducer. [Monitor number formatting](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/d0cbbbfdb29ff5bd08ec7556f4c33efbd44406c9) removes distracting decimal tails. Other platforms still need review. |
-| Xbox graphics | Retain exact collision colors, SVG filtering, alpha-correct brightness/pen compositing and clamped texture uploads around your newer effect cache. [1.3 merge/adaptations](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/61) and [evidence](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-upstream-1.3.md). Experimental GPU hue stays off by default. [Source-alpha sprite collisions (#71)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) now fix thin hazard overlaps on Xbox. |
-| Xbox input | [Pause before the next game frame](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/300b42ddf7ea36e31dce89970deb3b2bfbe06998) and [retain short SDL Back taps](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/75da9c5b7d485a04a338c234ed1dfb76c6c4133a). Native controller handoff and confirmation-release gating remain. Slow work already running can still delay pause. |
-| Xbox homebrew controls | Return to game list/launcher, short Start replay for stopped projects, Restart Xbox / Shut down menus, and **LT + RT + Back + Start** held two seconds. [Implementation](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7bd8152f0f8e9d031875e28ca50add7db9aaab9f). A three-second test hold reaches XBMC while the runtime responds; disconnected controls or a hard hang cannot guarantee reset. |
-| Individual projects | Reproducible prepared copies, separate from engine changes: [Jumper post-win timer restart](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/2a52b3114e24c8e35d57976d986fab82c4516730), [Sokoban full-set map/goal repairs](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/1ecd8978f78cf78c6caa1566e7c0e19cda209492), and the other [preparation scripts](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main/scripts). Controller sidecars only map existing keys. |
+| Scope                  | Follow-up / review link                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Shared core            | [Exact subject alpha for color sensing](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7f6015cf8a6d8083eb4939ccd9cffc06fb55048b), with an expanded 58-case reproducer. [Monitor number formatting](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/d0cbbbfdb29ff5bd08ec7556f4c33efbd44406c9) removes distracting decimal tails. Other platforms still need review.                                                                                                                                                 |
+| Xbox graphics          | Retain exact collision colors, SVG filtering, alpha-correct brightness/pen compositing and clamped texture uploads around your newer effect cache. [1.3 merge/adaptations](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/61) and [evidence](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-upstream-1.3.md). Experimental GPU hue stays off by default. [Source-alpha sprite collisions (#71)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) now fix thin hazard overlaps on Xbox. |
+| Xbox input             | [Pause before the next game frame](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/300b42ddf7ea36e31dce89970deb3b2bfbe06998) and [retain short SDL Back taps](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/75da9c5b7d485a04a338c234ed1dfb76c6c4133a). Native controller handoff and confirmation-release gating remain. Slow work already running can still delay pause.                                                                                                                                         |
+| Xbox homebrew controls | Return to game list/launcher, short Start replay for stopped projects, Restart Xbox / Shut down menus, and **LT + RT + Back + Start** held two seconds. [Implementation](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/7bd8152f0f8e9d031875e28ca50add7db9aaab9f). A three-second test hold reaches XBMC while the runtime responds; disconnected controls or a hard hang cannot guarantee reset.                                                                                                                                 |
+| Individual projects    | Reproducible prepared copies, separate from engine changes: [Jumper post-win timer restart](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/2a52b3114e24c8e35d57976d986fab82c4516730), [Sokoban full-set map/goal repairs](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/1ecd8978f78cf78c6caa1566e7c0e19cda209492), and the other [preparation scripts](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main/scripts). Controller sidecars only map existing keys.                                   |
 
 For upstream review, the small shared fixes and their reproducers are the best
-starting point. Keep Xbox backend changes and prepared Scratch projects separate;
-the full fork comparison is context, not a request to pull every commit.
+starting point. Keep Xbox backend changes and prepared Scratch projects
+separate; the full fork comparison is context, not a request to pull every
+commit.
 
 ## What testing establishes
 
 The 1.3 integration builds, passes native/SDL regressions and both GPU fixtures,
-and launches/exits all **21 games** in native xemu. Separate emulator runs complete
-Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban puzzles.
+and launches/exits all **21 games** in native xemu. Separate emulator runs
+complete Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban
+puzzles.
 
-On the physical **128 MB Xbox**, native Maze passes win/replay/two clean returns;
-Sokoban completes puzzles 1–11; its saved test ends six moves into twelve.
-Those results use the earlier identified executable. The separate 1.3 build now
-boots on hardware and plays the new CPU games. Level EATEN! now clears
-Levels 1–2 on the ordinary SDL build, earns Level 3 and resets that level with Y.
-Intermittent blue-only startup is still open. The primary
-dashboard launcher remains the older SDL build. The separate GPU-repair build
-now loads Fireboy and Level EATEN, returns both to the browser, and returns to
-XBMC normally. This bounded run does not establish repeated startup reliability. **Full qualification of the existing 21 games and 64 MB support are open.**
-Nine more games are approved for testing below: **30 is the target, not a pass count.**
+On the physical **128 MB Xbox**, earlier native tests cover Maze win/replay and
+Sokoban puzzles 1–11. The ordinary combined build clears Fireboy Level 1/all
+seven gems/both exits, starts earned Level 2, and advances Ninja course 1 → 2.
+Level EATEN clears Levels 1–2 and resets earned Level 3 on the ordinary RGBA-fix
+build.
+
+**The regular dashboard entry now uses the ordinary combined runtime.** Beach
+Volleyball repeats CPU match/loss/title-X replay; Bouncy Heroes repeats Score
+10, loss/A replay; Mushroom Valley reaches Score 14, loses, retries with A and
+scores again. All three return cleanly to the browser; launcher return to XBMC
+and FTP readbacks pass. The prior executable is backed up and all 30
+games/settings are preserved. Native/repeated startup and full qualification
+remain open. **30 is the target, not a pass count; retail 64 MB is unverified.**
 
 Open: native startup/handoffs, later levels/replay, audio and Appel smoothness.
 A short Appel sample near 29 FPS does not establish a speed improvement; the
 transform-cache experiment stays unmerged. KVM delivery is tracked separately
-from game defects. See the [current matrix](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md).
+from game defects. See the
+[current matrix](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-qualification.md).
 
-Emulator memory check: xemu is configured for 128 MB, but the current guest kernel reports **64 MB**. Memory-sensitive emulator failures need that scope; our physical console has 128 MB.
+Emulator memory check: xemu is configured for 128 MB, but the current guest
+kernel reports **64 MB**. Memory-sensitive emulator failures need that scope;
+our physical console has 128 MB.
 
 ## Games in action
 
-**Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
-They are conservative, provisional assessments of the tested game/build; they
-are not benchmark scores. Earlier clips use earlier builds. Beach, GlowBall, Candy and Paint use the
-separate ordinary 1.3 build; Ninja uses the merged scheduler build with SDL window/audio.
-Level EATEN now shows earned Level 3 movement/reset on the ordinary RGBA-fix build.
-Fireboy now shows the final gem and Level 1 win on the ordinary combined collision/RGBA test build.
-Mushroom Valley and Bouncy Heroes use a diagnostic variant with read-only logging.
-Repeat those loops with the ordinary build before final acceptance. GIF sampling
-does not measure game frame rate.
+**Grades describe actual playability on our 128 MB Xbox, not just whether a game
+boots.** They are conservative, provisional assessments of the tested
+game/build; they are not benchmark scores. Earlier clips use earlier builds.
+Beach, GlowBall, Candy and Paint use the separate ordinary 1.3 build; Ninja uses
+the merged scheduler build with SDL window/audio. Level EATEN now shows earned
+Level 3 movement/reset on the ordinary RGBA-fix build. Fireboy now shows the
+final gem and Level 1 win on the ordinary combined collision/RGBA test build.
+Mushroom Valley and Bouncy Heroes now show the ordinary dashboard build: a Score
+5 → 6 jump and a Score 10 run/ending, respectively. Their loss/replay/browser
+loops also pass without diagnostics. GIF sampling does not measure game frame
+rate.
 
-- **A:** smooth, responsive and stable through the main gameplay/ending/replay checks.
-- **B+:** tested objective or game loop plus replay works; quality/reliability checks remain.
-- **B:** real gameplay works, but progression or important checks are incomplete.
-- **C:** playable with significant roughness or limitations. **Appel is C: movement is not yet smooth.**
+- **A:** smooth, responsive and stable through the main gameplay/ending/replay
+  checks.
+- **B+:** tested objective or game loop plus replay works; quality/reliability
+  checks remain.
+- **B:** real gameplay works, but progression or important checks are
+  incomplete.
+- **C:** playable with significant roughness or limitations. **Appel is C:
+  movement is not yet smooth.**
 - **D:** cannot reliably play. No current entry is rated D.
 
-**No A grades yet.** Smoothness/responsiveness are not sufficiently qualified for
-an A; unknown does not mean smooth. B+ is not a full-game completion claim.
+**No A grades yet.** Smoothness/responsiveness are not sufficiently qualified
+for an A; unknown does not mean smooth. B+ is not a full-game completion claim.
 KVM dropouts/missed input are recorded separately from demonstrated game faults.
 
 The GIFs are **real Xbox footage**, including older sessions, at recorded pace.
 They are silent, consistently displayed at **180 × 120**, two games per row.
-Written results may come from later tests. “Got working” identifies **core/runtime**,
-**Xbox**, **controller profile**, or **prepared-project** work; it does not imply
-that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/README.md).
+Written results may come from later tests. “Got working” identifies
+**core/runtime**, **Xbox**, **controller profile**, or **prepared-project**
+work; it does not imply that every change is new since upstream 1.3.
+[Capture provenance](mike-gameplay/README.md).
 
 <table>
 <tbody>
@@ -302,9 +325,9 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <h3><a href="https://scratch.mit.edu/projects/333452181/">Beach Volleyball</a></h3>
 <img src="mike-gameplay/beach-volleyball.gif" alt="Beach Volleyball gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — CPU match playable; 2P pending</strong></p>
-<p><strong>Playable:</strong> X starts Easy CPU; D-pad moves, A jumps; scored twice, natural 2–5 loss; Green Flag/X replay and browser return.</p>
+<p><strong>Playable:</strong> X starts Easy CPU; D-pad moves, A jumps; natural 2–5 loss, automatic title return/X replay and browser return. Repeated on the ordinary dashboard build.</p>
 <p><strong>Got working:</strong> Prepared project/profile: X-to-CPU shortcut and on-screen controls; original gameplay/assets preserved.</p>
-<p><strong>Left:</strong> Independent two-player controls; direct ending-screen replay; audio, measured smoothness and longer testing. Short Start does not replay this ending; use Back → Green Flag.</p>
+<p><strong>Left:</strong> Player win, independent two-player controls, audio, measured smoothness and longer testing. After the ending, use X at the returned title; short Start is not its replay control.</p>
 <p><a href="#next-nine-target-pack-of-30">New-game progress and limits</a></p>
 </td>
 </tr>
@@ -339,9 +362,9 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
 <img src="mike-gameplay/mushroom-valley.gif" alt="Mushroom Valley gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — Scored run and controller retry</strong></p>
-<p><strong>Playable:</strong> Hold/release A; two scored landings, natural loss, A retry/new round, renewed jump and browser return.</p>
+<p><strong>Playable:</strong> Hold/release A; ordinary dashboard build reaches Score 14/natural loss, A retries to zero, a renewed jump scores again, and browser return passes. Retry randomly picks an authored character, including the axe in this clip.</p>
 <p><strong>Got working:</strong> Prepared project: A activates the existing mouse-only Retry gate; ending hint added.</p>
-<p><strong>Left:</strong> Repeat prepared copy on ordinary build; longer runs and audio/smoothness.</p>
+<p><strong>Left:</strong> Longer runs, repeated startup and audio/smoothness.</p>
 </td>
 </tr>
 <tr>
@@ -349,9 +372,9 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <h3><a href="https://scratch.mit.edu/projects/173918262/">Bouncy Heroes</a></h3>
 <img src="mike-gameplay/bouncy-heroes.gif" alt="Bouncy Heroes gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — Scored combat and replay</strong></p>
-<p><strong>Playable:</strong> Directions + A dash, B slam; Score 10 / four coins; natural Game Over, A menu/replay and browser return.</p>
+<p><strong>Playable:</strong> Directions + A dash, B slam; ordinary dashboard build reaches Score 10/natural Game Over, A menu/replay, renewed combat and browser return. The clip shows that ordinary run.</p>
 <p><strong>Got working:</strong> Existing keys mapped in a controller profile; no project or core patch.</p>
-<p><strong>Left:</strong> Ordinary-build repeat, character/menu coverage, audio/smoothness and longer play.</p>
+<p><strong>Left:</strong> Character/menu coverage, audio/smoothness and longer play.</p>
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/404349977/">Ninja Climb</a></h3>
@@ -383,36 +406,37 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 </tbody>
 </table>
 
-Hopper links to the original game; we tested its Everywhere variant. Ultra Bird's
-link is the example Discord channel because its standalone project URL was not
-recorded. Full Appel Level 1 completion is currently emulator evidence; the
-normal physical run has not yet repeated that win.
+Hopper links to the original game; we tested its Everywhere variant. Ultra
+Bird's link is the example Discord channel because its standalone project URL
+was not recorded. Full Appel Level 1 completion is currently emulator evidence;
+the normal physical run has not yet repeated that win.
 
 ## Next nine: target pack of 30
 
 **All nine are installed; 30 is the target, not a qualified-game count.**
-Candy’s loading workaround and Paint’s controller menu now pass their Xbox gameplay
-loops. All 30 entries have real Xbox clips. No new game has earned an A; smoothness,
-audio and extended stability remain unqualified. This console has 128 MB.
+Candy’s loading workaround and Paint’s controller menu now pass their Xbox
+gameplay loops. All 30 entries have real Xbox clips. No new game has earned an
+A; smoothness, audio and extended stability remain unqualified. This console has
+128 MB.
 
-| Game | Current Xbox result / next check |
-| --- | --- |
-| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
-| [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Ordinary Xbox build clears Levels 1–2 → earned Level 3; Y resets Level 3, with fall retry and browser/launcher return. Later levels, repeated startup and quality remain open. |
+| Game                                                                 | Current Xbox result / next check                                                                                                                                                                                                                                                                   |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Beach Volleyball](https://scratch.mit.edu/projects/333452181/)      | **B:** Ordinary dashboard build repeats CPU 2–5 loss, automatic title/X replay and browser return. Player win/independent 2P/quality pending.                                                                                                                                                      |
+| [GlowBall](https://scratch.mit.edu/projects/112176502/)              | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending.                                                                                                                                                                                                                       |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/)          | **C:** Ordinary Xbox build clears Levels 1–2 → earned Level 3; Y resets Level 3, with fall retry and browser/launcher return. Later levels, repeated startup and quality remain open.                                                                                                              |
 | [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Ordinary Xbox build clears Level 1/all seven gems/both exits, B Menu → earned Level 2 start → browser. Time medal missed. [Collision PR #71 is merged](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71); later levels, repeated startup, 2P and quality checks remain open. |
-| [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
-| [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
-| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
-| [Ninja Climb](https://scratch.mit.edu/projects/404349977/) | **B:** First course cleared twice on Xbox, natural death/respawn, Green Flag replay and browser return. Later courses and quality checks open. |
-| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/) | **B:** Score 2/loss, prepared A retry, renewed jump/return. |
+| [Paint the Maze](https://scratch.mit.edu/projects/314731988/)        | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open.                                                                                                                                                  |
+| [Candy Caves](https://scratch.mit.edu/projects/1385416673/)          | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open.                                                                       |
+| [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/)         | **B:** Ordinary dashboard build: dash/slam, Score 10, natural loss/A replay/renewed combat/browser return. Characters/quality pending.                                                                                                                                                             |
+| [Ninja Climb](https://scratch.mit.edu/projects/404349977/)           | **B:** First course cleared twice on Xbox, natural death/respawn, Green Flag replay and browser return. Later courses and quality checks open.                                                                                                                                                     |
+| [Mushroom Valley](https://scratch.mit.edu/projects/285730673/)       | **B:** Ordinary dashboard build: Score 14/natural loss, prepared A retry to zero, renewed Score 1 jump/browser return. Longer runs/quality pending.                                                                                                                                                |
 
 [Merged project helpers (PR #65)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/65)
 prepare separate controller-ready copies for Beach/GlowBall CPU menus, Mushroom
-retry, Fireboy’s level selector, Candy’s clone workaround and Paint’s Play/Home menu.
-These are **prepared-project/profile changes**, separate from engine changes;
-original assets/credits remain. The named Xbox checks above pass, with quality
-and later-progression limits still open.
+retry, Fireboy’s level selector, Candy’s clone workaround and Paint’s Play/Home
+menu. These are **prepared-project/profile changes**, separate from engine
+changes; original assets/credits remain. The named Xbox checks above pass, with
+quality and later-progression limits still open.
 
 [Merged shared core repair (PR #66)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/66)
 fixes Ninja’s Reset → clear sequence. The reference fixture passes both engines
@@ -422,51 +446,53 @@ startup reliability, later courses and quality checks remain open.
 
 [Merged Xbox SDL GPU repair (PR #67)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/67):
 Fireboy could overrun the 512 KiB command buffer. The capacity guard passes the
-negative-control stress test, xemu full-level clear, and a real Xbox
-Fireboy → browser → Level EATEN → browser → XBMC run with no DMA error observed.
-This is a startup/cleanup result, not a performance or full-pack pass.
+negative-control stress test, xemu full-level clear, and a real Xbox Fireboy →
+browser → Level EATEN → browser → XBMC run with no DMA error observed. This is a
+startup/cleanup result, not a performance or full-pack pass.
 
 [Merged Fireboy results controls (PR #69)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/69)
-add B Menu to the prepared project. On Xbox, natural loss/Black retry/B Menu pass.
-xemu additionally checks win → earned next level, held-B release gating and replay.
-The original level physics, locks, assets and credits are preserved.
+add B Menu to the prepared project. On Xbox, natural loss/Black retry/B Menu
+pass. xemu additionally checks win → earned next level, held-B release gating
+and replay. The original level physics, locks, assets and credits are preserved.
 
-For unclear behavior, we compare official Scratch, Xbox and selectively our Mac port.
+For unclear behavior, we compare official Scratch, Xbox and selectively our Mac
+port.
 [Merged Xbox collision fix (#71)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71)
-corrects thin hazard overlaps. The ordinary Xbox build clears Fireboy Level 1/all
-seven gems, starts earned Level 2 and returns cleanly. Appel's three-apple check
-and Ninja's Course 1 → 2/browser regression also pass.
+corrects thin hazard overlaps. The ordinary Xbox build clears Fireboy Level
+1/all seven gems, starts earned Level 2 and returns cleanly. Appel's three-apple
+check and Ninja's Course 1 → 2/browser regression also pass.
 
 **Measured cost:** Fireboy is 29.84 → 29.89 FPS; Appel's first-wall movement is
 27.03 → 26.54 FPS on the 128MB Xbox with Xbox rendering and SDL window/audio.
 The fix adds about 0.7–0.8 ms of script time per frame in these samples. Similar
 p95 timing and remaining long frames mean no smoothness or grade upgrade.
 [Full measurements and limits](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-alpha-collision.md).
-XBMC can stay responsive with FTP unavailable after launcher return; one software
-Reboot restores it. That network-handoff issue remains open. One xemu guest has
-a decor artifact from its first capture; other fresh clears render normally.
+XBMC can stay responsive with FTP unavailable after launcher return; one
+software Reboot restores it. That network-handoff issue remains open. One xemu
+guest has a decor artifact from its first capture; other fresh clears render
+normally.
 
 [Merged Xbox RGBA upload fix (#72)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/72):
 SDL3 reports upload success as `true`; this corrects an inverted check. Matched
 128 MB Xbox probes retain RGBA instead of discarding it for compression. The
 ordinary build passes four costume swaps, Appel jumps/scrolling through 3/35
-apples, and Level EATEN fall reset, Levels 1–2 clear, earned Level 3 reset and browser return.
-No FPS improvement or full-pack qualification is claimed.
+apples, and Level EATEN fall reset, Levels 1–2 clear, earned Level 3 reset and
+browser return. No FPS improvement or full-pack qualification is claimed.
 
 Independent simultaneous two-player input still needs backend/per-port binding
-work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
-on one controller. Repeat diagnostic-build results on the ordinary build before
-final acceptance. Further fresh launches, meaningful progression, endings/replay,
-audio and measured smoothness remain the acceptance work.
+work; the current backend exposes one active pad. Fireboy’s clip uses two
+keysets on one controller. Repeat diagnostic-build results on the ordinary build
+before final acceptance. Further fresh launches, meaningful progression,
+endings/replay, audio and measured smoothness remain the acceptance work.
 
 ## Why adding games is cumbersome
 
 **The browser selects installed games. There is no in-app Scratch search,
-download or add flow.** Download the `.sb2`/`.sb3` on a computer, return to XBMC,
-FTP it (and any controller sidecar) into `E:\ScratchEverywhere\`, then relaunch.
-That transfer/setup loop is what I meant by tricky when playing with my daughter.
+download or add flow.** Download the `.sb2`/`.sb3` on a computer, return to
+XBMC, FTP it (and any controller sidecar) into `E:\ScratchEverywhere\`, then
+relaunch. That transfer/setup loop is what I meant by tricky when playing with
+my daughter.
 
 An archive receiver/import screen and easy arrows/WASD presets would help. A
 per-project Controls editor already exists; make it easier to find. Importing a
 project would not guarantee its compatibility.
-
