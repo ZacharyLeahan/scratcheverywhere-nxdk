@@ -65,7 +65,8 @@ They are conservative, provisional assessments of the tested game/build; they
 are not benchmark scores. Earlier clips use earlier builds. Beach, GlowBall, Candy and Paint use the
 separate ordinary 1.3 build; Ninja uses the merged scheduler build with SDL window/audio.
 Level EATEN now shows earned Level 3 movement/reset on the ordinary RGBA-fix build.
-Fireboy, Mushroom Valley and Bouncy Heroes use a diagnostic variant with read-only logging.
+Fireboy now shows the final gem and Level 1 win on the ordinary combined collision/RGBA test build.
+Mushroom Valley and Bouncy Heroes use a diagnostic variant with read-only logging.
 Repeat those loops with the ordinary build before final acceptance. GIF sampling
 does not measure game frame rate.
 
@@ -328,11 +329,11 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <tr>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/571560558/">Fireboy and Watergirl</a></h3>
-<img src="mike-gameplay/fireboy-watergirl.gif" alt="Fireboy and Watergirl gameplay on the physical Xbox" width="180" height="120">
-<p><strong>Playability: C — Full Xbox level clear still open</strong></p>
-<p><strong>Playable:</strong> Both characters move/jump; natural Game Over, Black/R retry, B back to the level selector after loss, and browser return on Xbox.</p>
-<p><strong>Got working:</strong> Prepared project: level selector preserves locks; <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/69">B results-menu shortcut</a> reuses the authored action. Release/fresh-press gating prevents held movement from skipping endings. xemu clears level 1/all seven gems and tests the earned Level 2/retry/menu loop.</p>
-<p><strong>Left:</strong> Full Xbox clear and next-level loop. Main misses blue-water death; the <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71">draft Xbox collision fix</a> passes this hazard twice and the blue-pool/upper-platform jumps on hardware. Fresh SDL/native xemu runs clear all seven gems and three medals, then start earned Level 2. Broader regression remains open. Repeated startup, later levels, independent two-pad support and audio/smoothness remain open.</p>
+<img src="mike-gameplay/fireboy-watergirl.gif" alt="Fireboy and Watergirl final gem and Level 1 win on the physical Xbox" width="180" height="120">
+<p><strong>Playability: C — Level 1 cleared; quality checks open</strong></p>
+<p><strong>Playable:</strong> Ordinary test build clears Level 1 with all seven gems and both exits. B Menu, earned Level 2 startup, Black retry and browser return pass. The stop-and-inspect run misses the time medal.</p>
+<p><strong>Got working:</strong> Prepared selector/results controls preserve authored locks. <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71">Draft Xbox collision fix</a> detects blue-water death and permits the full route; no movement or jump physics changed. GIF shows the final gem and win.</p>
+<p><strong>Left:</strong> Collision fix remains off main pending broader regression/performance review. Later levels, repeated startup, independent two-pad support, audio and measured smoothness remain open.</p>
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
@@ -399,7 +400,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Ordinary Xbox build clears Levels 1–2 → earned Level 3; Y resets Level 3, with fall retry and browser/launcher return. Later levels, repeated startup and quality remain open. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox selection/start, hazard loss, Black retry, B results Menu and browser return pass. xemu clears level 1/all gems and the earned Level 2/menu/retry loop. Main misses blue-water death; [draft PR #71](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) passes it twice on Xbox. Fresh SDL/native xemu clears earn all three medals and start Level 2; broader regression remains open. Full Xbox clear, repeated startup, 2P and quality checks remain open. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Ordinary Xbox test build clears Level 1/all seven gems/both exits, B Menu → earned Level 2 start → browser. Time medal missed. [Draft collision PR #71](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) remains off main; broader regression, later levels, repeat startup, 2P and quality checks remain open. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
@@ -435,8 +436,8 @@ For unclear behavior, we compare official Scratch, Xbox and selectively our Mac 
 blue-water death passes twice on hardware; red-pool safety, Retry, browser return
 and matched blue-pool/upper-platform jumps also pass. Fresh xemu clears earn all
 seven gems and three medals with SDL (54s) and native rendering (53s); both start
-earned Level 2. Level EATEN clears Level 1 on Xbox; native xemu clears earned Level 2, resets Level 3 and returns cleanly.
-**Still off main:** full Xbox clear, broader regression and quality checks remain.
+earned Level 2. Level EATEN clears Levels 1–2 on Xbox and resets earned Level 3; native xemu also passes that progression.
+**Still off main:** the ordinary combined test build now clears Level 1 on Xbox with all seven gems/both exits, then starts earned Level 2 and returns to the browser. The time medal is missed during inspection. Appel also passes a bounded three-apple/terrain/scroll/jump/browser check. Broader regression and measured performance remain open.
 One xemu guest has a decor artifact from its first gameplay capture; other fresh clears rendered normally. Cause remains open.
 
 [Merged Xbox RGBA upload fix (#72)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/72):

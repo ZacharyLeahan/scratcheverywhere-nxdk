@@ -23,3 +23,8 @@ the [qualification matrix](../xbox-game-qualification.md) for limits.
 The Level EATEN clip uses November 2 ordinary-build footage of movement and Y reset
 on earned Level 3. The longer hardware test cleared Levels 1–2 without gameplay
 seeding; the GIF illustrates the resulting level and reset, rather than the full clear.
+
+The Fireboy clip uses November 2 ordinary-build Xbox footage of the final blue
+gem and both exits, followed by the Level 1 results. The saved longer run collects
+all seven gems; the time medal is missed during inspection. It is a 6.1-second
+continuous interval at recorded pace, not a performance measurement.
