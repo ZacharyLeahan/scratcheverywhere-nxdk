@@ -1,4 +1,7 @@
 #include "collision.hpp"
+#ifdef __XBOX__
+#include "collision_grid.hpp"
+#endif
 #include "color_effects.hpp"
 #include "image.hpp"
 #include "math.hpp"
@@ -223,6 +226,30 @@ bool collision::spriteInSprite(Sprite *a, Sprite *b) {
     auto &costumeB = b->costumes[b->currentCostume];
     std::shared_ptr<CollisionMask> maskB = getValidCollisionMask(b);
     if (maskB == nullptr) return false;
+
+#ifdef __XBOX__
+    const auto axisAligned = [](const Sprite *s) {
+        return s->rotationStyle != Sprite::RotationStyle::ALL_AROUND ||
+               std::remainder(s->rotation - 90.0, 360.0) == 0;
+    };
+    if (axisAligned(a) && axisAligned(b) && maskA->image && maskB->image &&
+        maskA->sourceScale > 0 && maskB->sourceScale > 0) {
+        const auto grid = [](const Sprite *s, const Costume &c, const CollisionMask &m) {
+            const double scale = getEffectiveSpriteSize(s, c) / 100.0;
+            const double flip = s->rotationStyle == Sprite::RotationStyle::LEFT_RIGHT && s->rotation < 0 ? -1 : 1;
+            const double pixelSize = 1.0 / m.sourceScale;
+            return CollisionGrid::View{m.image->getPixelWidth(), m.image->getPixelHeight(),
+                                       s->xPosition + flip * (pixelSize * 0.5 - c.rotationCenterX) * scale,
+                                       s->yPosition - (pixelSize * 0.5 - c.rotationCenterY) * scale,
+                                       flip * pixelSize * scale, -pixelSize * scale};
+        };
+        // A fixed world-space sampling grid can miss a fractional-cell overlap
+        // indefinitely (for example, a small platform character over a thin hazard).
+        // Intersect source alpha pixels directly. Reduced mask cells also change
+        // ground contact, so using them here can lift a character above a hazard.
+        return CollisionGrid::intersects(grid(a, costumeA, *maskA), [&](int x, int y) { return maskA->image->getAlphaAt(x, y) != 0; }, grid(b, costumeB, *maskB), [&](int x, int y) { return maskB->image->getAlphaAt(x, y) != 0; });
+    }
+#endif
 
     const float dx = a->xPosition - b->xPosition;
     const float dy = a->yPosition - b->yPosition;
