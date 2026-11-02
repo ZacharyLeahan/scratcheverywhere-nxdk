@@ -7,7 +7,7 @@ recap. Each clip is one continuous interval, kept at its recorded pace,
 resampled to 10 fps and scaled to 480 × 320 with a 128-color GIF palette.
 GIFs are silent and repeat from the beginning.
 
-The [manifest](manifest.json) records each clip's capture time, duration,
+The [original clips manifest](manifest.json) and [nine-game manifest](pack30-provenance.json) record capture time, duration,
 source-image hashes and output hash. Original JPEGs, detailed timestamps and
 controller traces remain local in ignored `build-xbox/hardware/`,
 `build-xbox/game21/`, and the ESP-KVM checkout’s `observations/`. The Spider Adventure clip uses the saved October 27
@@ -19,3 +19,7 @@ two stream warm-up/cache frames are excluded before sampling. It demonstrates
 CPU gameplay, not independent two-player support or a measured frame rate.
 See the [recap](../xbox-handoff-for-mike.md) for game credits/source links and
 the [qualification matrix](../xbox-game-qualification.md) for limits.
+
+The Level EATEN clip uses November 2 ordinary-build footage of movement and Y reset
+on earned Level 3. The longer hardware test cleared Levels 1–2 without gameplay
+seeding; the GIF illustrates the resulting level and reset, rather than the full clear.

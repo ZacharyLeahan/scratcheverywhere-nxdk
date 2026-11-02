@@ -1,6 +1,6 @@
 # Original Xbox follow-up for Mike
 
-Updated November 1, 2026. **This recap and its GIFs stay on a feature branch.**
+Updated November 2, 2026. **This recap and its GIFs stay on a feature branch.**
 [Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) has the
 latest merged code; the [game status](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-status.md)
 tracks what actually passed.
@@ -8,11 +8,11 @@ tracks what actually passed.
 ## Upstream baseline
 
 Our main now includes upstream through
-[`c58ca6e6`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/c58ca6e64d7828a7e8c21373c9ce67ab181e09e6),
+[`b62d2070`](https://github.com/ScratchEverywhere/ScratchEverywhere/commit/b62d207096e32bf05953b7f1d2cef2b9bbb4ca76),
 including [release 1.3](https://github.com/ScratchEverywhere/ScratchEverywhere/releases/tag/1.3).
 The latest syncs add [executable/library recipes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/68)
 and a [prebuilt executable phase](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/70);
-these do not change the Xbox runtime. The native
+the [catalog CLI/name fixes](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/73) are also merged. These do not change the Xbox runtime. The native
 NV2A/window/audio work is upstream's baseline. Earlier input-default,
 SB2 parsing and resampler fixes are already incorporated; their implementation
 files match upstream. They are not being proposed again.
@@ -20,7 +20,7 @@ files match upstream. They are not being proposed again.
 ## What remains in our fork beyond upstream
 
 These follow-ups remain beyond upstream. Some predate the 1.3 tag; this is the
-**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/c58ca6e64d7828a7e8c21373c9ce67ab181e09e6...main).
+**current code difference**, rather than a list of changes authored after release. [Full fork-only comparison](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/compare/b62d207096e32bf05953b7f1d2cef2b9bbb4ca76...main).
 
 | Scope | Follow-up / review link |
 | --- | --- |
@@ -43,8 +43,9 @@ Mario, a Retro Racing lap, all 20 Jumper courses and all 13 Sokoban puzzles.
 On the physical **128 MB Xbox**, native Maze passes win/replay/two clean returns;
 Sokoban completes puzzles 1–11; its saved test ends six moves into twelve.
 Those results use the earlier identified executable. The separate 1.3 build now
-boots on hardware and plays the new CPU games. Level EATEN! has cleared its
-first level, though an intermittent blue-only startup is still open. The primary
+boots on hardware and plays the new CPU games. Level EATEN! now clears
+Levels 1–2 on the ordinary SDL build, earns Level 3 and resets that level with Y.
+Intermittent blue-only startup is still open. The primary
 dashboard launcher remains the older SDL build. The separate GPU-repair build
 now loads Fireboy and Level EATEN, returns both to the browser, and returns to
 XBMC normally. This bounded run does not establish repeated startup reliability. **Full qualification of the existing 21 games and 64 MB support are open.**
@@ -62,8 +63,9 @@ Emulator memory check: xemu is configured for 128 MB, but the current guest kern
 **Grades describe actual playability on our 128 MB Xbox, not just whether a game boots.**
 They are conservative, provisional assessments of the tested game/build; they
 are not benchmark scores. Earlier clips use earlier builds. Beach, GlowBall, Candy and Paint use the
-separate ordinary 1.3 build; Ninja uses the merged scheduler build with SDL window/audio; Level EATEN, Fireboy, Mushroom Valley and Bouncy
-Heroes use its diagnostic variant with read-only logging.
+separate ordinary 1.3 build; Ninja uses the merged scheduler build with SDL window/audio.
+Level EATEN now shows earned Level 3 movement/reset on the ordinary RGBA-fix build.
+Fireboy, Mushroom Valley and Bouncy Heroes use a diagnostic variant with read-only logging.
 Repeat those loops with the ordinary build before final acceptance. GIF sampling
 does not measure game frame rate.
 
@@ -317,10 +319,10 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/704676520/">Level EATEN!</a></h3>
 <img src="mike-gameplay/level-eaten.gif" alt="Level EATEN! gameplay on the physical Xbox" width="180" height="120">
-<p><strong>Playability: C — First level cleared; startup issue open</strong></p>
-<p><strong>Playable:</strong> Walk/jump/eat/grow; first-level win → Level 2; Y reset, Green Flag replay and browser return. Candidate xemu also clears Level 2 → Level 3.</p>
+<p><strong>Playability: C — Two levels cleared; startup/quality open</strong></p>
+<p><strong>Playable:</strong> Ordinary Xbox build clears Levels 1–2 → earned Level 3; Y reset stays on Level 3. Natural fall retry and browser/launcher return pass. The clip shows Level 3 movement/reset.</p>
 <p><strong>Got working:</strong> Profile only. Stepping aside lets the last cube fall from the player’s head; no eating-runtime fix was needed.</p>
-<p><strong>Left:</strong> Intermittent blue-only startup; repeat win/replay on ordinary build, later levels and audio/smoothness.</p>
+<p><strong>Left:</strong> Repeated startup/longer sessions, Level 3 onward, audio and measured smoothness.</p>
 </td>
 </tr>
 <tr>
@@ -396,7 +398,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | --- | --- |
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
-| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Xbox first-level win → Level 2, reset/replay/return. Collision-candidate native xemu also reaches Level 3 after Green Flag/Y retry. Intermittent Xbox startup remains open. |
+| [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Ordinary Xbox build clears Levels 1–2 → earned Level 3; Y resets Level 3, with fall retry and browser/launcher return. Later levels, repeated startup and quality remain open. |
 | [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox selection/start, hazard loss, Black retry, B results Menu and browser return pass. xemu clears level 1/all gems and the earned Level 2/menu/retry loop. Main misses blue-water death; [draft PR #71](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) passes it twice on Xbox. Fresh SDL/native xemu clears earn all three medals and start Level 2; broader regression remains open. Full Xbox clear, repeated startup, 2P and quality checks remain open. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
@@ -436,6 +438,13 @@ seven gems and three medals with SDL (54s) and native rendering (53s); both star
 earned Level 2. Level EATEN clears Level 1 on Xbox; native xemu clears earned Level 2, resets Level 3 and returns cleanly.
 **Still off main:** full Xbox clear, broader regression and quality checks remain.
 One xemu guest has a decor artifact from its first gameplay capture; other fresh clears rendered normally. Cause remains open.
+
+[Merged Xbox RGBA upload fix (#72)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/72):
+SDL3 reports upload success as `true`; this corrects an inverted check. Matched
+128 MB Xbox probes retain RGBA instead of discarding it for compression. The
+ordinary build passes four costume swaps, Appel jumps/scrolling through 3/35
+apples, and Level EATEN fall reset, Levels 1–2 clear, earned Level 3 reset and browser return.
+No FPS improvement or full-pack qualification is claimed.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets

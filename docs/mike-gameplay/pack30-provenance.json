@@ -1,5 +1,4 @@
 {
-  "recorded_utc_date": "2026-11-01",
   "source": "Physical 128 MB original Xbox via ESP-KVM live MJPEG; two warm frames omitted; each GIF uses one continuous source interval",
   "clips": [
     {
@@ -58,9 +57,10 @@
     },
     {
       "gif": "level-eaten.gif",
+      "capture_started_utc": "2026-11-02T04:16:04.426100+00:00",
       "warm_frames_excluded": 2,
-      "continuous_source_interval_seconds": 3.710327542,
-      "encoded_seconds": 3.7,
+      "continuous_source_interval_seconds": 3.3188546249999997,
+      "encoded_seconds": 3.3000000000000003,
       "dimensions": [
         480,
         320
@@ -69,10 +69,39 @@
         180,
         120
       ],
-      "xbe_sha256": "a57d47e0ceaabc636d7f3a4c78b48276c2a1d3b23759234ca3f0563999956abe",
-      "sha256": "6f048bd7407d378daa1b9a056a3fe4189035c2f963e346005502c50b424600ce",
-      "bytes": 476062,
-      "scope": "Real Xbox video only. GIF sampling is not a game FPS measurement."
+      "xbe_sha256": "23e03a940d00da8acc3336a1d0b3bc423f6afa7223ae0f80e41fe35e7f2e4eab",
+      "source_jpeg_sha256": [
+        "418036284b849a678b44543c4c6cc0248f3379fe292c21d88b07c5aa0e25ca28",
+        "72b8bdddf420ee06f5e90c4f4415147d860c6677c43fad7fc230478ad32c8d02",
+        "99aca77a9090b1cbc184ba7662af14bb70ae72f2ee5ae950895af5ada4dafc55",
+        "b23667d65a821fde8a730f7bec915b1d3c37bfa7d48925d4646fb96c8bd10b20",
+        "355e7b6e7301c89413ec95c21392f4a994264f12247456d86e5d730ad3f24515",
+        "6c78f3bbad868462567279276a53ea2c34f18a4502dbefe045197fae899a1387",
+        "6861b7af2b2923269e21c4e29c3465155edc86f6b2bbf4733f817666fb48d163",
+        "73be35d2b802ad368631ee60e9b176ac5620232ed07a1a7d739f9f42c6ea1dc2",
+        "d22fb4aab5956ffcd73c9ec1ce84f5e10e9279c598746b18bb3a0f23cbf30a27",
+        "e67aeafdacc2278a027f70cda38ce85b885f2d6ceb1d7ad3ba33dbf6e2b83770",
+        "be6f8ecaa429fa9c297d719433bbffe4610b700e45bf8f52674d86b8b0e416b2",
+        "7dd48b78d19cab7d0d10c676e1fb147e55c35f7f655b181f1b97c7f73e093bb8",
+        "6e1428bb4bbf819d718ea2954ce17102a5ded52db2fe74a71ac3a156d7910269",
+        "e16639cae3de2b0f4cb4c474e9cef3d385dcf10923c3295fd2c6434bf4a2042a",
+        "9e81b1642ecec8f8231831abdc4049365282bab224a52954eeccb71372e3560b",
+        "75b046f6c69fcd6cb387574e2d52fa848ad2c43e3583a2a6e512d49f6ab86b7c",
+        "c883abe9d5fec64d191e45ceef43f216a1b3a5b69bd0683c6f27b6b308190441",
+        "0d1aabb01776c770f865ad32e67e043f12a734e44877fda9f32a4b67e2322666",
+        "b294ecc964939f808ee44074cf3b03b51bdb86411dd37f321c55c0b9ae601dc6",
+        "59cbaf2ea0a96eda15084c63981f08a45d49d5ba838d8dc5daf6cf4ca13747b6",
+        "1f04136aa34f837f94f0f185bcb62e2c015408ac767ed648fb3d0f0b5632e462",
+        "8a01d884e4e032cfc6141902ef0e1dd84b82725510a7c077df42e7287092cc2a",
+        "642153994b26dacaf8abc649e39b0bcd92b044d2be80792188154bcdb50cf918",
+        "5ca5873f4805b148d6f3176d1a89ac94743cd8dde8dca18701cb24a81320d2d1",
+        "08a42fb8fb163d70f297c43356fa15c0e7423fb69c5cdbd2f1c46d8e6945376b"
+      ],
+      "sha256": "2b60a3d944bc0f3be0529a2a6972ba55728310fa406e68e6ee7cf3a4e093799a",
+      "bytes": 388242,
+      "scope": "Real Xbox footage: earned Level 3 movement and Y reset after clearing Level 2. One continuous interval at recorded pace; GIF sampling does not measure game FPS.",
+      "capture_id": "ordinary-eaten3-reset-140",
+      "previous_gif_sha256": "6f048bd7407d378daa1b9a056a3fe4189035c2f963e346005502c50b424600ce"
     },
     {
       "gif": "fireboy-watergirl.gif",
@@ -165,5 +194,7 @@
       "backend": "SDL3 window/audio + Xbox renderer",
       "scope": "ActualXbox Ninja firstcourseclear afterGreenFlag; one continuous final7secondsourceinterval, not gameFPSmeasurement"
     }
-  ]
+  ],
+  "initial_recorded_utc_date": "2026-11-01",
+  "updated_utc_date": "2026-11-02"
 }
