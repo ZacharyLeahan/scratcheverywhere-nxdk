@@ -21,6 +21,8 @@ Validation:
   both the 600 × 440 pattern and 640 × 480 backdrop. Both return to XBMC.
 - The normal corrected NXDK build completes with the private metadata logger
   removed. It repeats four costume swaps and returns cleanly to the browser.
+  Appel renders terrain and scrolling, responds to jumps, collects 3/35 apples
+  and returns to the browser. Level EATEN clears Level One after a manual reset.
 
 Run the host regression and generate the offline hardware fixture:
 
@@ -33,3 +35,8 @@ Map the fixture's Scratch A key to a controller button. Four presses should show
 `SWAPS 4` and restore the original pattern. The fixture is separate from the
 30-game pack. These checks establish the upload/fallback behavior; game frame
 rate, long-session memory use and retail 64 MB hardware remain unqualified.
+
+Level EATEN can leave the player off-screen after walking off its first platform
+on both the control and corrected hardware builds; Y resets the level. The
+official Scratch player and the 64 MB xemu test reset automatically. This
+remains a separate open issue; the comparison does not establish a cause.
