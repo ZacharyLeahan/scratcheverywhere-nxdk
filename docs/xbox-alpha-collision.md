@@ -37,8 +37,9 @@ Validation so far:
   green medals: 54 seconds with the SDL renderer and 53 seconds with the native
   Xbox renderer. Both runs also pass normal B Menu, selection of the unlocked
   Level Two and its startup. An earlier exploratory clear missed the time medal.
-- Level EATEN also loads after Fireboy cleanup, moves, jumps and collects one
-  cube on hardware; a full Level EATEN clear was not established in that run.
+- Level EATEN clears Level One and reaches Level Two on the physical Xbox.
+  Native xemu also clears its earned Level Two, resets Level Three with Y, and
+  returns to the browser with zero remaining sprites.
 
 The old bank route took off too far from the platform. Moving along the right
 shelf before jumping reaches the platform in all three players; no movement or
@@ -46,10 +47,11 @@ jump physics were changed. The fresh full-level regression uses that route.
 
 A full physical-Xbox clear, broader game checks, performance and audio remain
 open. A timed green-pool jump failed in both the official player and on Xbox;
-that takeoff is not yet qualified. A long exploratory xemu session also showed
-decor artifacts after repeated attempts; the fresh full-level run rendered
-normally. Its cause and relationship to the change remain unverified. No
-playability-grade improvement is claimed yet.
+that takeoff is not yet qualified. One xemu guest shows decor artifacts already
+in its first gameplay capture; this predates its retries. Other fresh full-level
+runs render normally. The affected decor has intact CPU pixels and a correctly
+decoded GPU allocation; composition, other textures and its relationship to this
+change remain open. No playability-grade improvement is claimed yet.
 
 Run the host geometry checks with:
 
