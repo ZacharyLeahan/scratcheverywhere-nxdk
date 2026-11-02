@@ -1,7 +1,8 @@
-# Xbox alpha collision candidate
+# Xbox alpha collision
 
-This Xbox-specific change is under validation on a feature branch. Broader game
-and performance qualification remains separate from the collision fix.
+This Xbox-specific repair fixes missed thin overlaps between axis-aligned
+sprites. Broader game and quality qualification remains separate from the
+collision fix.
 
 In [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/), walking
 Fireboy into blue water ends the game in the official Scratch player, our Mac
@@ -51,17 +52,65 @@ The old bank route took off too far from the platform. Moving along the right
 shelf before jumping reaches the platform in all three players; no movement or
 jump physics were changed. The fresh full-level regression uses that route.
 
-Later physical levels, broader game checks, performance and audio remain open.
-Both characters now pass the physical green-pool jump after a running approach;
-earlier timed takeoffs failed in both the official player and on Xbox. One xemu
-guest shows decor artifacts already in its first gameplay capture; this predates
-its retries. Other fresh full-level runs render normally. The affected decor has
-intact CPU pixels and a correctly decoded GPU allocation; composition, other
-textures and its relationship to this change remain open. No playability-grade
-improvement is claimed yet.
+Later physical levels, broader game checks, whole-game performance and audio
+remain open. Both characters now pass the physical green-pool jump after a
+running approach; earlier timed takeoffs failed in both the official player and
+on Xbox. One xemu guest shows decor artifacts already in its first gameplay
+capture; this predates its retries. Other fresh full-level runs render normally.
+The affected decor has intact CPU pixels and a correctly decoded GPU allocation;
+composition, other textures and its relationship to this change remain open. No
+playability-grade improvement is claimed yet.
 
 Run the host geometry checks with:
 
 ```sh
 python3 tests/collision_grid_test.py
 ```
+
+## Bounded hardware performance — November 2, 2026
+
+Two matching Release builds on the physical 128MB Xbox compare current main
+`89a23e4d` with this fix. Profiling flags and CMake cache bytes match; only the
+collision implementation differs. The existing frame profiler is enabled,
+detailed thread tracing is off, and test video streams are closed during each
+measurement. Projects, profiles and saved settings are unchanged.
+
+Fireboy stays at the initial Level One spawn for 50 seconds. Appel repeats eight
+Left 1.5-second / Right 2-second cycles at its first wall with one apple, for 28
+seconds. Both scenes are visually checked before and after. Every complete
+120-frame interval enclosed by the action is included, with 0.5-second boundary
+guards; loading/menu intervals are excluded.
+
+| Scene / build         | Measured frames |   FPS | Mean script ms/frame | Median window p95 ms |
+| --------------------- | --------------: | ----: | -------------------: | -------------------: |
+| Fireboy spawn / main  |            1200 | 29.84 |                10.41 |                34.59 |
+| Fireboy spawn / fix   |            1320 | 29.89 |                11.23 |                34.60 |
+| Appel movement / main |             600 | 27.03 |                16.62 |                52.69 |
+| Appel movement / fix  |             600 | 26.54 |                17.32 |                52.87 |
+
+The fix costs about 0.8 ms of script time per frame in Fireboy and 0.7 ms in
+Appel in these samples. Fireboy's average frame rate is unchanged; Appel is
+about 0.5 FPS lower. These short samples do not establish a general performance
+improvement. Both Fireboy samples contain one roughly 267 ms hitch. Appel's
+maximum periods are 151.8 ms on main and 151.2 ms with the fix; slow frames
+remain. Window p95 values are not pooled frame percentiles. No 60 FPS,
+Mac-equivalent smoothness, retail-64MB or audio qualification is claimed.
+
+All 75 candidate and 155 main frame reports match the retrieved console logs.
+Received UDP sequences are contiguous within each run; initial network messages
+are retained in the disk logs. Both runs return through the browser to XBMC.
+Main's return leaves the dashboard responsive but FTP unavailable; one verified
+XBMC software Reboot restores FTP. This repeats an earlier network-handoff
+issue; its cause remains open. No DMA or out-of-memory error is logged.
+
+The ordinary combined build also passes Appel's three-apple terrain/scroll/jump
+check and Ninja Climb's natural spike death/respawn, first-course clear, earned
+second-course startup and browser return. These checks do not qualify later
+levels or independent two-controller play.
+
+The profiling XBEs are `bef0bd96…` (main) and `8f15c424…` (fix). Local evidence
+is under ignored `build-xbox/hardware/pack30-20261101/`:
+`collision-performance-143/`, `performance-results-143.json`,
+`performance-scene-review-143.json` and `performance-log-verification-143.json`.
+The normal build is restored with profiling and UDP logging off; the regular
+dashboard launcher is preserved.
