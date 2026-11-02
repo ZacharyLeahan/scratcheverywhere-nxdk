@@ -8,7 +8,6 @@
 #include <algorithm>
 #ifdef __XBOX__
 #include <filesystem.hpp>
-#include <xbox_pointer_help.hpp>
 #endif
 #ifdef SE_XBOX_TRACE_GAME_STATE
 #include <blockExecutor.hpp>
@@ -98,13 +97,6 @@ void PauseMenu::init() {
     turboButton->buttonDown = systemButton;
     systemButton->buttonUp = turboButton;
     exitProjectButton->text->setText("Return to game list");
-    pointerMoveHelp = std::make_unique<MenuText>(XboxPointerHelp::move, 200, 207);
-    pointerClickHelp = std::make_unique<MenuText>(XboxPointerHelp::click, 200, 222);
-    for (MenuText *line : {pointerMoveHelp.get(), pointerClickHelp.get()}) {
-        line->scale = 0.65;
-        line->text->setCenterAligned(true);
-        line->text->setColor(Math::color(255, 255, 255, 255));
-    }
 #endif
     isInitialized = true;
 }
@@ -187,10 +179,6 @@ void PauseMenu::render() {
 
     pauseControl->render();
     backButton->render();
-#ifdef __XBOX__
-    pointerMoveHelp->render();
-    pointerClickHelp->render();
-#endif
 
     Render::endFrame(false);
 }
@@ -200,8 +188,6 @@ void PauseMenu::cleanup() {
     isInitialized = false;
 #ifdef __XBOX__
     Input::inputControls = std::move(gameControls);
-    pointerMoveHelp.reset();
-    pointerClickHelp.reset();
 #endif
 
     if (backButton != nullptr) {

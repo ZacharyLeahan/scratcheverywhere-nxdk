@@ -19,8 +19,6 @@ class SE_EXPORT PauseMenu : public Menu {
 #ifdef __XBOX__
     std::map<std::string, std::string> gameControls;
     bool backReleased = false;
-    std::unique_ptr<MenuText> pointerMoveHelp;
-    std::unique_ptr<MenuText> pointerClickHelp;
 #endif
   public:
 #ifdef __XBOX__

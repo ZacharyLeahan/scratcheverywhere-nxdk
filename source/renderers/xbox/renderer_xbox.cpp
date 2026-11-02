@@ -30,7 +30,6 @@
 #include <log.hpp>
 #include <math.hpp>
 #include <runtime.hpp>
-#include <xbox_pointer_help.hpp>
 #include <string>
 #include <text.hpp>
 #include <types.hpp>
@@ -1188,38 +1187,6 @@ void Renderer_Xbox::renderSprites() {
 
     drawBlackBars(Sdlrenderer, getWidth(), getHeight());
     Render::renderMonitors();
-
-    // Once per app session, only after pointer mode is used during a project.
-    // This is an overlay: it never consumes input or pauses game scripts.
-    static bool pointerHelpSeen = false;
-    static Uint64 pointerHelpStarted = 0;
-    static std::unique_ptr<TextObject> pointerMoveHelp, pointerClickHelp, pointerReminder;
-    if (!pointerHelpSeen && Input::mousePointer.isMoving) {
-        pointerHelpSeen = true;
-        pointerHelpStarted = SDL_GetTicks();
-        pointerMoveHelp = createTextObject(XboxPointerHelp::move, 0, 0);
-        pointerClickHelp = createTextObject(XboxPointerHelp::click, 0, 0);
-        pointerReminder = createTextObject(XboxPointerHelp::reminder, 0, 0);
-    }
-    if (pointerMoveHelp) {
-        if (SDL_GetTicks() - pointerHelpStarted < XboxPointerHelp::durationMs) {
-            const float sx = getWidth() / 400.0f;
-            const float sy = getHeight() / 240.0f;
-            drawBox(370 * sx, 54 * sy, getWidth() / 2, 201 * sy, 24, 24, 32, 255);
-            int y = 183;
-            for (TextObject *line : {pointerMoveHelp.get(), pointerClickHelp.get(), pointerReminder.get()}) {
-                line->setCenterAligned(true);
-                line->setColor(Math::color(255, 255, 255, 255));
-                line->setScale(0.65f * sy);
-                line->render(getWidth() / 2, y * sy);
-                y += 15;
-            }
-        } else {
-            pointerMoveHelp.reset();
-            pointerClickHelp.reset();
-            pointerReminder.reset();
-        }
-    }
 
 #if !defined(PLATFORM_HAS_MOUSE) && !defined(PLATFORM_HAS_TOUCH)
     if (Input::mousePointer.isMoving) {
