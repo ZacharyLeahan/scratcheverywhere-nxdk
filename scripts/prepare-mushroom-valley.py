@@ -2,7 +2,7 @@
 """Allow Space/A to activate Mushroom Valley's existing mouse-only Retry.
 
 Keeps the authored restart sequence, physics, scoring, assets and mouse control.
-Adds a small controller hint that appears alongside the original Retry icon.
+The original Retry icon remains unchanged; no helper sprite or banner is added.
 """
 import argparse
 import copy
@@ -51,29 +51,6 @@ def prepare(source, output):
     blocks[ids[2]]["shadow"] = True
     blocks[condition]["parent"] = ids[0]
     blocks[wait]["inputs"]["CONDITION"] = [2, ids[0]]
-    broadcasts = {}
-    for target in project["targets"]:
-        broadcasts.update({name: key for key, name in target["broadcasts"].items()})
-    if not all(name in broadcasts for name in ["miss", "start"]):
-        raise ValueError("Unexpected project revision: missing original loss/start broadcasts.")
-    helper = {
-        "xbox_hint_flag": block("event_whenflagclicked", next_block="xbox_hint_hide0", hat=True),
-        "xbox_hint_hide0": block("looks_hide", "xbox_hint_flag"),
-        "xbox_hint_miss": block("event_whenbroadcastreceived", fields={"BROADCAST_OPTION": ["miss", broadcasts["miss"]]}, next_block="xbox_hint_wait", hat=True),
-        "xbox_hint_wait": block("control_wait", "xbox_hint_miss", {"DURATION": [1, [5, "1"]]}, next_block="xbox_hint_show"),
-        "xbox_hint_show": block("looks_show", "xbox_hint_wait"),
-        "xbox_hint_start": block("event_whenbroadcastreceived", fields={"BROADCAST_OPTION": ["start", broadcasts["start"]]}, next_block="xbox_hint_hide1", hat=True),
-        "xbox_hint_hide1": block("looks_hide", "xbox_hint_start"),
-    }
-    svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="380" height="30"><rect width="380" height="30" rx="6" fill="#172238"/><text x="190" y="20" text-anchor="middle" font-family="sans-serif" font-size="16" fill="white">A: Retry | Hold/release A to jump</text></svg>'
-    digest = hashlib.md5(svg).hexdigest()
-    assets[digest + ".svg"] = svg
-    project["targets"].append(dict(isStage=False, name="Xbox retry hint", variables={}, lists={}, broadcasts={},
-                                   blocks=helper, comments={}, currentCostume=0,
-                                   costumes=[dict(name="Xbox controls", bitmapResolution=1, dataFormat="svg", assetId=digest,
-                                                  md5ext=digest + ".svg", rotationCenterX=190, rotationCenterY=15)],
-                                   sounds=[], volume=100, layerOrder=1000, visible=False, x=0, y=-140,
-                                   size=100, direction=90, draggable=False, rotationStyle="don't rotate"))
     for before, after in zip(original["targets"], project["targets"]):
         if before["name"] != retry["name"]:
             assert before == after
@@ -93,7 +70,7 @@ def prepare(source, output):
     paths[1].write_text(json.dumps({"controls": {"space": "A"}}, indent=2) + "\n")
     receipt = {"source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
                "output_sha256": hashlib.sha256(output.read_bytes()).hexdigest(),
-               "scope": "Prepared-project Retry accepts Space in addition to original mouse gate; hint/profile added",
+               "scope": "Prepared-project Retry accepts Space in addition to original mouse gate; profile added, original visuals preserved",
                "original_restart_sequence_and_physics_preserved": True, "hardware_tested": False, "emulator_tested": False}
     paths[2].write_text(json.dumps(receipt, indent=2) + "\n")
     return receipt

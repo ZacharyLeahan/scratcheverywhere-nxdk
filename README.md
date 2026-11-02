@@ -24,7 +24,7 @@ over to 6-8th-generation gaming consoles, handheld platforms, and more!
 
 ## Documentation
 
-For this Original Xbox fork, start with the **[21-game status and known issues](docs/xbox-game-status.md)** or the [NXDK build notes](docs/xbox-fork-build.md).
+For this Original Xbox fork, start with the **[30-game status and known issues](docs/xbox-game-status.md)**, [controller reference](docs/xbox-controls.md), or [NXDK build notes](docs/xbox-fork-build.md).
 
 Most of the documentation on how to use Scratch Everywhere! can be found on the
 website: <https://ScratchEverywhere.github.io>.

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Add an Xbox X-to-CPU menu shortcut to a separate prepared Scratch copy.
 
-Original targets, game logic and assets are preserved. Adds one helper sprite,
-one controls-hint SVG, a sidecar profile and a provenance receipt. This does
+Original targets, game logic and assets are preserved. Adds one hidden helper,
+a sidecar profile and a provenance receipt, without a control-hint banner. This does
 not add simultaneous multi-controller support or qualify performance/audio.
 Beach Volleyball uses the original Easy CPU setting. Existing mouse menus remain.
 """
@@ -72,9 +72,9 @@ def prepare(game, source, output):
         raise ValueError('Unexpected project revision: required CPU-menu variables or broadcasts are missing.')
     active = 'xbox_cpu_active'
     b = Blocks()
-    activate = b.chain(b.set('Xbox CPU menu active', active, 1), b.add('looks_show'))
+    activate = b.chain(b.set('Xbox CPU menu active', active, 1), b.add('looks_hide'))
     b.hat('event_whenflagclicked', {}, activate)
-    activate = b.chain(b.set('Xbox CPU menu active', active, 1), b.add('looks_show'))
+    activate = b.chain(b.set('Xbox CPU menu active', active, 1), b.add('looks_hide'))
     b.hat('event_whenbroadcastreceived', {'BROADCAST_OPTION': [menu, bid[menu]]}, activate)
     off = 'Begin match' if name == 'Beach-Volleyball' else 'Menu OFF'
     deactivate = b.chain(b.set('Xbox CPU menu active', active, 0), b.add('looks_hide'))
@@ -96,12 +96,13 @@ def prepare(game, source, output):
     b.blocks[cond]['parent'] = branch
     b.blocks[body]['parent'] = branch
     b.hat('event_whenkeypressed', {'KEY_OPTION': ['c', None]}, branch)
-    svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="420" height="28" viewBox="0 0 420 28"><rect width="420" height="28" rx="7" fill="#172238"/><text x="210" y="19" text-anchor="middle" font-family="sans-serif" font-size="16" fill="white">Xbox: X plays CPU' + (b' (Easy)' if difficulty else b'') + b' | D-pad moves, A jumps</text></svg>'
+    # Scratch sprites need a valid costume; this helper always stays hidden.
+    svg = b'<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4"><rect width="4" height="4" fill="#172238"/></svg>'
     md = hashlib.md5(svg).hexdigest()
     asset = md + '.svg'
     assert asset not in files
     files[asset] = svg
-    helper = dict(isStage=False, name='Xbox CPU menu shortcut', variables={active: ['Xbox CPU menu active', 1]}, lists={}, broadcasts={}, blocks=b.blocks, comments={}, currentCostume=0, costumes=[dict(name='Xbox controls', bitmapResolution=1, dataFormat='svg', assetId=md, md5ext=asset, rotationCenterX=210, rotationCenterY=14)], sounds=[], volume=100, layerOrder=1000, visible=True, x=0, y=-160, size=100, direction=90, draggable=False, rotationStyle="don't rotate")
+    helper = dict(isStage=False, name='Xbox CPU menu shortcut', variables={active: ['Xbox CPU menu active', 1]}, lists={}, broadcasts={}, blocks=b.blocks, comments={}, currentCostume=0, costumes=[dict(name='Hidden helper', bitmapResolution=1, dataFormat='svg', assetId=md, md5ext=asset, rotationCenterX=2, rotationCenterY=2)], sounds=[], volume=100, layerOrder=1000, visible=False, x=0, y=-160, size=100, direction=90, draggable=False, rotationStyle="don't rotate")
     originals = copy.deepcopy(p['targets'])
     p['targets'].append(helper)
     assert p['targets'][:-1] == originals
@@ -123,7 +124,7 @@ def prepare(game, source, output):
     profile = {'controls': {'left arrow': ['dpadLeft', 'LeftStickLeft'], 'right arrow': ['dpadRight', 'LeftStickRight'], 'up arrow': ['dpadUp', 'LeftStickUp', 'A'], 'down arrow': ['dpadDown', 'LeftStickDown'], 'c': 'X'}}
     data = (json.dumps(profile, indent=2) + '\n').encode()
     pathlib.Path(str(out) + '.json').write_bytes(data)
-    receipt = dict(source=str(source), source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(), output_sha256=hashlib.sha256(out.read_bytes()).hexdigest(), profile_sha256=hashlib.sha256(data).hexdigest(), scope='Prepared-project CPU menu shortcut plus controller profile; original targets/gameplay and every original asset identical', original_target_count=len(originals), additional_targets=1, additional_assets=1, hardware_tested=False, emulator_tested=False)
+    receipt = dict(source=str(source), source_sha256=hashlib.sha256(source.read_bytes()).hexdigest(), output_sha256=hashlib.sha256(out.read_bytes()).hexdigest(), profile_sha256=hashlib.sha256(data).hexdigest(), scope='Hidden prepared-project CPU menu shortcut plus controller profile; no help banner; original targets/gameplay and every original asset identical', original_target_count=len(originals), additional_targets=1, additional_assets=1, hardware_tested=False, emulator_tested=False)
     pathlib.Path(str(out) + '.preparation.json').write_text(json.dumps(receipt, indent=2) + '\n')
     return receipt
 

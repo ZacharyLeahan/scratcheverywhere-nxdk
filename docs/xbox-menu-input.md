@@ -117,20 +117,22 @@ direct physical-pad behavior remain unverified.
 
 ## Console pause and system actions
 
-### Shared mouse controls
+### Shared mouse controls and minimal UI
 
-The Xbox pause menu always shows these instructions, regardless of the project:
-hold **White + D-pad / left stick** to move the pointer, and keep **White** held
-while pressing **RT** to click. Black is also accepted as the click button.
-These are mouse clicks, not separate left/right mouse buttons.
+The November 2 UI cleanup removes the six-second mouse-help popup and the two
+mouse-help lines from pause. Mouse emulation remains: hold **White + D-pad /
+left stick** to move the pointer, and keep **White** held while pressing **RT**
+to click. Black also clicks. See the [controller reference](xbox-controls.md).
 
-The first use of pointer mode during gameplay shows the same instructions and
-a reminder about Back / Select pause for six seconds. The hint appears once per
-app session, draws above the game, and does not consume input or pause scripts.
-It does not depend on game-specific menu detection or idle timers.
+The prepared Beach/GlowBall CPU shortcuts and Mushroom Retry retain their keys
+without added banners. Fireboy retains its selected-level label and selector/
+results controls, with the instruction bubbles removed. Pause, browser return,
+exit to dashboard, restart/shutdown, reset chord and stopped-project Start
+replay remain. Direct entry into the installed-game browser is retained; this
+cleanup does not restore the upstream home screen or redesign its menus.
 
-October 27 shared-help validation: Xbox Release build passed with profiling off;
-FTP readback verified `F:\scratch-pointer-help-20261027\default.xbe` with SHA-256
+Historical October 27 shared-help validation, before removal: Xbox Release build
+passed with profiling off; FTP readback verified `F:\scratch-pointer-help-20261027\default.xbe` with SHA-256
 `98c93665e87f51ce9b503c876b0301155e07084922bb1588dcd777bbbfca807e`.
 KVM checks confirmed both pause lines fit, the first pointer use shows the
 three-line hint, and later pointer use after expiry leaves it hidden. The game

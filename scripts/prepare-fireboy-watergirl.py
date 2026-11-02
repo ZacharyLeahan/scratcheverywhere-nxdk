@@ -184,18 +184,13 @@ def prepare(source, output):
     show = helper.add("looks_show")
     front = helper.add("looks_gotofrontback", fields={"FRONT_BACK": ["front", None]})
     label = helper.add("operator_join", {"STRING1": literal("Level "), "STRING2": variable("Xbox level choice", choice)})
-    hint = helper.add("operator_join", {"STRING1": [2, label], "STRING2": literal("\nD-pad: choose; A: play\nFireboy: left/A\nWatergirl: right/X")})
-    say = helper.add("looks_say", {"MESSAGE": [2, hint]})
+    # Selection feedback is needed for controller navigation; instructions live
+    # in the pack documentation rather than covering the authored menus.
+    say = helper.add("looks_say", {"MESSAGE": [2, label]})
     clear = helper.add("looks_say", {"MESSAGE": literal("")})
     hide = helper.add("looks_hide")
-    result_costume = helper.add("looks_switchcostumeto", {"COSTUME": literal(1)})
-    result_show = helper.add("looks_show")
-    result_front = helper.add("looks_gotofrontback", fields={"FRONT_BACK": ["front", None]})
-    result_hint = helper.add("looks_say", {"MESSAGE": literal("B: level menu\nBlack: retry")})
-    result_active = helper.add("operator_equals", {"OPERAND1": variable("Xbox results menu active", results_active), "OPERAND2": literal(1)})
-    result_toggle = helper.add("control_if_else", {"CONDITION": [2, result_active], "SUBSTACK": [2, helper.chain(result_costume, result_show, result_front, result_hint)], "SUBSTACK2": [2, helper.chain(hide, clear)]})
     menu = helper.add("operator_equals", {"OPERAND1": variable("page", page), "OPERAND2": literal("menu")})
-    toggle = helper.add("control_if_else", {"CONDITION": [2, menu], "SUBSTACK": [2, helper.chain(costume, show, front, say)], "SUBSTACK2": [2, result_toggle]})
+    toggle = helper.add("control_if_else", {"CONDITION": [2, menu], "SUBSTACK": [2, helper.chain(costume, show, front, say)], "SUBSTACK2": [2, helper.chain(hide, clear)]})
     loop = helper.add("control_forever", {"SUBSTACK": [2, toggle]})
     helper.hat("event_whenflagclicked", {}, loop)
     costumes = []
