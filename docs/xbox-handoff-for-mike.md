@@ -43,6 +43,25 @@ starting point. Keep Xbox backend changes and prepared Scratch projects
 separate; the full fork comparison is context, not a request to pull every
 commit.
 
+## UI scope
+
+[UI cleanup #75](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/75)
+keeps the upstream menu appearance and the homebrew conveniences: pause/resume,
+return to game list or dashboard, project replay, restart/shutdown, and the
+**LT + RT + Back + Start** reset chord. Direct game-list startup stays.
+
+Removed: our mouse-help popup/pause lines and the extra Beach/GlowBall, Mushroom
+and Fireboy instruction banners/bubbles. Controller shortcuts still work;
+Fireboy keeps its selected-level label so the selection is visible. Instructions
+are in the
+[controller reference on main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-controls.md).
+
+The new build passes NXDK compilation, prepared-project preservation checks and
+a private xemu Beach movement/jump/replay/pause/browser/system-menu check.
+**Xbox installation and physical checks are pending**: HDMI and FTP were
+unavailable. Earlier Xbox results and grades remain; the GIFs show the prior UI
+and may include the removed hints.
+
 ## What testing establishes
 
 The 1.3 integration builds, passes native/SDL regressions and both GPU fixtures,
@@ -326,7 +345,7 @@ work; it does not imply that every change is new since upstream 1.3.
 <img src="mike-gameplay/beach-volleyball.gif" alt="Beach Volleyball gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — CPU match playable; 2P pending</strong></p>
 <p><strong>Playable:</strong> X starts Easy CPU; D-pad moves, A jumps; natural 2–5 loss, automatic title return/X replay and browser return. Repeated on the ordinary dashboard build.</p>
-<p><strong>Got working:</strong> Prepared project/profile: X-to-CPU shortcut and on-screen controls; original gameplay/assets preserved.</p>
+<p><strong>Got working:</strong> Prepared project/profile: X-to-CPU shortcut retained; added banner removed in the new prepared copy. Original gameplay/assets preserved.</p>
 <p><strong>Left:</strong> Player win, independent two-player controls, audio, measured smoothness and longer testing. After the ending, use X at the returned title; short Start is not its replay control.</p>
 <p><a href="#next-nine-target-pack-of-30">New-game progress and limits</a></p>
 </td>
@@ -337,7 +356,7 @@ work; it does not imply that every change is new since upstream 1.3.
 <img src="mike-gameplay/glowball.gif" alt="GlowBall gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — CPU match and replay</strong></p>
 <p><strong>Playable:</strong> X starts CPU; directions/A jump; natural 2–5 loss, X replay and browser return.</p>
-<p><strong>Got working:</strong> Prepared project/profile: CPU shortcut and controls hint; original gameplay preserved.</p>
+<p><strong>Got working:</strong> Prepared project/profile: CPU shortcut retained; added hint removed in the new prepared copy. Original gameplay preserved.</p>
 <p><strong>Left:</strong> Independent 2P, player win, audio/smoothness and longer play.</p>
 </td>
 <td width="50%" valign="top">
@@ -355,7 +374,7 @@ work; it does not imply that every change is new since upstream 1.3.
 <img src="mike-gameplay/fireboy-watergirl.gif" alt="Fireboy and Watergirl final gem and Level 1 win on the physical Xbox" width="180" height="120">
 <p><strong>Playability: C — Level 1 cleared; quality checks open</strong></p>
 <p><strong>Playable:</strong> Ordinary test build clears Level 1 with all seven gems and both exits. B Menu, earned Level 2 startup, Black retry and browser return pass. The stop-and-inspect run misses the time medal.</p>
-<p><strong>Got working:</strong> Prepared selector/results controls preserve authored locks. <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71">Merged Xbox collision fix</a> detects blue-water death and permits the full route; no movement or jump physics changed. GIF shows the final gem and win.</p>
+<p><strong>Got working:</strong> Prepared selector/results controls preserve authored locks; new copy retains only the selected-level label, without instruction bubbles. <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71">Merged Xbox collision fix</a> detects blue-water death and permits the full route; no movement or jump physics changed. GIF shows the final gem and win.</p>
 <p><strong>Left:</strong> Later levels, repeated startup, independent two-pad support, audio and measured smoothness remain open. The paired sample adds about 0.8 ms of script time per frame; the grade stays C.</p>
 </td>
 <td width="50%" valign="top">
@@ -363,7 +382,7 @@ work; it does not imply that every change is new since upstream 1.3.
 <img src="mike-gameplay/mushroom-valley.gif" alt="Mushroom Valley gameplay on the physical Xbox" width="180" height="120">
 <p><strong>Playability: B — Scored run and controller retry</strong></p>
 <p><strong>Playable:</strong> Hold/release A; ordinary dashboard build reaches Score 14/natural loss, A retries to zero, a renewed jump scores again, and browser return passes. Retry randomly picks an authored character, including the axe in this clip.</p>
-<p><strong>Got working:</strong> Prepared project: A activates the existing mouse-only Retry gate; ending hint added.</p>
+<p><strong>Got working:</strong> Prepared project: A activates the existing mouse-only Retry gate; added ending hint removed in the new prepared copy.</p>
 <p><strong>Left:</strong> Longer runs, repeated startup and audio/smoothness.</p>
 </td>
 </tr>
