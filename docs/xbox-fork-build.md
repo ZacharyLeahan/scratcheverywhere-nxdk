@@ -10,7 +10,7 @@ and supports both the native NV2A renderer/window with dedicated Xbox audio and
 the legacy Xbox SDL path. Compatibility patches remain in `cmake/patches`;
 the SDK revision matches `docker/Dockerfile.xbox`. Existing saved renderer
 preferences are respected. Build success does not qualify either path on hardware;
-see the [21-game status and known issues](xbox-game-status.md).
+see the [30-game status and known issues](xbox-game-status.md).
 
 ## Native build
 
@@ -115,8 +115,10 @@ BUILD_JOBS=4 bash scripts/build-xbox.sh \
 
 This produces a Release XBE and matching debug symbols with profiling/input
 tracing disabled. The merged build and 21 affected host checks pass; that does
-not replace native-backend physical acceptance or establish FPS. The latest
-physical test launcher remains separate from the newly merged build.
+not replace native-backend physical acceptance or establish FPS. The
+[current dashboard installation](xbox-game-status.md#current-dashboard-installation)
+now uses an ordinary build matching the merged runtime. Its bounded hardware
+results do not qualify all games or both backends.
 
 For diagnostics only, `SE_XBOX_TRACE_GAME_STATE=ON` logs stage variables when
 the runtime pause menu opens. It defaults to `OFF`. See the
