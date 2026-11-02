@@ -453,7 +453,7 @@ nonstd::expected<void, std::string> Image_Xbox::buildTiles() {
                     }
                     SDL_SetTextureBlendMode(tile.texture, SDL_BLENDMODE_BLEND);
                     SDL_SetTextureScaleMode(tile.texture, SDL_SCALEMODE_PIXELART);
-                    if (!SDL_UpdateTexture(tile.texture, nullptr, scratch32.data(), tile.w * 4)) {
+                    if (SDL_UpdateTexture(tile.texture, nullptr, scratch32.data(), tile.w * 4)) {
                         tiles.push_back(tile);
                         continue;
                     }
