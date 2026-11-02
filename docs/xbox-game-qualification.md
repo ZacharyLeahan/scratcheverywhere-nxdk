@@ -29,14 +29,14 @@ add Maze win/replay/two returns and the installed full-set Sokoban copy
 through puzzle eleven. The round is deliberately paused after six moves in
 twelve; puzzles twelve/thirteen and the other outstanding gates remain open.
 
-The goal is all twenty-one installed games thoroughly tested on the physical
+The goal now covers all thirty installed games thoroughly tested on the physical
 Xbox, with fixes until each works. Downloads, successful builds, and a title
-screen are not full passes.
-Twenty-one distinct game projects are now packaged and installed with archive readback
-verification. Installation is not qualification; outstanding gameplay checks
-remain listed below. Older dated sections retain their then-current twenty-game
-scope. The current console has 128MB RAM; this does not
-establish retail 64MB support.
+screen are not full passes. The original twenty-one retain their detailed
+checklist below; the [nine additions](xbox-game-status.md#nine-additions-target-pack-of-30)
+have separate tested objectives and remaining checks. All thirty archives are
+installed with readback verification. Installation is not qualification.
+Older dated sections retain their then-current scope. The current console has
+128MB RAM; this does not establish retail 64MB support.
 
 For each game, establish selection from the normal browser, correct visuals,
 controller movement and actions, a meaningful gameplay objective/score, loss or
