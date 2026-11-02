@@ -330,7 +330,7 @@ that every change is new since upstream 1.3. [Capture provenance](mike-gameplay/
 <p><strong>Playability: C — Full Xbox level clear still open</strong></p>
 <p><strong>Playable:</strong> Both characters move/jump; natural Game Over, Black/R retry, B back to the level selector after loss, and browser return on Xbox.</p>
 <p><strong>Got working:</strong> Prepared project: level selector preserves locks; <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/69">B results-menu shortcut</a> reuses the authored action. Release/fresh-press gating prevents held movement from skipping endings. xemu clears level 1/all seven gems and tests the earned Level 2/retry/menu loop.</p>
-<p><strong>Left:</strong> Full Xbox clear and next-level loop. Main misses blue-water death; a separate <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/5dea170994543b8df3fc23c1790edc46a6a73985">Xbox collision candidate</a> passes this hazard twice on hardware, pending full-level regression. Repeated startup, later levels, independent two-pad support and audio/smoothness remain open.</p>
+<p><strong>Left:</strong> Full Xbox clear and next-level loop. Main misses blue-water death; the <a href="https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71">draft Xbox collision fix</a> passes this hazard twice and the blue-pool/upper-platform jumps on hardware. Fresh SDL/native xemu runs clear all seven gems and three medals, then start earned Level 2. Broader regression remains open. Repeated startup, later levels, independent two-pad support and audio/smoothness remain open.</p>
 </td>
 <td width="50%" valign="top">
 <h3><a href="https://scratch.mit.edu/projects/285730673/">Mushroom Valley</a></h3>
@@ -397,7 +397,7 @@ audio and extended stability remain unqualified. This console has 128 MB.
 | [Beach Volleyball](https://scratch.mit.edu/projects/333452181/) | **B:** CPU scored match/loss, Green Flag replay/return. Independent 2P pending. |
 | [GlowBall](https://scratch.mit.edu/projects/112176502/) | **B:** CPU scored match/loss, title/X replay/return. Independent 2P pending. |
 | [Level EATEN!](https://scratch.mit.edu/projects/704676520/) | **C:** Xbox first-level win → Level 2, reset/replay/return. Candidate xemu also reaches Level 3 after Green Flag/Y retry. Intermittent Xbox startup remains open. |
-| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox selection/start, hazard loss, Black retry, B results Menu and browser return pass. xemu clears level 1/all gems and the earned Level 2/menu/retry loop. Main misses blue-water death; a [feature candidate](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/5dea170994543b8df3fc23c1790edc46a6a73985) passes it twice on Xbox, pending full-level regression. Full Xbox clear, repeated startup, 2P and quality checks remain open. |
+| [Fireboy and Watergirl](https://scratch.mit.edu/projects/571560558/) | **C:** Xbox selection/start, hazard loss, Black retry, B results Menu and browser return pass. xemu clears level 1/all gems and the earned Level 2/menu/retry loop. Main misses blue-water death; [draft PR #71](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71) passes it twice on Xbox. Fresh SDL/native xemu clears earn all three medals and start Level 2; broader regression remains open. Full Xbox clear, repeated startup, 2P and quality checks remain open. |
 | [Paint the Maze](https://scratch.mit.edu/projects/314731988/) | **B:** First three puzzle wins; Y reset, B Home/A resume at level 4 and browser return on Xbox. Later puzzles, Save/Load and quality checks open. |
 | [Candy Caves](https://scratch.mit.edu/projects/1385416673/) | **B:** Prepared repair loads; mining earns candy; natural Game Over, explicit A replay/new map, renewed mining and browser return on Xbox. Original-project engine compatibility, later progression and quality checks open. |
 | [Bouncy Heroes](https://scratch.mit.edu/projects/173918262/) | **B:** Dash/slam, Score 10/four coins, natural loss/A replay/return. |
@@ -429,10 +429,13 @@ xemu additionally checks win → earned next level, held-B release gating and re
 The original level physics, locks, assets and credits are preserved.
 
 For unclear behavior, we compare official Scratch, Xbox and selectively our Mac port.
-This led to an [Xbox-specific alpha-collision candidate](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/commit/5dea170994543b8df3fc23c1790edc46a6a73985):
-blue-water death passes twice on hardware; red-pool safety, Retry and browser return
-also pass. Level EATEN moves/jumps and collects a cube. **This candidate stays off main
-while full-level and broader game regression remain open.**
+[Draft Xbox collision fix (#71)](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/71):
+blue-water death passes twice on hardware; red-pool safety, Retry, browser return
+and matched blue-pool/upper-platform jumps also pass. Fresh xemu clears earn all
+seven gems and three medals with SDL (54s) and native rendering (53s); both start
+earned Level 2. Level EATEN moves/jumps and collects a cube on Xbox.
+**Still off main:** full Xbox clear, broader regression and quality checks remain.
+A warm xemu decor artifact needs investigation; fresh clears rendered normally.
 
 Independent simultaneous two-player input still needs backend/per-port binding
 work; the current backend exposes one active pad. Fireboy’s clip uses two keysets
