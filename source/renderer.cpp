@@ -433,31 +433,44 @@ void Render::calculateRenderPosition(Sprite *sprite, const bool isSVG) {
     const int screenHeight = getHeight();
     const Costume &costume = sprite->costumes[sprite->currentCostume];
 
+#ifdef __XBOX__
+    auto &info = sprite->renderInfo;
+    auto &cache = info.xboxTransform;
+    const bool reset = !cache.valid || info.forceUpdate || sprite->currentCostume != info.oldCostumeID;
+    const bool viewportChanged = reset || cache.screenWidth != screenWidth || cache.screenHeight != screenHeight ||
+        cache.projectWidth != Scratch::projectWidth || cache.projectHeight != Scratch::projectHeight ||
+        cache.renderMode != static_cast<int>(renderMode) || cache.renderScale != renderScale;
+    const bool imageChanged = reset || cache.imageWidth != sprite->spriteWidth || cache.imageHeight != sprite->spriteHeight ||
+        cache.centerX != costume.rotationCenterX || cache.centerY != costume.rotationCenterY;
+    const bool scaleChanged = viewportChanged || info.oldSize != sprite->size ||
+        cache.bitmapResolution != costume.bitmapResolution || cache.isSVG != isSVG ||
+        cache.halfQuality != Scratch::bitmapHalfQuality;
+    const bool rotationChanged = reset || info.oldRotation != sprite->rotation ||
+        cache.rotationStyle != static_cast<int>(sprite->rotationStyle);
+    const bool positionChanged = scaleChanged || rotationChanged || imageChanged ||
+        info.oldX != sprite->xPosition || info.oldY != sprite->yPosition;
+    info.oldCostumeID = sprite->currentCostume;
+    info.forceUpdate = false;
+#else
     // If the window size changed, or if the sprite changed costumes
     if (sprite->renderInfo.forceUpdate || sprite->currentCostume != sprite->renderInfo.oldCostumeID) {
-#ifdef __XBOX__
-        sprite->renderInfo.oldX = -999999.0f;
-        sprite->renderInfo.oldY = -999999.0f;
-        sprite->renderInfo.oldRotation = -999999.0f;
-        sprite->renderInfo.oldSize = -999999.0f;
-#else
         // change all renderinfo a bit to update position for all
         sprite->renderInfo.oldX++;
         sprite->renderInfo.oldY++;
         sprite->renderInfo.oldRotation++;
         sprite->renderInfo.oldSize++;
-#endif
         sprite->renderInfo.oldCostumeID = sprite->currentCostume;
         sprite->renderInfo.forceUpdate = false;
     }
+#endif
 
-    if (sprite->size != sprite->renderInfo.oldSize) {
-        sprite->renderInfo.oldSize = sprite->size;
 #ifdef __XBOX__
-        sprite->renderInfo.oldRotation = -999999.0f;
-        sprite->renderInfo.oldX = -999999.0f;
-        sprite->renderInfo.oldY = -999999.0f;
+    if (scaleChanged) {
 #else
+    if (sprite->size != sprite->renderInfo.oldSize) {
+#endif
+        sprite->renderInfo.oldSize = sprite->size;
+#ifndef __XBOX__
         sprite->renderInfo.oldRotation++;
         sprite->renderInfo.oldX++;
         sprite->renderInfo.oldY++;
@@ -473,13 +486,13 @@ void Render::calculateRenderPosition(Sprite *sprite, const bool isSVG) {
         }
         sprite->renderInfo.renderScaleY = sprite->renderInfo.renderScaleX;
     }
-    if (sprite->rotation != sprite->renderInfo.oldRotation) {
-        sprite->renderInfo.oldRotation = sprite->rotation;
 #ifdef __XBOX__
-        sprite->renderInfo.oldSize = -999999.0f;
-        sprite->renderInfo.oldX = -999999.0f;
-        sprite->renderInfo.oldY = -999999.0f;
+    if (rotationChanged) {
 #else
+    if (sprite->rotation != sprite->renderInfo.oldRotation) {
+#endif
+        sprite->renderInfo.oldRotation = sprite->rotation;
+#ifndef __XBOX__
         sprite->renderInfo.oldSize++;
         sprite->renderInfo.oldX++;
         sprite->renderInfo.oldY++;
@@ -490,8 +503,12 @@ void Render::calculateRenderPosition(Sprite *sprite, const bool isSVG) {
             sprite->renderInfo.renderRotation = 0;
         }
     }
+#ifdef __XBOX__
+    if (positionChanged) {
+#else
     if (sprite->xPosition != sprite->renderInfo.oldX ||
         sprite->yPosition != sprite->renderInfo.oldY) {
+#endif
 
         sprite->renderInfo.oldX = sprite->xPosition;
         sprite->renderInfo.oldY = sprite->yPosition;
@@ -553,6 +570,31 @@ void Render::calculateRenderPosition(Sprite *sprite, const bool isSVG) {
         sprite->renderInfo.renderX = renderX;
         sprite->renderInfo.renderY = renderY;
     }
+#ifdef __XBOX__
+    // Size and rotation do not invalidate one another. Keep all geometry and
+    // viewport inputs explicit, including same-index image reloads/crop changes.
+    if (scaleChanged) {
+        cache.isSVG = isSVG;
+        cache.halfQuality = Scratch::bitmapHalfQuality;
+        cache.bitmapResolution = costume.bitmapResolution;
+    }
+    if (rotationChanged) cache.rotationStyle = static_cast<int>(sprite->rotationStyle);
+    if (imageChanged) {
+        cache.imageWidth = sprite->spriteWidth;
+        cache.imageHeight = sprite->spriteHeight;
+        cache.centerX = costume.rotationCenterX;
+        cache.centerY = costume.rotationCenterY;
+    }
+    if (viewportChanged) {
+        cache.screenWidth = screenWidth;
+        cache.screenHeight = screenHeight;
+        cache.projectWidth = Scratch::projectWidth;
+        cache.projectHeight = Scratch::projectHeight;
+        cache.renderMode = static_cast<int>(renderMode);
+        cache.renderScale = renderScale;
+    }
+    cache.valid = true;
+#endif
 }
 
 void Render::setRenderScale() {
