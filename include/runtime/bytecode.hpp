@@ -124,14 +124,6 @@ enum class BytecodeOp : uint8_t {
     LengthOfVar,
     MathOp,
 
-    NumAdd,
-    NumSubtract,
-    NumMultiply,
-    NumDivide,
-    BooleanAnd,
-    BooleanOr,
-    BooleanNot,
-
     ValueEquals,
     ValueLess,
     ValueGreater,

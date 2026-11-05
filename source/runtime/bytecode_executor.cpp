@@ -967,54 +967,6 @@ void BytecodeExecutor::runThread(BytecodeThread &thread) {
                 SE_NEXT();
             }
 
-            SE_CASE(NumAdd) {
-                const double b = thread.numberStack.back();
-                thread.numberStack.pop_back();
-                thread.numberStack.back() = thread.numberStack.back() + b;
-                thread.pc++;
-                SE_NEXT();
-            }
-            SE_CASE(NumSubtract) {
-                const double b = thread.numberStack.back();
-                thread.numberStack.pop_back();
-                thread.numberStack.back() = thread.numberStack.back() - b;
-                thread.pc++;
-                SE_NEXT();
-            }
-            SE_CASE(NumMultiply) {
-                const double b = thread.numberStack.back();
-                thread.numberStack.pop_back();
-                thread.numberStack.back() = thread.numberStack.back() * b;
-                thread.pc++;
-                SE_NEXT();
-            }
-            SE_CASE(NumDivide) {
-                const double b = thread.numberStack.back();
-                thread.numberStack.pop_back();
-                thread.numberStack.back() = thread.numberStack.back() / b;
-                thread.pc++;
-                SE_NEXT();
-            }
-            SE_CASE(BooleanAnd) {
-                const bool b = thread.boolStack.back();
-                thread.boolStack.pop_back();
-                thread.boolStack.back() = thread.boolStack.back() && b;
-                thread.pc++;
-                SE_NEXT();
-            }
-            SE_CASE(BooleanOr) {
-                const bool b = thread.boolStack.back();
-                thread.boolStack.pop_back();
-                thread.boolStack.back() = thread.boolStack.back() || b;
-                thread.pc++;
-                SE_NEXT();
-            }
-            SE_CASE(BooleanNot) {
-                thread.boolStack.back() = !thread.boolStack.back();
-                thread.pc++;
-                SE_NEXT();
-            }
-
             SE_CASE(CallNative)
             SE_CASE_ALIAS(CallNativeNumber)
             SE_CASE_ALIAS(CallNativeString)
