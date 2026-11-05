@@ -1,6 +1,6 @@
 # Original Xbox follow-up for Mike
 
-Updated November 2, 2026. **This recap and its GIFs stay on a feature branch.**
+Updated November 4, 2026. **This recap and its GIFs stay on a feature branch.**
 [Main](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/tree/main) has
 the latest merged code; the
 [game status](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/main/docs/xbox-game-status.md)
@@ -22,6 +22,16 @@ are also merged. These do not change the Xbox runtime. The native
 NV2A/window/audio work is upstream's baseline. Earlier input-default, SB2
 parsing and resampler fixes are already incorporated; their implementation files
 match upstream. They are not being proposed again.
+
+**New performance work is still in
+[draft #76](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/76),
+not main.** It integrates upstream through `4054c836`, including your Xbox x87
+JIT backend. A matched Appel movement test on our 128 MB Xbox gives **26.7 FPS
+before, 23.2 with new bytecode, and 19.4 in JIT mode**; a fresh-process JIT
+repeat agrees. We are investigating the regression before merging. Direct Player
+One works again, the original 30-game installation is preserved, and **Appel
+remains C**.
+[Measured scope and next checks](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/blob/codex/xbox-upstream-jit-20261104/docs/xbox-upstream-jit.md).
 
 ## What remains in our fork beyond upstream
 
