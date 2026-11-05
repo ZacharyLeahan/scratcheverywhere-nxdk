@@ -28,7 +28,7 @@ void operator delete[](void *p) noexcept { std::free(p); }
 struct Block { std::string key, name; double threshold=0; };
 struct Sprite {
     Sprite *cloneOriginal=nullptr;
-    std::unordered_map<std::string,std::unordered_set<Block*>> hats;
+    std::unordered_map<std::string,std::vector<Block*>> hats;
     BroadcastHatIndex broadcastHatIndex;
 };
 struct ScriptThread {};
@@ -42,6 +42,7 @@ std::unordered_map<std::string,int> keyHeldDuration;
 std::vector<std::string> inputKeys, inputBuffer;
 std::unordered_set<Block*> codePressedBlockOpcodes;
 }
+namespace Math { std::string toLowerCaseJs(std::string s) { std::transform(s.begin(),s.end(),s.begin(),[](unsigned char c){return std::tolower(c);}); return s; } }
 namespace Scratch {
 std::vector<Sprite*> sprites;
 void *pauseMenu=nullptr;

@@ -5,6 +5,8 @@ import subprocess
 import tempfile
 root = Path(__file__).resolve().parents[1]
 source = (root/'source/runtime/runtime_costumes.cpp').read_text()
+math_source = (root/'source/runtime/math.cpp').read_text()
+fn = math_source[math_source.index('double Math::jsRound('):math_source.index('double Math::degreesToRadians(')]
 function = source[source.index('void Scratch::switchCostume('):source.index('void Scratch::loadCurrentCostumeImage(')]
 with tempfile.TemporaryDirectory(prefix='xbox-costume-cache-') as tmp:
     tmp = Path(tmp)
@@ -39,7 +41,7 @@ auto &costume=s->costumes[s->currentCostume];costume.imageViewOffsetX=image->x;c
 s->loadedCostumeIndex=s->currentCostume;
 s->loadedCostumeRequestScale=(s->size/100)*std::min(float(Render::width)/projectWidth,float(Render::renderMode==Render::BOTH_SCREENS?480:Render::height)/projectHeight);}
 };
-'''+function+r'''
+'''+'namespace Math { double jsRound(double); }\n'+fn+function+r'''
 int main(){
 Sprite s;Scratch::sprites={&s};
 Scratch::switchCostume(&s,0);assert(Scratch::loads==1);

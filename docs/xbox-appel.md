@@ -86,6 +86,9 @@ an unqualified production result.
   direct typed VM operations. Inputs retain the existing numeric/boolean
   conversions and evaluation order. Bytecode cache version 2 forces old caches
   to rebuild from project sources; an older player may reject the new cache.
+  **November 4 integration:** upstream JIT supersedes these private typed
+  opcodes. The test branch now uses upstream operator lowering and cache format;
+  see the [JIT review](xbox-upstream-jit.md).
 
 The lightweight timing report now accounts for diagnostic report-writing time
 separately (`previous_report_us`) and excludes that work from the next sampled
@@ -99,7 +102,6 @@ python3 tests/appel_controller_menu_test.py original-Appel.sb3
 python3 tests/broadcast_index_test.py
 python3 tests/value_numeric_cache_test.py
 python3 tests/xbox_costume_cache_test.py
-python3 tests/bytecode_typed_arithmetic_test.py
 python3 tests/xbox_frame_profile_test.py
 ```
 

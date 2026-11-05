@@ -11,6 +11,8 @@ expected_include = next(cache.glob('*/src/include/nonstd/expected.hpp')).parents
 ryu = next(cache.glob('*/src/ryu/d2s.c')).parents[1]
 executor = (root/'source/runtime/bytecode_executor.cpp').read_text()
 resolver = executor[executor.index('size_t resolveListIndex('):executor.index('bool valuesEqual(')]
+helpers = (root/'include/runtime/value.hpp').read_text()
+helpers = helpers[helpers.index('inline void insertValueAt('):]
 cases = executor[executor.index('            SE_CASE(DeleteFromList)'):executor.index('            SE_CASE(ItemNumOfList)')]
 benchmark = '--benchmark' in sys.argv
 with tempfile.TemporaryDirectory(prefix='bytecode-list-index-') as tmp:
@@ -53,8 +55,9 @@ size_t referenceIndex(const TrackedValue &v, size_t size) {
     return i<0 || i>=double(size) ? size : size_t(i);
 }
 #define Value TrackedValue
-'''+resolver+r'''
 struct List { std::vector<Value> items; };
+constexpr unsigned BYTECODE_MAX_LIST_ITEMS=200000;
+'''+helpers+'\n'+resolver+r'''
 struct Thread { List *list; std::vector<Value> valueStack; unsigned pc=0; };
 enum class BytecodeStackKind { Value };
 enum class BytecodeOp { DeleteFromList, DeleteAllOfList, InsertInList, ReplaceInList, ItemOfList };
@@ -169,5 +172,5 @@ int main(int argc,char**) {
     command = ['c++','-std=c++17','-O2','-include','vector']
     if not benchmark: command += ['-fsanitize=address,undefined']
     command += ['-I'+str(p) for p in includes]
-    subprocess.run(command+[str(tmp/'test.cpp'),str(root/'source/runtime/value.cpp'),str(root/'source/runtime/math.cpp'),str(tmp/'d2s.o'),'-o',str(tmp/'test')],check=True)
+    subprocess.run(command+[str(tmp/'test.cpp'),str(root/'source/runtime/value.cpp'),str(root/'source/runtime/math.cpp'),str(root/'source/runtime/conversions.cpp'),str(tmp/'d2s.o'),'-o',str(tmp/'test')],check=True)
     subprocess.run([str(tmp/'test')] + (['--benchmark'] if benchmark else []),check=True)

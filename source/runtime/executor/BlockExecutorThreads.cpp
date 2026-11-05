@@ -4,6 +4,7 @@
 #include "xbox_frame_profile.hpp"
 #include <algorithm>
 #include <cstddef>
+#include <math.hpp>
 #include <renderer.hpp>
 #include <runtime.hpp>
 #include <speech_manager.hpp>
@@ -56,7 +57,7 @@ std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
 #ifdef SE_XBOX_PROFILE_THREADS
     Timer profileBroadcast;
 #endif
-    std::transform(broadcast.begin(), broadcast.end(), broadcast.begin(), ::tolower);
+    broadcast = Math::toLowerCaseJs(broadcast);
 
     std::vector<uint64_t> startedThreads;
     for (auto &spr : Scratch::sprites) {
@@ -64,7 +65,7 @@ std::vector<uint64_t> BlockExecutor::startBroadcastHats(std::string broadcast) {
         const auto hats = definition->hats.find(opcode);
         if (hats == definition->hats.end() || hats->second.empty()) continue;
         const auto &matching = definition->broadcastHatIndex.lookup(broadcast, hats->second, [](Block *hat) {
-            return Scratch::getFieldValue(*hat, "BROADCAST_OPTION");
+            return Math::toLowerCaseJs(Scratch::getFieldValue(*hat, "BROADCAST_OPTION"));
         });
         for (Block *hat : matching)
             startedThreads.push_back(startHat(spr, hat));

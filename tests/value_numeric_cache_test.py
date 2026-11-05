@@ -58,5 +58,5 @@ int main() {
     subprocess.run(['cc','-O2','-I'+str(ryu),'-c',str(ryu/'ryu/d2s.c'),'-o',str(tmp/'d2s.o')],check=True)
     includes = [tmp,root/'include',root/'include/runtime',json_include,expected_include,ryu]
     command = ['c++','-std=c++17','-O2','-include','vector','-fsanitize=address,undefined'] + ['-I'+str(p) for p in includes]
-    subprocess.run(command+[str(tmp/'test.cpp'),str(root/'source/runtime/value.cpp'),str(root/'source/runtime/math.cpp'),str(tmp/'d2s.o'),'-o',str(tmp/'test')],check=True)
+    subprocess.run(command+[str(tmp/'test.cpp'),str(root/'source/runtime/value.cpp'),str(root/'source/runtime/math.cpp'),str(root/'source/runtime/conversions.cpp'),str(tmp/'d2s.o'),'-o',str(tmp/'test')],check=True)
     subprocess.run([str(tmp/'test')],check=True)
