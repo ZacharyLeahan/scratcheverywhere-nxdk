@@ -1,8 +1,10 @@
 # Upstream Xbox performance review — November 4, 2026
 
-This is an integration/test branch. Main remains at `2bf9fd13`; the installed
-Xbox launcher remains `092ca5ff…`. No speedup or 30-game qualification is
-claimed.
+This is an integration/test branch in
+[draft PR #76](https://github.com/ZacharyLeahan/scratcheverywhere-nxdk/pull/76).
+Main remains at `2bf9fd13`; the installed Xbox launcher remains `092ca5ff…`. The
+first physical Appel measurements regress, so promotion is held. No speedup or
+30-game qualification is claimed.
 
 ## What changed upstream
 
@@ -57,21 +59,59 @@ Two earlier runs sent inputs before the title was ready and are excluded from
 gameplay acceptance. Emulator configuration is 128 MiB, but its current guest
 kernel reports 64 MiB. No emulator timing is presented as Xbox performance.
 
-The physical console is reachable at its game list. The existing Player Two
-route advertises S3 `192.168.1.243`, configured and consuming USB reports, but
-bounded A presses on routes Two and One did not visibly select a project. This
-is a controller-delivery limitation; no physical JIT performance result exists.
-No KVM firmware, routing or configuration was changed.
+## Physical comparison — November 4, 2026
 
-Two temporary Appel copies differ only in their sidecar runtime setting
-(`bytecode`/`jit`); original archive, profile, settings and primary executable
-were verified unchanged before testing. A separate older profiled executable was
-launched as the baseline. Its runtime matches main apart from inactive
-mouse-help UI code. Return to XBMC is needed to remove the temporary copies and
-finish any deployment/readbacks. The new adapted JIT executable has not yet been
-launched on the physical console.
+The main ESP DEVICE USB adapter is physical Player One. Fresh streaming video
+confirms actual A pressure and release in Controller Tool, then Appel movement,
+pause, browser return and confirmed dashboard return. Earlier ineffective S3
+attempts do not apply to this working direct route. No firmware, routing or
+console settings were changed during these tests.
 
-A valid comparison needs the same first-wall scene/controller workload, reviewed
-before/after images, and complete console frame-profile windows excluding menu
-and loading time. Compare the existing main runtime, upstream bytecode, and
-upstream JIT. Report script time, frame periods and slow frames separately.
+On the physical **128 MB Xbox**, matching profiled Release builds use the Xbox
+renderer, SDL3 window/audio, forced 480p and the same prepared Appel archive and
+controls. Two temporary copies differ only in their runtime sidecar. The old
+baseline runtime matches main apart from inactive mouse-help UI files.
+
+Each run starts at Level 1's first wall with one apple. It repeats eight Left
+1.5-second / Right 2-second cycles. Fresh images before and after confirm the
+same scene. No test video consumer is open during measurement. All complete
+120-frame intervals inside the action are included with 0.5-second boundary
+guards; loading and menu time are excluded. Host/console interval checks pass.
+
+| Runtime                    | Frames |   FPS | Script ms/frame | Median window p95 ms |
+| -------------------------- | -----: | ----: | --------------: | -------------------: |
+| Previous main runtime      |    600 | 26.71 |           17.22 |                52.69 |
+| Upstream bytecode          |    480 | 23.16 |           22.23 |                52.68 |
+| Upstream JIT, second load  |    360 | 19.36 |           24.13 |                68.97 |
+| Upstream JIT, fresh launch |    480 | 19.43 |           23.88 |                68.40 |
+
+These samples show **no Appel speedup**: upstream bytecode is about 13% slower
+and JIT mode about 28% slower than the baseline in this sequence. A
+fresh-process JIT repeat gives 19.43 FPS, about 27% below baseline; reload/order
+does not explain this observed slowdown. These are short samples, not a
+whole-game benchmark. Window p95 is not a pooled percentile. Maximum periods are
+still 133–153 ms; neither Mac-like smoothness nor an A grade follows.
+
+The console logs distinguish `Runtime: bytecode VM` and
+`Runtime: bytecode VM + JIT`, without a logged backend-check failure. Exact
+physical JIT compilation coverage was not instrumented; the 23-sprite count
+above comes from xemu. Do not infer that every script ran native code from the
+runtime label alone.
+
+All 39 baseline, 44 first-candidate and 24 fresh-JIT frame reports match the
+retrieved console logs. Received sequences are contiguous while listening. Both
+runtimes return through the game list to XBMC with working FTP. Both temporary
+test archives and sidecars were removed after the final run. FTP readbacks
+verify the original 30-game list, Appel archive/profile, settings and primary
+executable. The Xbox is left in XBMC with all test controls released.
+
+The tested profiler XBEs are `8f15c424…` (baseline) and `a20baa59…` (adapted
+upstream). Matching ELF/cache receipts, plans, frame reports and fresh image
+reviews are retained under ignored `build-xbox/hardware/upstream-jit-20261104/`
+and the shared ESP-KVM observations directory. The earlier `c35bf7ca…`
+executable is excluded and was not launched in this comparison.
+
+Before merging, isolate the regression: verify native-code coverage/arena use,
+separate script cost from present/frame pacing, and repeat on an ordinary build.
+The new bytecode path must also remain usable for games whose JIT coverage is
+partial. Keep the working regular launcher while this draft is investigated.
