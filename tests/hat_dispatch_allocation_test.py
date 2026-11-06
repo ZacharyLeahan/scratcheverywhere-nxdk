@@ -12,8 +12,10 @@ broadcast=threads[threads.index('std::vector<uint64_t> BlockExecutor::startBroad
 all_hats=threads[threads.index('void BlockExecutor::runAllBlocksByOpcode('):]
 with tempfile.TemporaryDirectory(prefix='hat-dispatch-') as tmp:
     tmp=Path(tmp)
+    (tmp/'math.hpp').write_text('#pragma once\n#include <string>\nnamespace Math { inline std::string toLowerCaseJs(std::string s) { for (char &c:s) c=std::tolower(static_cast<unsigned char>(c)); return s; } }\n')
     (tmp/'test.cpp').write_text(r'''
 #include "broadcast_index.hpp"
+#include "math.hpp"
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
@@ -153,5 +155,5 @@ int main() {
     std::cout<<"PASS: actual key/repeat/pause/timer/loudness hats, clone broadcasts/order; 400 sprites x 100 empty polls with zero allocations or inserted hats\n";
 }
 ''')
-    subprocess.run(['c++','-std=c++17','-O2','-fsanitize=address,undefined','-I'+str(root/'include/runtime'),str(tmp/'test.cpp'),'-o',str(tmp/'test')],check=True)
+    subprocess.run(['c++','-std=c++17','-O2','-fsanitize=address,undefined','-I'+str(tmp),'-I'+str(root/'include/runtime'),str(tmp/'test.cpp'),'-o',str(tmp/'test')],check=True)
     subprocess.run([str(tmp/'test')],check=True)

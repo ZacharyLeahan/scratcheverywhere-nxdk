@@ -138,7 +138,7 @@ static bool stringVariableSlot(BytecodeCompiler &compiler, Block *block, Bytecod
     const ParsedInput *input = Scratch::getInput(block, "STRING");
     if (input == nullptr || input->inputType != ParsedInput::VARIABLE || input->list) return false;
     Variable *var = BlockExecutor::getVariable(input->variableId, compiler.sprite());
-    if (var == nullptr || !std::holds_alternative<std::shared_ptr<const std::string>>(var->value)) return false;
+    if (var == nullptr) return false;
     slot = compiler.variableSlot(input->variableId);
     return true;
 }
@@ -490,20 +490,18 @@ SCRATCH_BLOCK_BOOLEAN(operator, contains) {
         return BlockResult::CONTINUE;
     }
 
-    const std::string lowered1 = Math::toLowerCaseJs(string1);
-    const std::string lowered2 = Math::toLowerCaseJs(string2);
-
     thread->eraseState(block);
-    *outValue = lowered1.find(lowered2) != std::string::npos;
+    *outValue = Math::containsCaseInsensitive(string1, string2);
     return BlockResult::CONTINUE;
 }
 SCRATCH_BLOCK_SIGNATURE(operator, contains, {"STRING1", BytecodeStackKind::String}, {"STRING2", BytecodeStackKind::String});
 SCRATCH_BLOCK_POSITIONAL_SS_B(operator, contains) {
-    if (str2.empty()) return true;
-    return Math::toLowerCaseJs(str1).find(Math::toLowerCaseJs(str2)) != std::string::npos;
+    return Math::containsCaseInsensitive(str1, str2);
 }
 
+// The JIT recognizes upstream native signatures; keep typed VM ops for non-JIT builds.
 // Typed arithmetic and logic avoid generic native-call dispatch in hot loops.
+#ifndef SE_JIT
 SCRATCH_BYTECODE_BLOCK(operator, add) {
     outFirstInstr = compiler.here();
     compiler.compileInput(block, "NUM1", BytecodeStackKind::Number);
@@ -552,3 +550,5 @@ SCRATCH_BYTECODE_BLOCK(operator, not) {
     compiler.emit(BytecodeOp::BooleanNot);
     return true;
 }
+
+#endif // !SE_JIT

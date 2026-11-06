@@ -254,3 +254,29 @@ Check the disc's embedded `default.xbe` against the executable under test before
 using matching debugger symbols. The October 30 native regression uses a fresh
 separate image with complete embedded-XBE byte comparison, not the stale primary
 ISO. This does not change the cache's intentional packaging setting.
+
+## Upstream synchronization (November 5, 2026)
+
+Merged all 40 upstream commits through `7893048a` from fork main `2bf9fd13`.
+The previous fork tip is retained locally at `backup/pre-upstream-20261105`.
+This imports the SLJIT runtime, Xbox x87 JIT backend and 512KB main-thread stack,
+string/list optimizations, numeric/boolean parity fixes, costume-cache changes,
+translations and platform/build repairs.
+
+The merge retains the fork's deferred thread disposal, broadcast index, controller
+handoffs, pause/reset behavior, SVG growth, source-color collision recovery,
+alpha-correct brightness and bounded pen readback. Broadcast dispatch now uses
+upstream's JavaScript case normalization while keeping its cached listener index.
+Upstream's numeric cache/conversion implementation supersedes the overlapping
+fork optimization. JIT builds use upstream native arithmetic signatures so the
+JIT can recognize them; non-JIT builds retain the fork's typed arithmetic ops.
+The bytecode analyzer understands those retained ops, and cache version 7
+invalidates older layouts. Host harnesses follow the new shared conversion/list
+helpers and upstream's costume-cache state.
+
+Validation: the normal dual-backend NXDK Release build succeeds with JIT on.
+Fifteen host checks pass: numeric conversions, list operations, typed arithmetic,
+thread lifetime, broadcast indexing, hat dispatch/allocation, costume lifetime,
+Xbox costume caching, NV2A texture padding/DXT layout, color effects, collision
+grid, native/SDL controller behavior and upstream string-conversion peepholes.
+No physical-console deployment or runtime qualification is implied by this sync.

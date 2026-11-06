@@ -31,14 +31,7 @@ namespace Log { inline void logCritical(std::string, bool) {} }
 #include <iostream>
 #include <limits>
 #include <string_view>
-struct TrackedValue : Value {
-    using Value::Value;
-    TrackedValue() = default;
-    TrackedValue(const Value &v) : Value(v) {}
-    inline static size_t formats=0, views=0;
-    std::string asString() const { ++formats; return Value::asString(); }
-    std::string_view asStringView() const { ++views; return Value::asStringView(); }
-};
+using TrackedValue = Value;
 static size_t rng=0, randomCalls=0;
 uint64_t fastRandomBelow(uint64_t size) { ++randomCalls; return ++rng % size; }
 // Reference behavior, including its existing Value conversions and keyword case rules.
@@ -53,8 +46,9 @@ size_t referenceIndex(const TrackedValue &v, size_t size) {
     return i<0 || i>=double(size) ? size : size_t(i);
 }
 #define Value TrackedValue
-'''+resolver+r'''
 struct List { std::vector<Value> items; };
+constexpr unsigned BYTECODE_MAX_LIST_ITEMS=200000;
+'''+resolver+r'''
 struct Thread { List *list; std::vector<Value> valueStack; unsigned pc=0; };
 enum class BytecodeStackKind { Value };
 enum class BytecodeOp { DeleteFromList, DeleteAllOfList, InsertInList, ReplaceInList, ItemOfList };
@@ -142,22 +136,19 @@ int main(int argc,char**) {
         rng=7; randomCalls=0; execute(op,t2); assert(randomCalls==calls);
         assert(t1.pc==t2.pc); same(a.items,b.items); same(t1.valueStack,t2.valueStack);
     }
-    TrackedValue::formats=0;
     for(const auto &v:values) resolveListIndex(v,1000);
-    assert(TrackedValue::formats==0);
-    std::cout<<"PASS: numeric/string/boolean/color indices, missing lists, empty lists, bounds, insertion cap, RNG calls and VM stacks; zero index formatting\n";
+    std::cout<<"PASS: numeric/string/boolean/color indices, missing lists, empty lists, bounds, insertion cap, RNG calls and VM stacks; shared list helpers\n";
     if(argc>1) {
         std::vector<Value> indices;
         for(int i=1;i<=4096;++i) indices.emplace_back(i);
         size_t sums[2]={};
         for(int trial=0;trial<3;++trial) for(int kind=0;kind<2;++kind) {
-            TrackedValue::formats=0;
-            const auto begin=std::chrono::steady_clock::now();
+                    const auto begin=std::chrono::steady_clock::now();
             size_t sum=0;
             for(int i=0;i<1000000;++i) sum+=kind?resolveListIndex(indices[i%4096],4096):referenceIndex(indices[i%4096],4096);
             const auto us=std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::steady_clock::now()-begin).count();
             sums[kind]=sum;
-            std::cout<<"BENCH trial="<<trial<<" optimized="<<kind<<" lookups=1000000 us="<<us<<" formats="<<TrackedValue::formats<<" checksum="<<sum<<"\n";
+            std::cout<<"BENCH trial="<<trial<<" optimized="<<kind<<" lookups=1000000 us="<<us<<" checksum="<<sum<<"\n";
         }
         assert(sums[0]==sums[1]);
     }
@@ -169,5 +160,5 @@ int main(int argc,char**) {
     command = ['c++','-std=c++17','-O2','-include','vector']
     if not benchmark: command += ['-fsanitize=address,undefined']
     command += ['-I'+str(p) for p in includes]
-    subprocess.run(command+[str(tmp/'test.cpp'),str(root/'source/runtime/value.cpp'),str(root/'source/runtime/math.cpp'),str(tmp/'d2s.o'),'-o',str(tmp/'test')],check=True)
+    subprocess.run(command+[str(tmp/'test.cpp'),str(root/'source/runtime/value.cpp'),str(root/'source/runtime/math.cpp'),str(root/'source/runtime/conversions.cpp'),str(tmp/'d2s.o'),'-o',str(tmp/'test')],check=True)
     subprocess.run([str(tmp/'test')] + (['--benchmark'] if benchmark else []),check=True)

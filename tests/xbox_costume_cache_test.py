@@ -18,6 +18,8 @@ with tempfile.TemporaryDirectory(prefix='xbox-costume-cache-') as tmp:
 #include <string>
 #include <unordered_map>
 #include <vector>
+namespace Math { double jsRound(double n) { return std::floor(n + 0.5); } }
+static bool s_costumeCacheDirty = true;
 struct Image { int width=30,height=40; float x=0,y=0; unsigned freeTimer=30; const unsigned maxFreeTimer=30;
 int getWidth(){return width;} int getHeight(){return height;}
 std::pair<float,float> getSVGViewOffset()const{return {x,y};}};

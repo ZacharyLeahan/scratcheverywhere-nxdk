@@ -26,9 +26,9 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+#include <hal/video.h>
 #include <windows.h>
 #include <xboxkrnl/xboxkrnl.h>
-#include <hal/video.h>
 
 #undef min
 #undef max
@@ -60,23 +60,22 @@ struct NV2AProf {
 static NV2AProf s_prof;
 // Bypasses the NXDK's broken std::to_string(double) implementation
 auto formatMs = [](double timeMs) -> std::string {
-	int ms = static_cast<int>(timeMs);
-	int us = static_cast<int>((timeMs - ms) * 1000.0);
-	std::string usStr = std::to_string(std::abs(us));
-	if (usStr.length() == 1) usStr = "00" + usStr;
-	else if (usStr.length() == 2) usStr = "0" + usStr;
-	return std::to_string(ms) + "." + usStr + " ms";
+    int ms = static_cast<int>(timeMs);
+    int us = static_cast<int>((timeMs - ms) * 1000.0);
+    std::string usStr = std::to_string(std::abs(us));
+    if (usStr.length() == 1) usStr = "00" + usStr;
+    else if (usStr.length() == 2) usStr = "0" + usStr;
+    return std::to_string(ms) + "." + usStr + " ms";
 };
 #define NV2A_PROF(x) x
 #else
 #define NV2A_PROF(x)
 #endif
 
-
 static inline void nv2a_cache_flush() {
 #ifdef __XBOX__
     NV2A_PROF(const uint64_t t0 = nv2aTsc());
-    __asm__ __volatile__ ("sfence" ::: "memory");
+    __asm__ __volatile__("sfence" ::: "memory");
     VIDEOREG(NV_PFB_WC_CACHE) |= NV_PFB_WC_CACHE_FLUSH_TRIGGER;
     while (VIDEOREG(NV_PFB_WC_CACHE) & NV_PFB_WC_CACHE_FLUSH_IN_PROGRESS) {
         __asm__ __volatile__("pause");
@@ -93,20 +92,27 @@ static inline uint32_t npot2pot(uint32_t num) {
 }
 
 static Renderer_NV2A::VideoDisplaySettings s_nv2aVideoSettings = {
-    640, 480, 32, 60, false, false, false, false, 0.04f, 0
-};
+    640, 480, 32, 60, false, false, false, false, 0.04f, 0};
 static bool s_videoInitialized = false;
 
 static uint32_t mapSmcToAvPack(uint32_t smcVal) {
     switch (smcVal & 0x07) {
-        case 0x00: return AV_PACK_SCART;
-        case 0x01: return AV_PACK_HDTV;
-        case 0x02: return AV_PACK_VGA;
-        case 0x03: return AV_PACK_RFU;
-        case 0x04: return AV_PACK_SVIDEO;
-        case 0x06: return AV_PACK_STANDARD;
-        case 0x07: return AV_PACK_NONE;
-        default:   return AV_PACK_NONE;
+    case 0x00:
+        return AV_PACK_SCART;
+    case 0x01:
+        return AV_PACK_HDTV;
+    case 0x02:
+        return AV_PACK_VGA;
+    case 0x03:
+        return AV_PACK_RFU;
+    case 0x04:
+        return AV_PACK_SVIDEO;
+    case 0x06:
+        return AV_PACK_STANDARD;
+    case 0x07:
+        return AV_PACK_NONE;
+    default:
+        return AV_PACK_NONE;
     }
 }
 
@@ -159,23 +165,23 @@ void Renderer_NV2A::initVideo() {
 
     float autoOverscan = 0.0f;
     switch (s_nv2aVideoSettings.avPackType) {
-        case AV_PACK_VGA:
+    case AV_PACK_VGA:
+        autoOverscan = 0.0f;
+        break;
+    case AV_PACK_HDTV:
+        if (s_nv2aVideoSettings.width == 640 && s_nv2aVideoSettings.height == 480 && !s_nv2aVideoSettings.supports480p) {
+            autoOverscan = 0.05f;
+        } else {
             autoOverscan = 0.0f;
-            break;
-        case AV_PACK_HDTV:
-            if (s_nv2aVideoSettings.width == 640 && s_nv2aVideoSettings.height == 480 && !s_nv2aVideoSettings.supports480p) {
-                autoOverscan = 0.05f;
-            } else {
-                autoOverscan = 0.0f;
-            }
-            break;
-        default:
-            if (s_nv2aVideoSettings.width == 640 && s_nv2aVideoSettings.height == 480) {
-                autoOverscan = 0.05f;
-            } else {
-                autoOverscan = 0.0f;
-            }
-            break;
+        }
+        break;
+    default:
+        if (s_nv2aVideoSettings.width == 640 && s_nv2aVideoSettings.height == 480) {
+            autoOverscan = 0.05f;
+        } else {
+            autoOverscan = 0.0f;
+        }
+        break;
     }
     s_nv2aVideoSettings.overscanRatio = autoOverscan;
 
@@ -203,13 +209,20 @@ uint32_t Renderer_NV2A::getAVPackType() {
 const char *Renderer_NV2A::getAVPackName() {
     initVideo();
     switch (s_nv2aVideoSettings.avPackType) {
-        case AV_PACK_STANDARD: return "Composite (Standard)";
-        case AV_PACK_RFU:      return "RF Adapter";
-        case AV_PACK_SCART:    return "SCART (RGB)";
-        case AV_PACK_HDTV:     return "HDTV (Component)";
-        case AV_PACK_VGA:      return "VGA";
-        case AV_PACK_SVIDEO:   return "S-Video";
-        default:               return "None / Unknown";
+    case AV_PACK_STANDARD:
+        return "Composite (Standard)";
+    case AV_PACK_RFU:
+        return "RF Adapter";
+    case AV_PACK_SCART:
+        return "SCART (RGB)";
+    case AV_PACK_HDTV:
+        return "HDTV (Component)";
+    case AV_PACK_VGA:
+        return "VGA";
+    case AV_PACK_SVIDEO:
+        return "S-Video";
+    default:
+        return "None / Unknown";
     }
 }
 
@@ -310,59 +323,59 @@ void Renderer_NV2A::getVideoMode(int &width, int &height, int &bpp, int &refresh
 static inline void combinerInit() {
     uint32_t *p = pb_begin();
     p = pb_push1(p, NV097_SET_SHADER_OTHER_STAGE_INPUT,
-        XGU_MASK(NV097_SET_SHADER_OTHER_STAGE_INPUT_STAGE1, 0) |
-        XGU_MASK(NV097_SET_SHADER_OTHER_STAGE_INPUT_STAGE2, 0) |
-        XGU_MASK(NV097_SET_SHADER_OTHER_STAGE_INPUT_STAGE3, 0));
+                 XGU_MASK(NV097_SET_SHADER_OTHER_STAGE_INPUT_STAGE1, 0) |
+                     XGU_MASK(NV097_SET_SHADER_OTHER_STAGE_INPUT_STAGE2, 0) |
+                     XGU_MASK(NV097_SET_SHADER_OTHER_STAGE_INPUT_STAGE3, 0));
     p = pb_push1(p, NV097_SET_SHADER_STAGE_PROGRAM,
-        XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE0, NV097_SET_SHADER_STAGE_PROGRAM_STAGE0_PROGRAM_NONE) |
-        XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE1, NV097_SET_SHADER_STAGE_PROGRAM_STAGE1_PROGRAM_NONE) |
-        XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE2, NV097_SET_SHADER_STAGE_PROGRAM_STAGE2_PROGRAM_NONE) |
-        XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE3, NV097_SET_SHADER_STAGE_PROGRAM_STAGE3_PROGRAM_NONE));
+                 XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE0, NV097_SET_SHADER_STAGE_PROGRAM_STAGE0_PROGRAM_NONE) |
+                     XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE1, NV097_SET_SHADER_STAGE_PROGRAM_STAGE1_PROGRAM_NONE) |
+                     XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE2, NV097_SET_SHADER_STAGE_PROGRAM_STAGE2_PROGRAM_NONE) |
+                     XGU_MASK(NV097_SET_SHADER_STAGE_PROGRAM_STAGE3, NV097_SET_SHADER_STAGE_PROGRAM_STAGE3_PROGRAM_NONE));
 
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_ICW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_MAP, 0x6) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_MAP, 0x1) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_MAP, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x0));
+                 XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_MAP, 0x6) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_MAP, 0x1) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_MAP, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x0));
 
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_OCW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_ALPHA_ICW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_MAP, 0x6) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_MAP, 0x1) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_MAP, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_MAP, 0x0));
+                 XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_MAP, 0x6) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_MAP, 0x1) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_MAP, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_MAP, 0x0));
 
     p = pb_push1(p, NV097_SET_COMBINER_ALPHA_OCW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_AB_DST, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_SUM_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_MUX_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_OP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_AB_DST, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_CD_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_SUM_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_MUX_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_OP, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_CONTROL,
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR0, NV097_SET_COMBINER_CONTROL_FACTOR0_SAME_FACTOR_ALL) |
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR1, NV097_SET_COMBINER_CONTROL_FACTOR1_SAME_FACTOR_ALL) |
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_ITERATION_COUNT, 1));
+                 XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR0, NV097_SET_COMBINER_CONTROL_FACTOR0_SAME_FACTOR_ALL) |
+                     XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR1, NV097_SET_COMBINER_CONTROL_FACTOR1_SAME_FACTOR_ALL) |
+                     XGU_MASK(NV097_SET_COMBINER_CONTROL_ITERATION_COUNT, 1));
 
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW0,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW1,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_SPECULAR_CLAMP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_SPECULAR_CLAMP, 0));
     pb_end(p);
 }
 
@@ -381,57 +394,57 @@ static inline void unlitCombinerApply() {
     p = pb_push1(p, NV097_SET_SHADER_STAGE_PROGRAM, 0);
 
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_ICW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_MAP, 0x6) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_MAP, 0x1) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_MAP, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x0));
+                 XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_MAP, 0x6) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_MAP, 0x1) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_MAP, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x0));
 
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_OCW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_ALPHA_ICW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_MAP, 0x6) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_MAP, 0x1) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_MAP, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_MAP, 0x0));
+                 XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_MAP, 0x6) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_MAP, 0x1) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_MAP, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_MAP, 0x0));
 
     p = pb_push1(p, NV097_SET_COMBINER_ALPHA_OCW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_AB_DST, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_SUM_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_MUX_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_OP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_AB_DST, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_CD_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_SUM_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_MUX_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_OP, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_CONTROL,
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR0, NV097_SET_COMBINER_CONTROL_FACTOR0_SAME_FACTOR_ALL) |
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR1, NV097_SET_COMBINER_CONTROL_FACTOR1_SAME_FACTOR_ALL) |
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_ITERATION_COUNT, 1));
+                 XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR0, NV097_SET_COMBINER_CONTROL_FACTOR0_SAME_FACTOR_ALL) |
+                     XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR1, NV097_SET_COMBINER_CONTROL_FACTOR1_SAME_FACTOR_ALL) |
+                     XGU_MASK(NV097_SET_COMBINER_CONTROL_ITERATION_COUNT, 1));
 
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW0,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, s_activePremultiply ? 1 : 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, s_activePremultiply ? 0x0 : 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, s_activePremultiply ? 1 : 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, s_activePremultiply ? 0x0 : 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW1,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_SPECULAR_CLAMP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_SPECULAR_CLAMP, 0));
     pb_end(p);
 }
 
@@ -476,42 +489,42 @@ static inline void textureCombinerApply() {
         XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_ALPHA_ICW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_SOURCE, 0x8) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_MAP, 0x6) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_MAP, 0x6) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_MAP, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_MAP, 0x0));
+                 XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_SOURCE, 0x8) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_A_MAP, 0x6) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_B_MAP, 0x6) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_C_MAP, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_ALPHA_ICW_D_MAP, 0x0));
 
     p = pb_push1(p, NV097_SET_COMBINER_ALPHA_OCW + 0 * 4,
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_AB_DST, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_SUM_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_MUX_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_OP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_AB_DST, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_CD_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_SUM_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_MUX_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_ALPHA_OCW_OP, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_CONTROL,
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR0, NV097_SET_COMBINER_CONTROL_FACTOR0_SAME_FACTOR_ALL) |
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR1, NV097_SET_COMBINER_CONTROL_FACTOR1_SAME_FACTOR_ALL) |
-        XGU_MASK(NV097_SET_COMBINER_CONTROL_ITERATION_COUNT, 1));
+                 XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR0, NV097_SET_COMBINER_CONTROL_FACTOR0_SAME_FACTOR_ALL) |
+                     XGU_MASK(NV097_SET_COMBINER_CONTROL_FACTOR1, NV097_SET_COMBINER_CONTROL_FACTOR1_SAME_FACTOR_ALL) |
+                     XGU_MASK(NV097_SET_COMBINER_CONTROL_ITERATION_COUNT, 1));
 
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW0,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, s_activePremultiply ? 1 : 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, s_activePremultiply ? 0x0 : 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, s_activePremultiply ? 1 : 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, s_activePremultiply ? 0x0 : 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
 
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW1,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_SPECULAR_CLAMP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_E_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_SOURCE, 0x0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_ALPHA, 0) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_F_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_SOURCE, 0x4) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_ALPHA, 1) | XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_G_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW1_SPECULAR_CLAMP, 0));
     pb_end(p);
 }
 
@@ -647,8 +660,7 @@ Renderer_NV2A::Renderer_NV2A() {
         1.0f, 0.0f, 0.0f, 0.0f,
         0.0f, 1.0f, 0.0f, 0.0f,
         0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
+        0.0f, 0.0f, 0.0f, 1.0f};
 
     uint32_t *p = pb_begin();
     p = xgu_set_blend_enable(p, true);
@@ -771,14 +783,13 @@ static void flushRetiredTextures(bool syncGpu) {
             __asm__ __volatile__("pause");
         }
         pb_wait_until_gr_not_busy();
-
     }
 #else
     (void)syncGpu;
 #endif
-    for (NV2ATexture *t : s_retiredTextures) freeTextureStorage(t);
+    for (NV2ATexture *t : s_retiredTextures)
+        freeTextureStorage(t);
     s_retiredTextures.clear();
-
 }
 
 NV2ATexture *Renderer_NV2A::createTexture(int width, int height, uint32_t format, bool swizzled, bool clearStorage) {
@@ -847,7 +858,6 @@ NV2ATexture *Renderer_NV2A::createTexture(int width, int height, uint32_t format
     if (clearStorage) {
 
         memset(tex->data, 0, tex->allocationSize);
-
     }
 #endif
     return tex;
@@ -898,8 +908,8 @@ bool Renderer_NV2A::updateTexture(NV2ATexture *texture, const void *pixels, int 
     if (texture->isDXT) {
         const NV2ADxtLayout::Layout layout{texture->dataWidth, texture->dataHeight, texture->pitch};
         if (!NV2ADxtLayout::upload(texture->data, layout, static_cast<const uint8_t *>(pixels), pitch,
-                                  texture->texWidth, texture->texHeight,
-                                  texture->format == XGU_TEXTURE_FORMAT_DXT5)) return false;
+                                   texture->texWidth, texture->texHeight,
+                                   texture->format == XGU_TEXTURE_FORMAT_DXT5)) return false;
     } else if (texture->swizzled) {
         static uint8_t *s_stage = nullptr;
         static size_t s_stageCap = 0;
@@ -987,19 +997,19 @@ void Renderer_NV2A::bindTexture(const NV2ATexture *texture, NV2AScaleMode scaleM
         XguTexFilter filterMag = XGU_TEXTURE_FILTER_NEAREST;
 
         switch (scaleMode) {
-            case NV2AScaleMode::Linear:
-                filterMin = XGU_TEXTURE_FILTER_LINEAR;
-                filterMag = XGU_TEXTURE_FILTER_LINEAR;
-                break;
-            case NV2AScaleMode::PixelArt:
-                filterMin = XGU_TEXTURE_FILTER_LINEAR;
-                filterMag = XGU_TEXTURE_FILTER_NEAREST;
-                break;
-            case NV2AScaleMode::Nearest:
-            default:
-                filterMin = XGU_TEXTURE_FILTER_NEAREST;
-                filterMag = XGU_TEXTURE_FILTER_NEAREST;
-                break;
+        case NV2AScaleMode::Linear:
+            filterMin = XGU_TEXTURE_FILTER_LINEAR;
+            filterMag = XGU_TEXTURE_FILTER_LINEAR;
+            break;
+        case NV2AScaleMode::PixelArt:
+            filterMin = XGU_TEXTURE_FILTER_LINEAR;
+            filterMag = XGU_TEXTURE_FILTER_NEAREST;
+            break;
+        case NV2AScaleMode::Nearest:
+        default:
+            filterMin = XGU_TEXTURE_FILTER_NEAREST;
+            filterMag = XGU_TEXTURE_FILTER_NEAREST;
+            break;
         }
 
         p = xgu_set_texture_filter(p, 0, 0, XGU_TEXTURE_CONVOLUTION_GAUSSIAN,
@@ -1036,42 +1046,42 @@ void Renderer_NV2A::setBlendMode(NV2ABlendMode mode) {
     s_activeFlatColor = (mode == NV2ABlendMode::Add);
 
     switch (mode) {
-        case NV2ABlendMode::None:
-            sfactor = XGU_FACTOR_ONE;
-            dfactor = XGU_FACTOR_ZERO;
-            s_activePremultiply = false;
-            break;
-        case NV2ABlendMode::Blend:
-            sfactor = XGU_FACTOR_ONE;
-            dfactor = XGU_FACTOR_ONE_MINUS_SRC_ALPHA;
-            s_activePremultiply = true;
-            break;
-        case NV2ABlendMode::Premultiplied:
-            sfactor = XGU_FACTOR_ONE;
-            dfactor = XGU_FACTOR_ONE_MINUS_SRC_ALPHA;
-            s_activePremultiply = false;
-            break;
-        case NV2ABlendMode::Add:
-            sfactor = XGU_FACTOR_SRC_ALPHA;
-            dfactor = XGU_FACTOR_ONE;
-            s_activePremultiply = false;
-            break;
+    case NV2ABlendMode::None:
+        sfactor = XGU_FACTOR_ONE;
+        dfactor = XGU_FACTOR_ZERO;
+        s_activePremultiply = false;
+        break;
+    case NV2ABlendMode::Blend:
+        sfactor = XGU_FACTOR_ONE;
+        dfactor = XGU_FACTOR_ONE_MINUS_SRC_ALPHA;
+        s_activePremultiply = true;
+        break;
+    case NV2ABlendMode::Premultiplied:
+        sfactor = XGU_FACTOR_ONE;
+        dfactor = XGU_FACTOR_ONE_MINUS_SRC_ALPHA;
+        s_activePremultiply = false;
+        break;
+    case NV2ABlendMode::Add:
+        sfactor = XGU_FACTOR_SRC_ALPHA;
+        dfactor = XGU_FACTOR_ONE;
+        s_activePremultiply = false;
+        break;
     }
 
     uint32_t *p = pb_begin();
     p = pb_push1(p, NV097_SET_COMBINER_SPECULAR_FOG_CW0,
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, s_activePremultiply ? 1 : 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, s_activePremultiply ? 0x0 : 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) |
-        XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
+                 XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_ALPHA, s_activePremultiply ? 1 : 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_A_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_SOURCE, s_activePremultiply ? 0x4 : 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_B_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_SOURCE, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_C_INVERSE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_SOURCE, s_activePremultiply ? 0x0 : 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_ALPHA, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_SPECULAR_FOG_CW0_D_INVERSE, 0));
     p = xgu_set_blend_func_sfactor(p, sfactor);
     p = xgu_set_blend_func_dfactor(p, dfactor);
     pb_end(p);
@@ -1178,22 +1188,22 @@ void Renderer_NV2A::drawBrightnessTriangles(const NV2AVertex *vertices, size_t c
     // Sources: texture0=8, diffuse=4, factor0=1, zero=0.
     // Maps: unsigned identity=0, unsigned invert=1 (invert zero gives one).
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_ICW,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, 0x8) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x1) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x1));
+                 XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_A_SOURCE, 0x8) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_B_SOURCE, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_C_SOURCE, 0x1) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_SOURCE, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_ICW_D_MAP, 0x1));
     // Write AB+CD to diffuse (4), consumed by the existing final combiner.
     // Discard the individual products; use a sum, with no dot products,
     // bias, or scaling. These explicit zero fields preserve the same word.
     p = pb_push1(p, NV097_SET_COMBINER_COLOR_OCW,
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x4) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
-        XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
+                 XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DST, 0x0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_SUM_DST, 0x4) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_MUX_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_AB_DOT_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_CD_DOT_ENABLE, 0) |
+                     XGU_MASK(NV097_SET_COMBINER_COLOR_OCW_OP, 0));
     pb_end(p);
     drawTriangles(vertices, count);
     // Restore even when the next sprite binds the same texture/blend mode;
@@ -1417,18 +1427,18 @@ static void ensureMainTarget() {
     p = pb_push1(p, NV097_SET_CONTEXT_DMA_COLOR, DMA_CHANNEL_PIXEL_RENDERER);
     p = pb_push1(p, NV097_SET_SURFACE_PITCH,
                  XGU_MASK(NV097_SET_SURFACE_PITCH_COLOR, pb_back_buffer_pitch()) |
-                 XGU_MASK(NV097_SET_SURFACE_PITCH_ZETA, pb_back_buffer_width() * 4));
+                     XGU_MASK(NV097_SET_SURFACE_PITCH_ZETA, pb_back_buffer_width() * 4));
     p = pb_push1(p, NV097_SET_SURFACE_COLOR_OFFSET, 0);
     p = pb_push1(p, NV097_SET_SURFACE_CLIP_HORIZONTAL,
                  XGU_MASK(NV097_SET_SURFACE_CLIP_HORIZONTAL_WIDTH, pb_back_buffer_width()) |
-                 XGU_MASK(NV097_SET_SURFACE_CLIP_HORIZONTAL_X, 0));
+                     XGU_MASK(NV097_SET_SURFACE_CLIP_HORIZONTAL_X, 0));
     p = pb_push1(p, NV097_SET_SURFACE_CLIP_VERTICAL,
                  XGU_MASK(NV097_SET_SURFACE_CLIP_VERTICAL_HEIGHT, pb_back_buffer_height()) |
-                 XGU_MASK(NV097_SET_SURFACE_CLIP_VERTICAL_Y, 0));
+                     XGU_MASK(NV097_SET_SURFACE_CLIP_VERTICAL_Y, 0));
     p = pb_push1(p, NV097_SET_SURFACE_FORMAT,
                  XGU_MASK(NV097_SET_SURFACE_FORMAT_COLOR, pb_ColorFmt) |
-                 XGU_MASK(NV097_SET_SURFACE_FORMAT_ZETA, NV097_SET_SURFACE_FORMAT_ZETA_Z24S8) |
-                 XGU_MASK(NV097_SET_SURFACE_FORMAT_TYPE, NV097_SET_SURFACE_FORMAT_TYPE_PITCH));
+                     XGU_MASK(NV097_SET_SURFACE_FORMAT_ZETA, NV097_SET_SURFACE_FORMAT_ZETA_Z24S8) |
+                     XGU_MASK(NV097_SET_SURFACE_FORMAT_TYPE, NV097_SET_SURFACE_FORMAT_TYPE_PITCH));
     p = xgu_set_viewport_scale(p, 1.0f, 1.0f, 1.0f, 1.0f);
     p = xgu_set_viewport_offset(p, 0.0f, 0.0f, 0.0f, 0.0f);
     if (s_stageScissorActive) {
@@ -1460,18 +1470,18 @@ static void ensurePenTarget() {
     p = pb_push1(p, NV097_SET_CONTEXT_DMA_COLOR, s_penDmaCtx.ChannelID);
     p = pb_push1(p, NV097_SET_SURFACE_PITCH,
                  XGU_MASK(NV097_SET_SURFACE_PITCH_COLOR, s_penTexture.pitch) |
-                 XGU_MASK(NV097_SET_SURFACE_PITCH_ZETA, pb_back_buffer_width() * 4));
+                     XGU_MASK(NV097_SET_SURFACE_PITCH_ZETA, pb_back_buffer_width() * 4));
     p = pb_push1(p, NV097_SET_SURFACE_COLOR_OFFSET, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(s_penTexture.dataPhysicalAddress)));
     p = pb_push1(p, NV097_SET_SURFACE_CLIP_HORIZONTAL,
                  XGU_MASK(NV097_SET_SURFACE_CLIP_HORIZONTAL_WIDTH, s_penTexture.texWidth) |
-                 XGU_MASK(NV097_SET_SURFACE_CLIP_HORIZONTAL_X, 0));
+                     XGU_MASK(NV097_SET_SURFACE_CLIP_HORIZONTAL_X, 0));
     p = pb_push1(p, NV097_SET_SURFACE_CLIP_VERTICAL,
                  XGU_MASK(NV097_SET_SURFACE_CLIP_VERTICAL_HEIGHT, s_penTexture.texHeight) |
-                 XGU_MASK(NV097_SET_SURFACE_CLIP_VERTICAL_Y, 0));
+                     XGU_MASK(NV097_SET_SURFACE_CLIP_VERTICAL_Y, 0));
     p = pb_push1(p, NV097_SET_SURFACE_FORMAT,
                  XGU_MASK(NV097_SET_SURFACE_FORMAT_COLOR, NV097_SET_SURFACE_FORMAT_COLOR_LE_A8R8G8B8) |
-                 XGU_MASK(NV097_SET_SURFACE_FORMAT_ZETA, NV097_SET_SURFACE_FORMAT_ZETA_Z24S8) |
-                 XGU_MASK(NV097_SET_SURFACE_FORMAT_TYPE, NV097_SET_SURFACE_FORMAT_TYPE_PITCH));
+                     XGU_MASK(NV097_SET_SURFACE_FORMAT_ZETA, NV097_SET_SURFACE_FORMAT_ZETA_Z24S8) |
+                     XGU_MASK(NV097_SET_SURFACE_FORMAT_TYPE, NV097_SET_SURFACE_FORMAT_TYPE_PITCH));
     p = xgu_set_viewport_scale(p, 1.0f, 1.0f, 1.0f, 1.0f);
     p = xgu_set_viewport_offset(p, 0.0f, 0.0f, 0.0f, 0.0f);
     p = xgu_set_scissor_rect(p, false, 0, 0, s_penTexture.texWidth, s_penTexture.texHeight);
@@ -1632,7 +1642,6 @@ static void traceEffectCache() {
 
 #endif
 
-
 void Renderer_NV2A::beginFrame(int screen, int colorR, int colorG, int colorB) {
     (void)screen;
     if (!hasFrameBegan) {
@@ -1734,7 +1743,6 @@ void Renderer_NV2A::endFrame(bool shouldFlush) {
 
     hasFrameBegan = false;
 
-
 #ifdef SE_XBOX_TRACE_RENDERER
     traceEffectCache();
 #endif
@@ -1769,8 +1777,7 @@ void Renderer_NV2A::drawBox(int w, int h, int x, int y, uint8_t colorR, uint8_t 
         {{x1, y1}, {colorR, colorG, colorB, colorA}, {0.0f, 0.0f}},
         {{x0, y0}, {colorR, colorG, colorB, colorA}, {0.0f, 0.0f}},
         {{x1, y1}, {colorR, colorG, colorB, colorA}, {0.0f, 0.0f}},
-        {{x0, y1}, {colorR, colorG, colorB, colorA}, {0.0f, 0.0f}}
-    };
+        {{x0, y1}, {colorR, colorG, colorB, colorA}, {0.0f, 0.0f}}};
 
     setBlendMode(colorA < 255 ? NV2ABlendMode::Blend : NV2ABlendMode::None);
     drawColorTriangles(verts, 6);
@@ -2109,8 +2116,7 @@ void Renderer_NV2A::renderPenLayer() {
         {{renderX + renderW, renderY + renderH}, {255, 255, 255, 255}, {u1, v1}},
         {{renderX, renderY}, {255, 255, 255, 255}, {u0, v0}},
         {{renderX + renderW, renderY + renderH}, {255, 255, 255, 255}, {u1, v1}},
-        {{renderX, renderY + renderH}, {255, 255, 255, 255}, {u0, v1}}
-    };
+        {{renderX, renderY + renderH}, {255, 255, 255, 255}, {u0, v1}}};
 
     bindTexture(&s_penTexture, false);
     // Drawing into the pen target has already multiplied RGB by alpha.
